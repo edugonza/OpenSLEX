@@ -27,7 +27,7 @@ public class SLEXStorage {
 	private InputStream DATAMODEL_SCHEMA_IN = SLEXStorage.class.getResourceAsStream("/org/processmining/openslex/resources/datamodels.sql");
 	
 	public static final String COMMON_CLASS_NAME = "COMMON";
-	private static final String JOURNAL_MODE = "MEMORY";
+	private static final String JOURNAL_MODE = "OFF";
 	private static final String PRAGMA_SYNCHRONOUS_MODE = "OFF";
 	
 	private boolean collection_attached = false;
@@ -51,6 +51,22 @@ public class SLEXStorage {
 		init();
 		openCollectionStorage(null);
 		openDataModelStorage(null);
+	}
+	
+	public void setAutoCommit(boolean autoCommit) {
+		try {
+			this.connection.setAutoCommit(autoCommit);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void commit() {
+		try {
+			this.connection.commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public static String getCurrentWorkingDir() {
@@ -94,7 +110,6 @@ public class SLEXStorage {
 	}
 	
 	private boolean checkSchema(String filename, String alias, InputStream schemaIn) {
-		
 		boolean result = false;
 		Connection connAux = null;
 		try {
@@ -149,7 +164,6 @@ public class SLEXStorage {
 			}
 			
 			if (checkSchema(filename,alias,schemaIn)) {
-			
 				statement = connection.createStatement();
 				statement.setQueryTimeout(30);
 				statement.execute("ATTACH DATABASE 'file:"+filename+"' AS "+alias);
@@ -192,7 +206,7 @@ public class SLEXStorage {
 			try {
 				statement = connection.createStatement();
 				statement.setQueryTimeout(30);
-				statement.execute("PRAGMA journal_mode = "+mode);
+				statement.execute("pragma journal_mode = "+mode+";");
 				result = true;
 			} catch (Exception e) {
 				result = false;
@@ -212,7 +226,7 @@ public class SLEXStorage {
 			try {
 				statement = connection.createStatement();
 				statement.setQueryTimeout(30);
-				statement.execute("PRAGMA synchronous = "+mode);
+				statement.execute("pragma synchronous = "+mode+";");
 				result = true;
 			} catch (Exception e) {
 				result = false;
@@ -225,14 +239,32 @@ public class SLEXStorage {
 		return false;
 	}
 	
+	private String queryPragma(String pragma) {
+		String result = "";
+		if (pragma != null) {
+			Statement statement = null;
+			try {
+				statement = connection.createStatement();
+				statement.setQueryTimeout(30);
+				ResultSet r = statement.executeQuery("pragma "+pragma);
+				if (r.next()) {
+					result = r.getString(1);
+				}
+			} catch (Exception e) {
+				result = e.getLocalizedMessage();
+			} finally {
+				closeStatement(statement);
+			}
+		}
+		return result;
+	}
+	
 	private void init() throws ClassNotFoundException {
 		
 		Class.forName("org.sqlite.JDBC");
 		
 		try {
 			connection = DriverManager.getConnection("jdbc:sqlite::memory:");
-			
-			setJournalMode("OFF");
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -971,15 +1003,26 @@ public class SLEXStorage {
 	
 	protected SLEXEventResultSet getEventsOfCollectionOrderedBy(
 			SLEXEventCollection ec,
-			SLEXAttribute orderAttribute) {
+			List<SLEXAttribute> orderAttributes) {
 		SLEXEventResultSet erset = null;
 		Statement statement = null;
 		try {
 			statement = connection.createStatement();
-			ResultSet rset = statement.executeQuery("SELECT * FROM "+COLLECTION_ALIAS+".event AS E, "+
-					COLLECTION_ALIAS+".attribute_value AS ATV WHERE E.collectionID = "+ec.getId()+
-					" AND ATV.eventID = E.id AND ATV.attributeID = "+orderAttribute.getId()+
-					" ORDER BY ATV.value ");
+			String wherequery = " WHERE E.collectionID = "+ec.getId();
+			String orderquery = " ORDER BY ";
+			String query = 			
+					" SELECT * FROM "+COLLECTION_ALIAS+".event AS E ";
+			for (int i=0;i<orderAttributes.size();i++) {
+				query += " ,"+COLLECTION_ALIAS+".attribute_value AS ATV"+i+" ";
+				wherequery += " AND ATV"+i+".eventID = E.id "+
+						 " AND ATV"+i+".attributeID = "+orderAttributes.get(i).getId()+" ";
+				orderquery += " ATV"+i+".value ";
+				if (i < orderAttributes.size()-1) {
+					orderquery += ", ";
+				}
+			}
+			query += wherequery + orderquery;
+			ResultSet rset = statement.executeQuery(query);
 			erset = new SLEXEventResultSet(this, rset);
 		} catch (Exception e) {
 			e.printStackTrace();
