@@ -1288,10 +1288,10 @@ public class SLEXStorage {
 		Statement statement = null;
 		boolean result = false;
 		try {
+			result = removeEventsFromTrace(t);
 			statement = connection.createStatement();
 			statement.setQueryTimeout(30);
 			statement.execute("DELETE FROM "+COLLECTION_ALIAS+".trace WHERE id = '"+t.getId()+"'");
-			result = removeEventsFromTrace(t);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			result = false;
