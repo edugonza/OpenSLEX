@@ -1016,7 +1016,7 @@ public class SLEXStorage {
 				query += " ,"+COLLECTION_ALIAS+".attribute_value AS ATV"+i+" ";
 				wherequery += " AND ATV"+i+".eventID = E.id "+
 						 " AND ATV"+i+".attributeID = "+orderAttributes.get(i).getId()+" ";
-				orderquery += " ATV"+i+".value ";
+				orderquery += " CAST(ATV"+i+".value AS INTEGER) ";
 				if (i < orderAttributes.size()-1) {
 					orderquery += ", ";
 				}
@@ -1207,6 +1207,23 @@ public class SLEXStorage {
 		return erset; 
 	}
 
+	protected int getNumberEventsOfTrace(SLEXTrace t) {
+		// TEST
+		int events = 0;
+		Statement statement = null;
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT count(*) FROM "+COLLECTION_ALIAS+".event AS E, "+COLLECTION_ALIAS+".trace_has_event AS TE WHERE E.id = TE.eventID AND TE.traceID='"+t.getId()+"'");
+			if (rset.next()) {
+				events = rset.getInt(1);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		return events;
+	}
+	
 	public SLEXTrace createTrace(int perspectiveId, String caseId) {
 		SLEXTrace t = new SLEXTrace(this);
 		t.setPerspectiveId(perspectiveId);
