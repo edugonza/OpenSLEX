@@ -19,51 +19,61 @@ import org.progressmining.xeslite.external.XFactoryExternalImpl;
 public class SLEXExporter {
 	
 	public static XLog exportPerspectiveToXLog(SLEXPerspective p) {
-		//XFactory xfactory = XFactoryRegistry.instance().currentDefault();
-		XFactory xfactory = new XFactoryExternalImpl.MapDBDiskImpl();
-		XLog xlog = xfactory.createLog();
-		String[] classifierKeys = new String[] {"1:5:TABLE_NAME","1:6:OPERATION","1:1:COLUMN_CHANGES"};
-		xlog.getClassifiers().add(new XEventAttributeClassifier("Activity", classifierKeys));
+		XLog xlog = null;
+		try {
+			//XFactory xfactory = XFactoryRegistry.instance().currentDefault();
+			XFactory xfactory = new XFactoryExternalImpl.MapDBDiskImpl();
+			xlog = xfactory.createLog();
 		
-		SLEXTraceResultSet trset = p.getTracesResultSet();
-		SLEXTrace t = null;
+			SLEXAttribute table_nameAttr = SLEXStorage.getInstance().findAttribute("COMMON", "TABLE_NAME");
+			SLEXAttribute operationAttr = SLEXStorage.getInstance().findAttribute("COMMON", "OPERATION");
+			SLEXAttribute column_changesAttr = SLEXStorage.getInstance().findAttribute("COMMON", "COLUMN_CHANGES");
+			String[] classifier1Keys = new String[] {table_nameAttr.toString(),operationAttr.toString(),column_changesAttr.toString()};
+			String[] classifier2Keys = new String[] {table_nameAttr.toString(),operationAttr.toString()};
+			xlog.getClassifiers().add(new XEventAttributeClassifier("Activity with changes vector", classifier1Keys));
+			xlog.getClassifiers().add(new XEventAttributeClassifier("Activity without changes vector", classifier2Keys));
 		
-		while ((t = trset.getNext()) != null) {
+			SLEXTraceResultSet trset = p.getTracesResultSet();
+			SLEXTrace t = null;
+		
+			while ((t = trset.getNext()) != null) {
 			
-			XAttributeMap tAttrMap = xfactory.createAttributeMap();
-			XAttributeLiteral caseIdAttr = xfactory.createAttributeLiteral("concept:name", t.getCaseId(), XConceptExtension.instance());
-			XAttributeLiteral idAttr = xfactory.createAttributeLiteral("Id", String.valueOf(t.getId()), null);
-			tAttrMap.put("caseId", caseIdAttr);
-			tAttrMap.put("Id", idAttr);
-			XTrace xt = xfactory.createTrace(tAttrMap);
+				XAttributeMap tAttrMap = xfactory.createAttributeMap();
+				XAttributeLiteral caseIdAttr = xfactory.createAttributeLiteral("concept:name", t.getCaseId(), XConceptExtension.instance());
+				XAttributeLiteral idAttr = xfactory.createAttributeLiteral("Id", String.valueOf(t.getId()), null);
+				tAttrMap.put("caseId", caseIdAttr);
+				tAttrMap.put("Id", idAttr);
+				XTrace xt = xfactory.createTrace(tAttrMap);
 			
-			xlog.add(xt);
+				xlog.add(xt);
 			
-			SLEXEventResultSet erset = t.getEventsResultSet();
-			SLEXEvent e = null;
+				SLEXEventResultSet erset = t.getEventsResultSet();
+				SLEXEvent e = null;
 			
-			while ((e = erset.getNext()) != null) {
-				XAttributeMap eAttrMap = xfactory.createAttributeMap();
-				XEvent xe = xfactory.createEvent();
-				XAttributeLiteral eidAttr = xfactory.createAttributeLiteral("Id", String.valueOf(e.getId()), null);
-				eAttrMap.put("Id", eidAttr);
+				while ((e = erset.getNext()) != null) {
+					XAttributeMap eAttrMap = xfactory.createAttributeMap();
+					XEvent xe = xfactory.createEvent();
+					XAttributeLiteral eidAttr = xfactory.createAttributeLiteral("Id", String.valueOf(e.getId()), null);
+					eAttrMap.put("Id", eidAttr);
 				
-				for (Entry<SLEXAttribute,SLEXAttributeValue> entry: e.getAttributeValues().entrySet()) {
-					String keyStr = entry.getKey().toString();
-					String valStr = entry.getValue().getValue();
-					if (keyStr == null) {
-						keyStr = "";
+					for (Entry<SLEXAttribute,SLEXAttributeValue> entry: e.getAttributeValues().entrySet()) {
+						String keyStr = entry.getKey().toString();
+						String valStr = entry.getValue().getValue();
+						if (keyStr == null) {
+							keyStr = "";
+						}
+						if (valStr == null) {
+							valStr = "";
+						}
+						eAttrMap.put(entry.getKey().toString(), xfactory.createAttributeLiteral(keyStr, valStr, null));
 					}
-					if (valStr == null) {
-						valStr = "";
-					}
-					eAttrMap.put(entry.getKey().toString(), xfactory.createAttributeLiteral(keyStr, valStr, null));
+					xe.setAttributes(eAttrMap);
+					xt.add(xe);
 				}
-				xe.setAttributes(eAttrMap);
-				xt.add(xe);
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		
 		return xlog;
 	}
 }
