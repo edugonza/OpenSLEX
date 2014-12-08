@@ -1031,6 +1031,51 @@ public class SLEXStorage {
 		
 		return erset;
 	}
+	
+	public SLEXEventResultSet getEventsOfCollectionBetweenDatesOrderedBy( 
+			SLEXEventCollection ec, List<SLEXAttribute> orderAttributes,
+			String startDate, String endDate) {
+		SLEXEventResultSet erset = null;
+		Statement statement = null;
+		try {
+			statement = connection.createStatement();
+			String wherequery = " WHERE E.collectionID = " + ec.getId();
+			String orderquery = " ORDER BY ";
+			String query = " SELECT * FROM " + COLLECTION_ALIAS
+					+ ".event AS E ";
+			int i = 0;
+			for (i = 0; i < orderAttributes.size(); i++) {
+				query += " ," + COLLECTION_ALIAS + ".attribute_value AS ATV"
+						+ i + " ";
+				wherequery += " AND ATV" + i + ".eventID = E.id " + " AND ATV"
+						+ i + ".attributeID = "
+						+ orderAttributes.get(i).getId() + " ";
+				orderquery += " CAST(ATV" + i + ".value AS INTEGER) ";
+				if (i < orderAttributes.size() - 1) {
+					orderquery += ", ";
+				}
+			}
+			
+			SLEXAttribute timestampAttr = findAttribute(COMMON_CLASS_NAME, "TIMESTAMP");
+			
+			if (timestampAttr != null) {
+				i++;
+				query += " , "+COLLECTION_ALIAS +".attribute_value AS ATV"+i+" ";
+				wherequery += " AND ATV"+i+".eventID = E.id " +
+							  " AND ATV"+i+".attributeID = "+timestampAttr.getId()+" " +
+							  " AND CAST(julianday(ATV"+i+".value) AS FLOAT) BETWEEN julianday('"+startDate+"') AND julianday('"+endDate+"') ";
+			}
+			
+			query += wherequery + orderquery;
+			ResultSet rset = statement.executeQuery(query);
+			erset = new SLEXEventResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+
+		return erset;
+	}
 
 	protected Hashtable<SLEXAttribute, SLEXAttributeValue> getAttributeValuesForEvent(
 			SLEXEvent ev) {
@@ -1334,5 +1379,7 @@ public class SLEXStorage {
 		
 		return trset; 
 	}
+
+	
 	
 }

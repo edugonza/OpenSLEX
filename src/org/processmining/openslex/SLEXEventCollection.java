@@ -52,6 +52,11 @@ public class SLEXEventCollection extends SLEXAbstractDatabaseObject {
 		return storage.getEventsOfCollectionOrderedBy(this,orderAttributes);
 	}
 	
+	public SLEXEventResultSet getEventsResultSetBetweenDatesOrderedBy(
+			List<SLEXAttribute> orderAtts, String startDate, String endDate) {
+		return storage.getEventsOfCollectionBetweenDatesOrderedBy(this,orderAtts,startDate,endDate);
+	}
+	
 	@Override
 	public String toString() {
 		return getId()+"";
