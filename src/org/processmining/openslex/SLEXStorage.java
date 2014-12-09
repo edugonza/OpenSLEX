@@ -479,7 +479,7 @@ public class SLEXStorage {
 		return id;
 	}
 	
-	protected boolean insert(SLEXEventCollection ec) {
+	protected synchronized boolean insert(SLEXEventCollection ec) {
 		Statement statement = null;
 		boolean result = false;
 		try {
@@ -516,7 +516,7 @@ public class SLEXStorage {
 		return result;
 	}
 	
-	protected boolean insert(SLEXEvent ev) {
+	protected synchronized boolean insert(SLEXEvent ev) {
 		Statement statement = null;
 		boolean result = false;
 		try {
@@ -554,7 +554,7 @@ public class SLEXStorage {
 		return result;
 	}
 	
-	protected boolean insert(SLEXAttribute at) {
+	protected synchronized boolean insert(SLEXAttribute at) {
 		Statement statement = null;
 		boolean result = false;
 		try {
@@ -591,7 +591,7 @@ public class SLEXStorage {
 		return result;
 	}
 	
-	protected boolean insert(SLEXDMAttribute at) {
+	protected synchronized boolean insert(SLEXDMAttribute at) {
 		Statement statement = null;
 		boolean result = false;
 		try {
@@ -628,7 +628,7 @@ public class SLEXStorage {
 		return result;
 	}
 	
-	protected boolean insert(SLEXDMKey k) {
+	protected synchronized boolean insert(SLEXDMKey k) {
 		Statement statement = null;
 		boolean result = false;
 		try {
@@ -755,7 +755,7 @@ public class SLEXStorage {
 		return result;
 	}
 	
-	protected boolean insert(SLEXClass cl) {
+	protected synchronized boolean insert(SLEXClass cl) {
 		Statement statement = null;
 		boolean result = false;
 		try {
@@ -792,7 +792,7 @@ public class SLEXStorage {
 		return result;
 	}
 	
-	protected boolean insert(SLEXDMClass cl) {
+	protected synchronized boolean insert(SLEXDMClass cl) {
 		Statement statement = null;
 		boolean result = false;
 		try {
@@ -829,7 +829,7 @@ public class SLEXStorage {
 		return result;
 	}
 	
-	protected boolean insert(SLEXPerspective p) {
+	protected synchronized boolean insert(SLEXPerspective p) {
 		Statement statement = null;
 		boolean result = false;
 		try {
@@ -866,7 +866,7 @@ public class SLEXStorage {
 		return result;
 	}
 	
-	protected boolean insert(SLEXDMDataModel dm) {
+	protected synchronized boolean insert(SLEXDMDataModel dm) {
 		Statement statement = null;
 		boolean result = false;
 		try {
@@ -903,7 +903,7 @@ public class SLEXStorage {
 		return result;
 	}
 	
-	protected boolean insert(SLEXTrace t) {
+	protected synchronized boolean insert(SLEXTrace t) {
 		Statement statement = null;
 		boolean result = false;
 		try {
