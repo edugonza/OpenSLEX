@@ -1040,19 +1040,23 @@ public class SLEXStorage {
 		try {
 			statement = connection.createStatement();
 			String wherequery = " WHERE E.collectionID = " + ec.getId();
-			String orderquery = " ORDER BY ";
+			String orderquery = " ";
 			String query = " SELECT * FROM " + COLLECTION_ALIAS
 					+ ".event AS E ";
 			int i = 0;
-			for (i = 0; i < orderAttributes.size(); i++) {
-				query += " ," + COLLECTION_ALIAS + ".attribute_value AS ATV"
-						+ i + " ";
-				wherequery += " AND ATV" + i + ".eventID = E.id " + " AND ATV"
-						+ i + ".attributeID = "
-						+ orderAttributes.get(i).getId() + " ";
-				orderquery += " CAST(ATV" + i + ".value AS INTEGER) ";
-				if (i < orderAttributes.size() - 1) {
-					orderquery += ", ";
+			
+			if (orderAttributes != null) {
+				orderquery = " ORDER BY ";
+				for (i = 0; i < orderAttributes.size(); i++) {
+					query += " ," + COLLECTION_ALIAS + ".attribute_value AS ATV"
+							+ i + " ";
+					wherequery += " AND ATV" + i + ".eventID = E.id " + " AND ATV"
+							+ i + ".attributeID = "
+							+ orderAttributes.get(i).getId() + " ";
+					orderquery += " CAST(ATV" + i + ".value AS INTEGER) ";
+					if (i < orderAttributes.size() - 1) {
+						orderquery += ", ";
+					}
 				}
 			}
 			
