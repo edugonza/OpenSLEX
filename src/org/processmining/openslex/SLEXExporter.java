@@ -20,14 +20,15 @@ public class SLEXExporter {
 	
 	public static XLog exportPerspectiveToXLog(SLEXPerspective p) {
 		XLog xlog = null;
+		SLEXStorage storage = p.getStorage();
 		try {
 			//XFactory xfactory = XFactoryRegistry.instance().currentDefault();
 			XFactory xfactory = new XFactoryExternalImpl.MapDBDiskImpl();
 			xlog = xfactory.createLog();
 		
-			SLEXAttribute table_nameAttr = SLEXStorage.getInstance().findAttribute("COMMON", "TABLE_NAME");
-			SLEXAttribute operationAttr = SLEXStorage.getInstance().findAttribute("COMMON", "OPERATION");
-			SLEXAttribute column_changesAttr = SLEXStorage.getInstance().findAttribute("COMMON", "COLUMN_CHANGES");
+			SLEXAttribute table_nameAttr = storage.findAttribute("COMMON", "TABLE_NAME");
+			SLEXAttribute operationAttr = storage.findAttribute("COMMON", "OPERATION");
+			SLEXAttribute column_changesAttr = storage.findAttribute("COMMON", "COLUMN_CHANGES");
 			String[] classifier1Keys = new String[] {table_nameAttr.toString(),operationAttr.toString(),column_changesAttr.toString()};
 			String[] classifier2Keys = new String[] {table_nameAttr.toString(),operationAttr.toString()};
 			xlog.getClassifiers().add(new XEventAttributeClassifier("Activity with changes vector", classifier1Keys));

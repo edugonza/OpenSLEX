@@ -37,17 +37,17 @@ public class SLEXStorage {
 	
 	private Connection connection = null;
 	
-	private static SLEXStorage _instance = null;
+//	private static SLEXStorage _instance = null;
 	
-	public static SLEXStorage getInstance() throws ClassNotFoundException {
-		if (_instance == null) {
-			_instance = new SLEXStorage();
-		}
-		
-		return _instance;
-	}
+//	public static SLEXStorage getInstance() throws ClassNotFoundException {
+//		if (_instance == null) {
+//			_instance = new SLEXStorage();
+//		}
+//		
+//		return _instance;
+//	}
 	
-	private SLEXStorage() throws ClassNotFoundException {
+	public SLEXStorage() throws ClassNotFoundException {
 		init();
 		openCollectionStorage(null);
 		openDataModelStorage(null);
@@ -265,7 +265,7 @@ public class SLEXStorage {
 		
 		try {
 			connection = DriverManager.getConnection("jdbc:sqlite::memory:");
-			
+			connection.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -1384,6 +1384,28 @@ public class SLEXStorage {
 		return trset; 
 	}
 
-	
+	public SLEXEventCollection getEventCollection(int id) {
+		SLEXEventCollectionResultSet ecrset = null;
+		SLEXEventCollection ec = null;
+		Statement statement = null;
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT * FROM "+COLLECTION_ALIAS+".collection WHERE id = '"+id+"'");
+			ecrset = new SLEXEventCollectionResultSet(this, rset);
+			ec = ecrset.getNext();
+			ecrset.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return ec; 
+	}
+
+	@Override
+	protected void finalize() throws Throwable {
+		super.finalize();
+		disconnect();
+	}
 	
 }
