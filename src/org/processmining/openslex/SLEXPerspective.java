@@ -5,11 +5,16 @@ public class SLEXPerspective extends SLEXAbstractDatabaseObject {
 	private int id = -1;
 	private int collectionId = -1;
 	private String name = null;
+	private String collectionFileName = null;
 	
-	protected SLEXPerspective(SLEXStorage storage) {
+	protected SLEXPerspective(SLEXStoragePerspective storage) {
 		super(storage);
 	}
 
+	public SLEXStoragePerspective getStorage() {
+		return (SLEXStoragePerspective) super.storage;
+	}
+	
 	public String getName() {
 		return this.name;
 	}
@@ -20,6 +25,14 @@ public class SLEXPerspective extends SLEXAbstractDatabaseObject {
 	
 	public int getCollectionId() {
 		return this.collectionId;
+	}
+	
+	public void setCollectionFileName(String filename) {
+		this.collectionFileName = filename;
+	}
+	
+	public String getCollectionFileName() {
+		return this.collectionFileName;
 	}
 	
 	protected void setId(int id) {
@@ -37,21 +50,21 @@ public class SLEXPerspective extends SLEXAbstractDatabaseObject {
 	}
 	
 	public SLEXTraceResultSet getTracesResultSet() {
-		return storage.getTracesOfPerspective(this);
+		return getStorage().getTracesOfPerspective(this);
 	}
 	
 	@Override
 	boolean insert(SLEXAbstractDatabaseObject p) {
-		return storage.insert((SLEXPerspective) p);
+		return getStorage().insert((SLEXPerspective) p);
 	}
 
 	@Override
 	boolean update(SLEXAbstractDatabaseObject p) {
-		return storage.update((SLEXPerspective) p);
+		return getStorage().update((SLEXPerspective) p);
 	}
 
 	public boolean remove(SLEXTrace t) {
-		return storage.removeTraceFromPerspective(this,t);
+		return getStorage().removeTraceFromPerspective(this,t);
 	}
 
 	@Override

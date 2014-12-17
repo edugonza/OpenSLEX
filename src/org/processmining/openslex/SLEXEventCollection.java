@@ -7,9 +7,13 @@ public class SLEXEventCollection extends SLEXAbstractDatabaseObject {
 	private int id = -1;
 	private String name = null;
 	
-	protected SLEXEventCollection(SLEXStorage storage, String name) {
+	protected SLEXEventCollection(SLEXStorageCollection storage, String name) {
 		super(storage);
 		this.name = name;
+	}
+	
+	public SLEXStorageCollection getStorage() {
+		return (SLEXStorageCollection) super.storage;
 	}
 	
 	public String getName() {
@@ -36,25 +40,25 @@ public class SLEXEventCollection extends SLEXAbstractDatabaseObject {
 	
 	@Override
 	boolean insert(SLEXAbstractDatabaseObject ec) {
-		return storage.insert((SLEXEventCollection) ec);
+		return getStorage().insert((SLEXEventCollection) ec);
 	}
 
 	@Override
 	boolean update(SLEXAbstractDatabaseObject ec) {
-		return storage.update((SLEXEventCollection) ec);
+		return getStorage().update((SLEXEventCollection) ec);
 	}
 	
 	public SLEXEventResultSet getEventsResultSet() {
-		return storage.getEventsOfCollection(this);
+		return getStorage().getEventsOfCollection(this);
 	}
 	
 	public SLEXEventResultSet getEventsResultSetOrderedBy(List<SLEXAttribute> orderAttributes) {
-		return storage.getEventsOfCollectionOrderedBy(this,orderAttributes);
+		return getStorage().getEventsOfCollectionOrderedBy(this,orderAttributes);
 	}
 	
 	public SLEXEventResultSet getEventsResultSetBetweenDatesOrderedBy(
 			List<SLEXAttribute> orderAtts, String startDate, String endDate) {
-		return storage.getEventsOfCollectionBetweenDatesOrderedBy(this,orderAtts,startDate,endDate);
+		return getStorage().getEventsOfCollectionBetweenDatesOrderedBy(this,orderAtts,startDate,endDate);
 	}
 	
 	@Override

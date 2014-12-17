@@ -6,10 +6,14 @@ public class SLEXTrace extends SLEXAbstractDatabaseObject {
 	private String caseId = null;
 	private int perspectiveId = -1;
 	
-	protected SLEXTrace(SLEXStorage storage) {
+	protected SLEXTrace(SLEXStoragePerspective storage) {
 		super(storage);
 	}
 
+	public SLEXStoragePerspective getStorage() {
+		return (SLEXStoragePerspective) super.storage;
+	}
+	
 	public int getId() {
 		return this.id;
 	}
@@ -37,25 +41,25 @@ public class SLEXTrace extends SLEXAbstractDatabaseObject {
 	}
 	
 	public boolean add(SLEXEvent e) {
-		return storage.addEventToTrace(this,e);
+		return getStorage().addEventToTrace(this,e);
 	}
 	
 	@Override
 	boolean insert(SLEXAbstractDatabaseObject t) {
-		return storage.insert((SLEXTrace) t);
+		return getStorage().insert((SLEXTrace) t);
 	}
 
 	@Override
 	boolean update(SLEXAbstractDatabaseObject t) {
-		return storage.update((SLEXTrace) t);
+		return getStorage().update((SLEXTrace) t);
 	}
 
 	public SLEXEventResultSet getEventsResultSet() {
-		return storage.getEventsOfTrace(this);
+		return getStorage().getEventsOfTrace(this);
 	}
 
 	public int getNumberEvents() {
-		return storage.getNumberEventsOfTrace(this);
+		return getStorage().getNumberEventsOfTrace(this);
 	}
 		
 }

@@ -11,11 +11,15 @@ public class SLEXDMClass extends SLEXAbstractDatabaseObject {
 	private List<SLEXDMAttribute> attributes = null;
 	private List<SLEXDMKey> keys = null;
 	
-	protected SLEXDMClass(SLEXStorage storage, String name, boolean common,int data_modelId) {
+	protected SLEXDMClass(SLEXStorageDataModel storage, String name, boolean common,int data_modelId) {
 		super(storage);
 		this.name = name;
 		this.common = common;
 		this.datamodelId = data_modelId;
+	}
+	
+	public SLEXStorageDataModel getStorage() {
+		return (SLEXStorageDataModel) super.storage;
 	}
 	
 	public String getName() {
@@ -59,11 +63,11 @@ public class SLEXDMClass extends SLEXAbstractDatabaseObject {
 	}
 	
 	protected void retrieveAttributes() {		
-		this.attributes = storage.getAttributesForDMClass(this);
+		this.attributes = getStorage().getAttributesForDMClass(this);
 	}
 	
 	protected void retrieveKeys() {
-		this.keys = storage.getKeysForDMClass(this);
+		this.keys = getStorage().getKeysForDMClass(this);
 	}
 	
 	public List<SLEXDMKey> getKeys() {
@@ -84,12 +88,12 @@ public class SLEXDMClass extends SLEXAbstractDatabaseObject {
 	
 	@Override
 	boolean insert(SLEXAbstractDatabaseObject cl) {
-		return storage.insert((SLEXDMClass) cl);
+		return getStorage().insert((SLEXDMClass) cl);
 	}
 
 	@Override
 	boolean update(SLEXAbstractDatabaseObject cl) {
-		return storage.update((SLEXDMClass) cl);
+		return getStorage().update((SLEXDMClass) cl);
 	}
 
 }

@@ -10,10 +10,6 @@ abstract class SLEXAbstractDatabaseObject {
 		this.storage = storage;
 	}
 	
-	public SLEXStorage getStorage() {
-		return this.storage;
-	}
-	
 	protected void setInserted(boolean inserted) {
 		this.inserted = inserted;
 	}

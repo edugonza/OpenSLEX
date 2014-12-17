@@ -8,8 +8,12 @@ public class SLEXEvent extends SLEXAbstractDatabaseObject {
 	private int collectionId = -1;
 	private Hashtable<SLEXAttribute, SLEXAttributeValue> attributeValues = null;
 	
-	protected SLEXEvent(SLEXStorage storage) {
+	protected SLEXEvent(SLEXStorageCollection storage) {
 		super(storage);
+	}
+	
+	public SLEXStorageCollection getStorage() {
+		return (SLEXStorageCollection) super.storage;
 	}
 	
 	public int getId() {
@@ -31,16 +35,16 @@ public class SLEXEvent extends SLEXAbstractDatabaseObject {
 	
 	@Override
 	boolean insert(SLEXAbstractDatabaseObject e) {
-		return storage.insert((SLEXEvent)e);
+		return getStorage().insert((SLEXEvent)e);
 	}
 
 	@Override
 	boolean update(SLEXAbstractDatabaseObject e) {
-		return storage.update((SLEXEvent)e);
+		return getStorage().update((SLEXEvent)e);
 	}
 
 	protected void retrieveAttributeValues() {
-		attributeValues = storage.getAttributeValuesForEvent(this);
+		attributeValues = getStorage().getAttributeValuesForEvent(this);
 	}
 	
 	public Hashtable<SLEXAttribute, SLEXAttributeValue> getAttributeValues() {

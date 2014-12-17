@@ -4,7 +4,7 @@ import java.sql.ResultSet;
 
 public class SLEXTraceResultSet extends SLEXAbstractResultSetObject {
 	
-	protected SLEXTraceResultSet(SLEXStorage storage, ResultSet rset) {
+	protected SLEXTraceResultSet(SLEXStoragePerspective storage, ResultSet rset) {
 		super(storage, rset);
 	}
 	
@@ -16,7 +16,7 @@ public class SLEXTraceResultSet extends SLEXAbstractResultSetObject {
 				String caseId = this.rset.getString("caseID");
 				int id = this.rset.getInt("id");
 				int perspectiveId = this.rset.getInt("perspectiveID");
-				t = new SLEXTrace(storage);
+				t = new SLEXTrace((SLEXStoragePerspective) storage);
 				t.setPerspectiveId(perspectiveId);
 				t.setId(id);
 				t.setCaseId(caseId);

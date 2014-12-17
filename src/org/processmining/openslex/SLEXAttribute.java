@@ -6,8 +6,12 @@ public class SLEXAttribute extends SLEXAbstractDatabaseObject {
 	private String name = null;
 	private int classId = -1;
 	
-	protected SLEXAttribute(SLEXStorage storage) {
+	protected SLEXAttribute(SLEXStorageCollection storage) {
 		super(storage);
+	}
+	
+	public SLEXStorageCollection getStorage() {
+		return (SLEXStorageCollection) super.storage;
 	}
 	
 	public int getId() {
@@ -38,12 +42,12 @@ public class SLEXAttribute extends SLEXAbstractDatabaseObject {
 	
 	@Override
 	boolean insert(SLEXAbstractDatabaseObject at) {
-		return storage.insert((SLEXAttribute) at);
+		return getStorage().insert((SLEXAttribute) at);
 	}
 
 	@Override
 	boolean update(SLEXAbstractDatabaseObject at) {
-		return storage.update((SLEXAttribute) at);
+		return getStorage().update((SLEXAttribute) at);
 	}
 
 	@Override

@@ -9,10 +9,14 @@ public class SLEXDMKeyAttribute extends SLEXAbstractDatabaseObject {
 	
 	public static final int REFERS_TO_NULL = -1;
 	
-	protected SLEXDMKeyAttribute(SLEXStorage storage, int keyId, int attributeId) {
+	protected SLEXDMKeyAttribute(SLEXStorageDataModel storage, int keyId, int attributeId) {
 		super(storage);
 		this.keyId = keyId;
 		this.attributeId = attributeId;
+	}
+	
+	public SLEXStorageDataModel getStorage() {
+		return (SLEXStorageDataModel) super.storage;
 	}
 	
 	public int getKeyId() {
@@ -43,12 +47,12 @@ public class SLEXDMKeyAttribute extends SLEXAbstractDatabaseObject {
 	
 	@Override
 	boolean insert(SLEXAbstractDatabaseObject at) {
-		return storage.insert((SLEXDMKeyAttribute) at);
+		return getStorage().insert((SLEXDMKeyAttribute) at);
 	}
 
 	@Override
 	boolean update(SLEXAbstractDatabaseObject at) {
-		return storage.update((SLEXDMKeyAttribute) at);
+		return getStorage().update((SLEXDMKeyAttribute) at);
 	}
 
 	@Override

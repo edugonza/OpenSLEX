@@ -6,7 +6,7 @@ public class SLEXEventResultSet extends SLEXAbstractResultSetObject {
 	
 	
 	
-	protected SLEXEventResultSet(SLEXStorage storage, ResultSet rset) {
+	protected SLEXEventResultSet(SLEXStorageCollection storage, ResultSet rset) {
 		super(storage, rset);
 	}
 	
@@ -17,7 +17,7 @@ public class SLEXEventResultSet extends SLEXAbstractResultSetObject {
 				
 				int id = this.rset.getInt("id");
 				int collectionId = this.rset.getInt("collectionID");
-				ev = new SLEXEvent(storage);
+				ev = new SLEXEvent((SLEXStorageCollection) storage);
 				ev.setId(id);
 				ev.setCollectionId(collectionId);
 				ev.retrieveAttributeValues();

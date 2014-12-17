@@ -6,10 +6,14 @@ public class SLEXClass extends SLEXAbstractDatabaseObject {
 	private String name = null;
 	private boolean common = false;
 	
-	protected SLEXClass(SLEXStorage storage, String name, boolean common) {
+	protected SLEXClass(SLEXStorageCollection storage, String name, boolean common) {
 		super(storage);
 		this.name = name;
 		this.common = common;
+	}
+	
+	public SLEXStorageCollection getStorage() {
+		return (SLEXStorageCollection) super.storage;
 	}
 	
 	public String getName() {
@@ -40,12 +44,12 @@ public class SLEXClass extends SLEXAbstractDatabaseObject {
 	
 	@Override
 	boolean insert(SLEXAbstractDatabaseObject cl) {
-		return storage.insert((SLEXClass) cl);
+		return getStorage().insert((SLEXClass) cl);
 	}
 
 	@Override
 	boolean update(SLEXAbstractDatabaseObject cl) {
-		return storage.update((SLEXClass) cl);
+		return getStorage().update((SLEXClass) cl);
 	}
 
 }

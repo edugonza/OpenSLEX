@@ -4,7 +4,7 @@ import java.sql.ResultSet;
 
 public class SLEXPerspectiveResultSet extends SLEXAbstractResultSetObject {
 	
-	protected SLEXPerspectiveResultSet(SLEXStorage storage, ResultSet rset) {
+	protected SLEXPerspectiveResultSet(SLEXStoragePerspective storage, ResultSet rset) {
 		super(storage, rset);
 	}
 	
@@ -16,10 +16,12 @@ public class SLEXPerspectiveResultSet extends SLEXAbstractResultSetObject {
 				String name = this.rset.getString("name");
 				int id = this.rset.getInt("id");
 				int collectionId = this.rset.getInt("collectionID");
-				p = new SLEXPerspective(storage);
+				String collectionFileName = this.rset.getString("collectionFileName");
+				p = new SLEXPerspective((SLEXStoragePerspective) storage);
 				p.setCollectionId(collectionId);
 				p.setId(id);
 				p.setName(name);
+				p.setCollectionFileName(collectionFileName);
 				p.setDirty(false);
 				p.setInserted(true);
 			}

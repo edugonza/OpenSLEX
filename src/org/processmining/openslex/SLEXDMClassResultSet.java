@@ -4,7 +4,7 @@ import java.sql.ResultSet;
 
 public class SLEXDMClassResultSet extends SLEXAbstractResultSetObject {
 	
-	protected SLEXDMClassResultSet(SLEXStorage storage, ResultSet rset) {
+	protected SLEXDMClassResultSet(SLEXStorageDataModel storage, ResultSet rset) {
 		super(storage, rset);
 	}
 	
@@ -17,7 +17,7 @@ public class SLEXDMClassResultSet extends SLEXAbstractResultSetObject {
 				int dataModelId = this.rset.getInt("data_modelID");
 				String name = this.rset.getString("name");
 				boolean common = this.rset.getBoolean("common");
-				cl = new SLEXDMClass(storage,name,common,dataModelId);
+				cl = new SLEXDMClass((SLEXStorageDataModel)storage,name,common,dataModelId);
 				cl.setId(id);
 				cl.retrieveAttributesAndKeys();
 				cl.setDirty(false);

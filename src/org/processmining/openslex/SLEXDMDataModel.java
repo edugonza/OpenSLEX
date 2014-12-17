@@ -10,14 +10,18 @@ public class SLEXDMDataModel extends SLEXAbstractDatabaseObject {
 		super(storage);
 	}
 	
+	public SLEXStorageDataModel getStorage() {
+		return (SLEXStorageDataModel) super.storage;
+	}
+	
 	@Override
 	boolean insert(SLEXAbstractDatabaseObject dm) {
-		return storage.insert((SLEXDMDataModel) dm);
+		return getStorage().insert((SLEXDMDataModel) dm);
 	}
 
 	@Override
 	boolean update(SLEXAbstractDatabaseObject dm) {
-		return storage.update((SLEXDMDataModel) dm);
+		return getStorage().update((SLEXDMDataModel) dm);
 	}
 
 	public int getId() {
