@@ -15,26 +15,31 @@ import java.util.Vector;
 
 import org.processmining.openslex.utils.ScriptRunner;
 
-public class SLEXStorage {
+public class SLEXStorageImpl implements SLEXStorageCollection, SLEXStorageDataModel, SLEXStoragePerspective {
 	
-	private static final String STORAGE_COLLECTION = "data"+File.separator+"collections.db";
-	private static final String STORAGE_DATAMODEL = "data"+File.separator+"datamodels.db";
+	private static final String STORAGE_COLLECTION = PATH+File.separator+"collections.db";
+	private static final String STORAGE_PERSPECTIVE = PATH+File.separator+"perspectives.db";
+	private static final String STORAGE_DATAMODEL = PATH+File.separator+"datamodels.db";
 	
 	private static final String COLLECTION_ALIAS = "collectionsdb";
+	private static final String PERSPECTIVE_ALIAS = "perspectivesdb";
 	private static final String DATAMODEL_ALIAS = "datamodelsdb";
 	
-	private InputStream COLLECTION_SCHEMA_IN =  SLEXStorage.class.getResourceAsStream("/org/processmining/openslex/resources/collections.sql");
+	private InputStream COLLECTION_SCHEMA_IN = SLEXStorage.class.getResourceAsStream("/org/processmining/openslex/resources/collections.sql");
+	private InputStream PERSPECTIVE_SCHEMA_IN = SLEXStorage.class.getResourceAsStream("/org/processmining/openslex/resources/perspectives.sql");
 	private InputStream DATAMODEL_SCHEMA_IN = SLEXStorage.class.getResourceAsStream("/org/processmining/openslex/resources/datamodels.sql");
 	
-	public static final String COMMON_CLASS_NAME = "COMMON";
 	private static final String JOURNAL_MODE = "OFF";
 	private static final String PRAGMA_SYNCHRONOUS_MODE = "OFF";
-	
 	private boolean collection_attached = false;
+	private boolean perspective_attached = false;
 	private boolean datamodel_attached = false;
 	
 	private boolean autoCommitOnCreation = true;
 	
+	private int type = 0;
+	private String filename = null;
+	private String path = null;	
 	private Connection connection = null;
 	
 //	private static SLEXStorage _instance = null;
@@ -47,12 +52,44 @@ public class SLEXStorage {
 //		return _instance;
 //	}
 	
-	public SLEXStorage() throws ClassNotFoundException {
+	public SLEXStorageImpl(String path, String filename, int type) throws Exception {
 		init();
-		openCollectionStorage(null);
-		openDataModelStorage(null);
+		this.filename = filename;
+		this.path = path;
+		this.type = type;
+		if (type == TYPE_COLLECTION) {
+			openCollectionStorage(path,filename);
+		} else if (type == TYPE_PERSPECTIVE) {
+			openPerspectiveStorage(path,filename);
+		} else if (type == TYPE_DATAMODEL) {
+			openDataModelStorage(path,filename);
+		} else {
+			throw new Exception("Type invalid");
+		}
 	}
 	
+	@Override
+	protected void finalize() throws Throwable {
+		super.finalize();
+		disconnect();
+	}
+	
+	@Override
+	public String getFilename() {
+		return filename;
+	}
+	
+	@Override
+	public String getPath() {
+		return path;
+	}
+	
+	@Override
+	public int getType() {
+		return type;
+	}
+	
+	@Override
 	public void setAutoCommit(boolean autoCommit) {
 		try {
 			this.connection.setAutoCommit(autoCommit);
@@ -61,6 +98,7 @@ public class SLEXStorage {
 		}
 	}
 	
+	@Override
 	public void commit() {
 		try {
 			this.connection.commit();
@@ -73,15 +111,15 @@ public class SLEXStorage {
 		return System.getProperty("user.dir");
 	}
 	
-	public boolean openCollectionStorage(String filename) {
+	public boolean openCollectionStorage(String path, String filename) {
 		if (collection_attached) {
 			collection_attached = !detachDatabase(COLLECTION_ALIAS);
 		}
 		if (!collection_attached) {
-			String fname = filename;
-			if (fname == null) {
-				fname = STORAGE_COLLECTION;
+			if (filename == null) {
+				return false;
 			}
+			String fname = path+File.separator+filename;
 			if (attachDatabaseFile(fname,COLLECTION_ALIAS,COLLECTION_SCHEMA_IN)) {
 				collection_attached = true;
 			}
@@ -91,15 +129,33 @@ public class SLEXStorage {
 		}
 	}
 	
-	public boolean openDataModelStorage(String filename) {
+	public boolean openPerspectiveStorage(String path, String filename) {
+		if (perspective_attached) {
+			perspective_attached = !detachDatabase(PERSPECTIVE_ALIAS);
+		}
+		if (!perspective_attached) {
+			if (filename == null) {
+				return false;
+			}
+			String fname = path+File.separator+filename;
+			if (attachDatabaseFile(fname,PERSPECTIVE_ALIAS,PERSPECTIVE_SCHEMA_IN)) {
+				perspective_attached = true;
+			}
+			return perspective_attached;
+		} else {
+			return false;
+		}
+	}
+	
+	public boolean openDataModelStorage(String path, String filename) {
 		if (datamodel_attached) {
 			datamodel_attached = !detachDatabase(DATAMODEL_ALIAS);
 		}
 		if (!datamodel_attached) {
-			String fname = filename;
-			if (fname == null) {
-				fname = STORAGE_DATAMODEL;
+			if (filename == null) {
+				return false;
 			}
+			String fname = path+File.separator+filename;
 			if (attachDatabaseFile(fname,DATAMODEL_ALIAS,DATAMODEL_SCHEMA_IN)) {
 				datamodel_attached = true;
 			}
@@ -271,6 +327,7 @@ public class SLEXStorage {
 		}
 	}
 	
+	@Override
 	public void disconnect() {
 		try {
 			if (connection != null) {
@@ -281,14 +338,17 @@ public class SLEXStorage {
 		}
 	}
 	
+	@Override
 	public void setAutoCommitOnCreation(boolean flag) {
 		this.autoCommitOnCreation = flag;
 	}
 	
+	@Override
 	public boolean isAutoCommitOnCreationEnabled() {
 		return this.autoCommitOnCreation;
 	}
 	
+	@Override
 	public SLEXEventCollection createEventCollection(String name) {
 		SLEXEventCollection ec = new SLEXEventCollection(this, name);
 		if (isAutoCommitOnCreationEnabled()) {
@@ -297,6 +357,7 @@ public class SLEXStorage {
 		return ec;
 	}
 	
+	@Override
 	public SLEXEvent createEvent(int collectionId) {
 		SLEXEvent ev = new SLEXEvent(this);
 		ev.setCollectionId(collectionId);
@@ -306,6 +367,7 @@ public class SLEXStorage {
 		return ev;
 	}
 	
+	@Override
 	public SLEXClass findClass(String name) {
 		SLEXClass cl = null;
 		Statement statement = null;
@@ -333,6 +395,7 @@ public class SLEXStorage {
 		return cl;
 	}
 	
+	@Override
 	public SLEXAttribute findAttribute(String className, String name) {
 		SLEXAttribute at = null;
 		Statement statement = null;
@@ -368,6 +431,7 @@ public class SLEXStorage {
 		return at;
 	}
 	
+	@Override
 	public SLEXAttribute findOrCreateAttribute(String className, String name, boolean common) {
 		
 		SLEXAttribute at = findAttribute(className, name);
@@ -379,6 +443,7 @@ public class SLEXStorage {
 		return at;
 	}
 	
+	@Override
 	public SLEXAttribute createAttribute(String className, String name, boolean common) {
 		SLEXAttribute at = new SLEXAttribute(this);
 		at.setName(name);
@@ -395,6 +460,7 @@ public class SLEXStorage {
 		return at;
 	}
 	
+	@Override
 	public SLEXAttributeValue createAttributeValue(int attributeId, int eventId, String value) {
 		SLEXAttributeValue av = new SLEXAttributeValue(this,attributeId,eventId);
 		av.setValue(value);
@@ -404,6 +470,7 @@ public class SLEXStorage {
 		return av;
 	}
 	
+	@Override
 	public SLEXClass createClass(String name, boolean common) {
 		SLEXClass cl = new SLEXClass(this,name,common);
 		if (isAutoCommitOnCreationEnabled()) {
@@ -412,6 +479,7 @@ public class SLEXStorage {
 		return cl;
 	}
 	
+	@Override
 	public SLEXDMDataModel createDMDataModel(String name) {
 		SLEXDMDataModel dm = new SLEXDMDataModel(this);
 		dm.setName(name);
@@ -421,6 +489,7 @@ public class SLEXStorage {
 		return dm;
 	}
 	
+	@Override
 	public SLEXDMClass createDMClass(int data_modelId, String name, boolean common) {
 		SLEXDMClass cl = new SLEXDMClass(this, name, common, data_modelId);
 		if (isAutoCommitOnCreationEnabled()) {
@@ -429,6 +498,7 @@ public class SLEXStorage {
 		return cl;
 	}
 	
+	@Override
 	public SLEXDMAttribute createDMAttribute(int classId, String name, boolean common) {
 		SLEXDMAttribute at = new SLEXDMAttribute(this);
 		at.setName(name);
@@ -439,6 +509,7 @@ public class SLEXStorage {
 		return at;
 	}
 	
+	@Override
 	public SLEXDMKey createDMKey(int classId, String name, int type, int refers_to_key) {
 		SLEXDMKey k = new SLEXDMKey(this);
 		k.setName(name);
@@ -453,6 +524,7 @@ public class SLEXStorage {
 		return k;
 	}
 	
+	@Override
 	public SLEXDMKeyAttribute createDMKeyAttribute(int keyId, int attributeId, int refersToAttributeId, int position) {
 		SLEXDMKeyAttribute kat = new SLEXDMKeyAttribute(this, keyId, attributeId);
 		kat.setRefersToId(refersToAttributeId);
@@ -479,7 +551,7 @@ public class SLEXStorage {
 		return id;
 	}
 	
-	protected synchronized boolean insert(SLEXEventCollection ec) {
+	public /*protected*/ synchronized boolean insert(SLEXEventCollection ec) {
 		Statement statement = null;
 		boolean result = false;
 		try {
@@ -498,7 +570,7 @@ public class SLEXStorage {
 		return result;
 	}
 	
-	protected boolean update(SLEXEventCollection ec) {
+	public /*protected*/ boolean update(SLEXEventCollection ec) {
 		Statement statement = null;
 		boolean result = false;
 		try {
@@ -516,7 +588,7 @@ public class SLEXStorage {
 		return result;
 	}
 	
-	protected synchronized boolean insert(SLEXEvent ev) {
+	public /*protected*/ synchronized boolean insert(SLEXEvent ev) {
 		Statement statement = null;
 		boolean result = false;
 		try {
@@ -536,7 +608,7 @@ public class SLEXStorage {
 		return result;
 	}
 	
-	protected boolean update(SLEXEvent ev) {
+	public /*protected*/ boolean update(SLEXEvent ev) {
 		Statement statement = null;
 		boolean result = false;
 		try {
@@ -554,7 +626,7 @@ public class SLEXStorage {
 		return result;
 	}
 	
-	protected synchronized boolean insert(SLEXAttribute at) {
+	public /*protected*/ synchronized boolean insert(SLEXAttribute at) {
 		Statement statement = null;
 		boolean result = false;
 		try {
@@ -573,7 +645,7 @@ public class SLEXStorage {
 		return result;
 	}
 	
-	protected boolean update(SLEXAttribute at) {
+	public /*protected*/ boolean update(SLEXAttribute at) {
 		Statement statement = null;
 		boolean result = false;
 		try {
@@ -591,7 +663,7 @@ public class SLEXStorage {
 		return result;
 	}
 	
-	protected synchronized boolean insert(SLEXDMAttribute at) {
+	public /*protected*/ synchronized boolean insert(SLEXDMAttribute at) {
 		Statement statement = null;
 		boolean result = false;
 		try {
@@ -610,7 +682,7 @@ public class SLEXStorage {
 		return result;
 	}
 	
-	protected boolean update(SLEXDMAttribute at) {
+	public /*protected*/ boolean update(SLEXDMAttribute at) {
 		Statement statement = null;
 		boolean result = false;
 		try {
@@ -628,7 +700,7 @@ public class SLEXStorage {
 		return result;
 	}
 	
-	protected synchronized boolean insert(SLEXDMKey k) {
+	public /*protected*/ synchronized boolean insert(SLEXDMKey k) {
 		Statement statement = null;
 		boolean result = false;
 		try {
@@ -647,7 +719,7 @@ public class SLEXStorage {
 		return result;
 	}
 	
-	protected boolean update(SLEXDMKey k) {
+	public /*protected*/ boolean update(SLEXDMKey k) {
 		Statement statement = null;
 		boolean result = false;
 		try {
@@ -665,7 +737,7 @@ public class SLEXStorage {
 		return result;
 	}
 	
-	protected boolean insert(SLEXDMKeyAttribute ka) {
+	public /*protected*/ boolean insert(SLEXDMKeyAttribute ka) {
 		Statement statement = null;
 		boolean result = false;
 		try {
@@ -689,7 +761,7 @@ public class SLEXStorage {
 		return result;
 	}
 	
-	protected boolean update(SLEXDMKeyAttribute ka) {
+	public /*protected*/ boolean update(SLEXDMKeyAttribute ka) {
 		Statement statement = null;
 		boolean result = false;
 		try {
@@ -713,7 +785,7 @@ public class SLEXStorage {
 		return result;
 	}
 	
-	protected boolean insert(SLEXAttributeValue av) {
+	public /*protected*/ boolean insert(SLEXAttributeValue av) {
 		PreparedStatement statement = null;
 		boolean result = false;
 		try {
@@ -734,7 +806,7 @@ public class SLEXStorage {
 		return result;
 	}
 	
-	protected boolean update(SLEXAttributeValue av) {
+	public /*protected*/ boolean update(SLEXAttributeValue av) {
 		PreparedStatement statement = null;
 		boolean result = false;
 		try {
@@ -755,7 +827,7 @@ public class SLEXStorage {
 		return result;
 	}
 	
-	protected synchronized boolean insert(SLEXClass cl) {
+	public /*protected*/ synchronized boolean insert(SLEXClass cl) {
 		Statement statement = null;
 		boolean result = false;
 		try {
@@ -774,7 +846,7 @@ public class SLEXStorage {
 		return result;
 	}
 	
-	protected boolean update(SLEXClass cl) {
+	public /*protected*/ boolean update(SLEXClass cl) {
 		Statement statement = null;
 		boolean result = false;
 		try {
@@ -792,7 +864,7 @@ public class SLEXStorage {
 		return result;
 	}
 	
-	protected synchronized boolean insert(SLEXDMClass cl) {
+	public /*protected*/ synchronized boolean insert(SLEXDMClass cl) {
 		Statement statement = null;
 		boolean result = false;
 		try {
@@ -811,7 +883,7 @@ public class SLEXStorage {
 		return result;
 	}
 	
-	protected boolean update(SLEXDMClass cl) {
+	public /*protected*/ boolean update(SLEXDMClass cl) {
 		Statement statement = null;
 		boolean result = false;
 		try {
@@ -829,13 +901,13 @@ public class SLEXStorage {
 		return result;
 	}
 	
-	protected synchronized boolean insert(SLEXPerspective p) {
+	public /*protected*/ synchronized boolean insert(SLEXPerspective p) {
 		Statement statement = null;
 		boolean result = false;
 		try {
 			statement = connection.createStatement();
 			statement.setQueryTimeout(30);
-			statement.execute("INSERT INTO "+COLLECTION_ALIAS+".perspective (name,collectionID) VALUES ('"+p.getName()+"','"+p.getCollectionId()+"')");
+			statement.execute("INSERT INTO "+PERSPECTIVE_ALIAS+".perspective (name,collectionID,collectionFileName) VALUES ('"+p.getName()+"','"+p.getCollectionId()+"','"+p.getCollectionFileName()+"')");
 			p.setId(getLastInsertedRowId(statement));
 			result = true;
 		} catch (Exception e) {
@@ -848,13 +920,13 @@ public class SLEXStorage {
 		return result;
 	}
 	
-	protected boolean update(SLEXPerspective p) {
+	public /*protected*/ boolean update(SLEXPerspective p) {
 		Statement statement = null;
 		boolean result = false;
 		try {
 			statement = connection.createStatement();
 			statement.setQueryTimeout(30);
-			statement.execute("UPDATE "+COLLECTION_ALIAS+".perspective SET name = '"+p.getName()+"', collectionID = '"+p.getCollectionId()+"' WHERE id = '"+p.getId()+"'");
+			statement.execute("UPDATE "+PERSPECTIVE_ALIAS+".perspective SET name = '"+p.getName()+"', collectionID = '"+p.getCollectionId()+"', collectionFileName = '"+p.getCollectionFileName()+"' WHERE id = '"+p.getId()+"'");
 			result = true;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -866,7 +938,7 @@ public class SLEXStorage {
 		return result;
 	}
 	
-	protected synchronized boolean insert(SLEXDMDataModel dm) {
+	public /*protected*/ synchronized boolean insert(SLEXDMDataModel dm) {
 		Statement statement = null;
 		boolean result = false;
 		try {
@@ -885,7 +957,7 @@ public class SLEXStorage {
 		return result;
 	}
 	
-	protected boolean update(SLEXDMDataModel dm) {
+	public /*protected*/ boolean update(SLEXDMDataModel dm) {
 		Statement statement = null;
 		boolean result = false;
 		try {
@@ -903,13 +975,13 @@ public class SLEXStorage {
 		return result;
 	}
 	
-	protected synchronized boolean insert(SLEXTrace t) {
+	public /*protected*/ synchronized boolean insert(SLEXTrace t) {
 		Statement statement = null;
 		boolean result = false;
 		try {
 			statement = connection.createStatement();
 			statement.setQueryTimeout(30);
-			statement.execute("INSERT INTO "+COLLECTION_ALIAS+".trace (caseID,perspectiveID) VALUES ('"+t.getCaseId()+"','"+t.getPerspectiveId()+"')");
+			statement.execute("INSERT INTO "+PERSPECTIVE_ALIAS+".trace (caseID,perspectiveID) VALUES ('"+t.getCaseId()+"','"+t.getPerspectiveId()+"')");
 			t.setId(getLastInsertedRowId(statement));
 			result = true;
 		} catch (Exception e) {
@@ -922,13 +994,13 @@ public class SLEXStorage {
 		return result;
 	}
 	
-	protected boolean update(SLEXTrace t) {
+	public /*protected*/ boolean update(SLEXTrace t) {
 		Statement statement = null;
 		boolean result = false;
 		try {
 			statement = connection.createStatement();
 			statement.setQueryTimeout(30);
-			statement.execute("UPDATE "+COLLECTION_ALIAS+".trace SET caseID = '"+t.getCaseId()+"', perspectiveID = '"+t.getPerspectiveId()+"' WHERE id = '"+t.getId()+"'");
+			statement.execute("UPDATE "+PERSPECTIVE_ALIAS+".trace SET caseID = '"+t.getCaseId()+"', perspectiveID = '"+t.getPerspectiveId()+"' WHERE id = '"+t.getId()+"'");
 			result = true;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -940,6 +1012,7 @@ public class SLEXStorage {
 		return result;
 	}
 	
+	@Override
 	public SLEXEventCollectionResultSet getEventCollections() {
 		SLEXEventCollectionResultSet ecrset = null;
 		Statement statement = null;
@@ -955,12 +1028,13 @@ public class SLEXStorage {
 		return ecrset; 
 	}
 
+	@Override
 	public SLEXPerspectiveResultSet getPerspectives() {
 		SLEXPerspectiveResultSet ecrset = null;
 		Statement statement = null;
 		try {
 			statement = connection.createStatement();
-			ResultSet rset = statement.executeQuery("SELECT * FROM "+COLLECTION_ALIAS+".perspective");
+			ResultSet rset = statement.executeQuery("SELECT * FROM "+PERSPECTIVE_ALIAS+".perspective");
 			ecrset = new SLEXPerspectiveResultSet(this, rset);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -970,12 +1044,13 @@ public class SLEXStorage {
 		return ecrset; 
 	}
 	
+	@Override
 	public SLEXPerspectiveResultSet getPerspectivesOfCollection(SLEXEventCollection ec) {
 		SLEXPerspectiveResultSet ecrset = null;
 		Statement statement = null;
 		try {
 			statement = connection.createStatement();
-			ResultSet rset = statement.executeQuery("SELECT * FROM "+COLLECTION_ALIAS+".perspective WHERE collectionID = "+ec.getId());
+			ResultSet rset = statement.executeQuery("SELECT * FROM "+PERSPECTIVE_ALIAS+".perspective WHERE collectionID = "+ec.getId());
 			ecrset = new SLEXPerspectiveResultSet(this, rset);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -985,7 +1060,7 @@ public class SLEXStorage {
 		return ecrset;
 	}
 	
-	protected SLEXEventResultSet getEventsOfCollection(
+	public /*protected*/ SLEXEventResultSet getEventsOfCollection(
 			SLEXEventCollection ec) {
 		SLEXEventResultSet erset = null;
 		Statement statement = null;
@@ -1001,7 +1076,8 @@ public class SLEXStorage {
 		return erset; 
 	}
 	
-	protected SLEXEventResultSet getEventsOfCollectionOrderedBy(
+	@Override
+	public /*protected*/ SLEXEventResultSet getEventsOfCollectionOrderedBy(
 			SLEXEventCollection ec,
 			List<SLEXAttribute> orderAttributes) {
 		SLEXEventResultSet erset = null;
@@ -1032,7 +1108,8 @@ public class SLEXStorage {
 		return erset;
 	}
 	
-	public SLEXEventResultSet getEventsOfCollectionBetweenDatesOrderedBy( 
+	@Override
+	public /*protected*/ SLEXEventResultSet getEventsOfCollectionBetweenDatesOrderedBy( 
 			SLEXEventCollection ec, List<SLEXAttribute> orderAttributes,
 			String startDate, String endDate) {
 		SLEXEventResultSet erset = null;
@@ -1081,7 +1158,7 @@ public class SLEXStorage {
 		return erset;
 	}
 
-	protected Hashtable<SLEXAttribute, SLEXAttributeValue> getAttributeValuesForEvent(
+	public /*protected*/ Hashtable<SLEXAttribute, SLEXAttributeValue> getAttributeValuesForEvent(
 			SLEXEvent ev) {
 		Hashtable<SLEXAttribute, SLEXAttributeValue> attributeValues = null;
 		Statement statement = null;
@@ -1119,8 +1196,7 @@ public class SLEXStorage {
 		return attributeValues;
 	}
 	
-
-	
+	@Override
 	public SLEXDMClassResultSet getClassesForDataModel(SLEXDMDataModel dm) {
 		SLEXDMClassResultSet crset = null;
 		Statement statement = null;
@@ -1136,6 +1212,7 @@ public class SLEXStorage {
 		return crset;
 	}
 	
+	@Override
 	public SLEXDMDataModelResultSet getDataModels() {
 		SLEXDMDataModelResultSet dmrset = null;
 		Statement statement = null;
@@ -1151,8 +1228,7 @@ public class SLEXStorage {
 		return dmrset;
 	}
 	
-
-
+	@Override
 	public List<SLEXDMAttribute> getAttributesForDMClass(SLEXDMClass cl) {
 		List<SLEXDMAttribute> atList = new Vector<>();
 		Statement statement = null;
@@ -1181,6 +1257,7 @@ public class SLEXStorage {
 		return atList;
 	}
 	
+	@Override
 	public List<SLEXDMKey> getKeysForDMClass(SLEXDMClass cl) {
 		List<SLEXDMKey> kList = new Vector<>();
 		Statement statement = null;
@@ -1213,6 +1290,7 @@ public class SLEXStorage {
 		return kList;
 	}
 	
+	@Override
 	public List<SLEXDMKeyAttribute> getKeyAttributesForDMKey(SLEXDMKey k) {
 		List<SLEXDMKeyAttribute> katList = new Vector<>();
 		Statement statement = null;
@@ -1241,12 +1319,42 @@ public class SLEXStorage {
 		return katList;
 	}
 	
-	protected SLEXEventResultSet getEventsOfTrace(SLEXTrace t) {
+	protected SLEXPerspective getPerspective(int id) {
+		SLEXPerspective p = null;
+		SLEXPerspectiveResultSet ecrset = null;
+		Statement statement = null;
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT * FROM "+PERSPECTIVE_ALIAS+".perspective WHERE id = '"+id+"'");
+			ecrset = new SLEXPerspectiveResultSet(this, rset);
+			p = ecrset.getNext();
+			closeStatement(statement);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return p; 
+	}
+	
+	public /*protected*/ SLEXEventResultSet getEventsOfTrace(SLEXTrace t) {
+		if (!collection_attached) {
+			SLEXPerspective p = getPerspective(t.getPerspectiveId());
+			File f = new File(p.getStorage().getPath()+File.separator+p.getCollectionFileName());
+			if (!f.exists()) {
+				f = new File(p.getCollectionFileName());
+				if (!f.exists()) {
+					System.err.println("Error: collection file "+p.getCollectionFileName()+" not found");
+					return null;
+				}
+			}
+			openCollectionStorage(f.getParent(),f.getName());
+		}
 		SLEXEventResultSet erset = null;
 		Statement statement = null;
 		try {
 			statement = connection.createStatement();
-			ResultSet rset = statement.executeQuery("SELECT * FROM "+COLLECTION_ALIAS+".event AS E, "+COLLECTION_ALIAS+".trace_has_event AS TE WHERE E.id = TE.eventID AND TE.traceID='"+t.getId()+"' ORDER BY TE.ordering");
+			ResultSet rset = statement.executeQuery("SELECT * FROM "+COLLECTION_ALIAS+".event AS E, "+PERSPECTIVE_ALIAS+".trace_has_event AS TE WHERE E.id = TE.eventID AND TE.traceID='"+t.getId()+"' ORDER BY TE.ordering");
 			erset = new SLEXEventResultSet(this, rset);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1256,13 +1364,13 @@ public class SLEXStorage {
 		return erset; 
 	}
 
-	protected int getNumberEventsOfTrace(SLEXTrace t) {
+	public /*protected*/ int getNumberEventsOfTrace(SLEXTrace t) {
 		// TEST
 		int events = 0;
 		Statement statement = null;
 		try {
 			statement = connection.createStatement();
-			ResultSet rset = statement.executeQuery("SELECT count(*) FROM "+COLLECTION_ALIAS+".event AS E, "+COLLECTION_ALIAS+".trace_has_event AS TE WHERE E.id = TE.eventID AND TE.traceID='"+t.getId()+"'");
+			ResultSet rset = statement.executeQuery("SELECT count(TE.eventID) FROM "+PERSPECTIVE_ALIAS+".trace_has_event AS TE WHERE TE.traceID='"+t.getId()+"'");
 			if (rset.next()) {
 				events = rset.getInt(1);
 			}
@@ -1273,6 +1381,7 @@ public class SLEXStorage {
 		return events;
 	}
 	
+	@Override
 	public SLEXTrace createTrace(int perspectiveId, String caseId) {
 		SLEXTrace t = new SLEXTrace(this);
 		t.setPerspectiveId(perspectiveId);
@@ -1283,17 +1392,20 @@ public class SLEXStorage {
 		return t;
 	}
 
+	@Override
 	public SLEXPerspective createPerspective(SLEXEventCollection evCol,
 			String name) {
 		SLEXPerspective p = new SLEXPerspective(this);
 		p.setCollectionId(evCol.getId());
 		p.setName(name);
+		p.setCollectionFileName(evCol.getStorage().getFilename());
 		if (isAutoCommitOnCreationEnabled()) {
 			p.commit();
 		}
 		return p;
 	}
 
+	@Override
 	public SLEXTrace cloneTrace(SLEXTrace t) {
 		SLEXTrace ct = this.createTrace(t.getPerspectiveId(), t.getCaseId());		
 		
@@ -1301,8 +1413,8 @@ public class SLEXStorage {
 		try {
 			statement = connection.createStatement();
 			//statement.setQueryTimeout(30);
-			statement.execute("INSERT INTO "+COLLECTION_ALIAS+".trace_has_event (traceID,eventID,ordering) "+
-							" SELECT '"+ct.getId()+"', eventID, ordering FROM "+COLLECTION_ALIAS+".trace_has_event "+
+			statement.execute("INSERT INTO "+PERSPECTIVE_ALIAS+".trace_has_event (traceID,eventID,ordering) "+
+							" SELECT '"+ct.getId()+"', eventID, ordering FROM "+PERSPECTIVE_ALIAS+".trace_has_event "+
 							" WHERE traceID = '"+t.getId()+"' ");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1313,13 +1425,13 @@ public class SLEXStorage {
 		return ct;
 	}
 
-	protected boolean addEventToTrace(SLEXTrace t, SLEXEvent e) {
+	public /*protected*/ boolean addEventToTrace(SLEXTrace t, SLEXEvent e) {
 		Statement statement = null;
 		boolean result = false;
 		try {
 			statement = connection.createStatement();
 			statement.setQueryTimeout(30);
-			statement.execute("INSERT INTO "+COLLECTION_ALIAS+".trace_has_event (traceID,eventID,ordering) VALUES ('"+t.getId()+"','"+e.getId()+"',(SELECT IFNULL(MAX(ordering), 0) + 1 FROM "+COLLECTION_ALIAS+".trace_has_event))");
+			statement.execute("INSERT INTO "+PERSPECTIVE_ALIAS+".trace_has_event (traceID,eventID,ordering) VALUES ('"+t.getId()+"','"+e.getId()+"',(SELECT IFNULL(MAX(ordering), 0) + 1 FROM "+PERSPECTIVE_ALIAS+".trace_has_event))");
 			result = true;
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -1337,7 +1449,7 @@ public class SLEXStorage {
 		try {
 			statement = connection.createStatement();
 			statement.setQueryTimeout(30);
-			statement.execute("DELETE FROM "+COLLECTION_ALIAS+".trace_has_event WHERE traceID = '"+t.getId()+"'");
+			statement.execute("DELETE FROM "+PERSPECTIVE_ALIAS+".trace_has_event WHERE traceID = '"+t.getId()+"'");
 			result = true;
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -1349,7 +1461,7 @@ public class SLEXStorage {
 		return result;
 	}
 	
-	protected boolean removeTraceFromPerspective(SLEXPerspective p,
+	public /*protected*/ boolean removeTraceFromPerspective(SLEXPerspective p,
 			SLEXTrace t) {
 		Statement statement = null;
 		boolean result = false;
@@ -1357,7 +1469,7 @@ public class SLEXStorage {
 			result = removeEventsFromTrace(t);
 			statement = connection.createStatement();
 			statement.setQueryTimeout(30);
-			statement.execute("DELETE FROM "+COLLECTION_ALIAS+".trace WHERE id = '"+t.getId()+"'");
+			statement.execute("DELETE FROM "+PERSPECTIVE_ALIAS+".trace WHERE id = '"+t.getId()+"'");
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			result = false;
@@ -1368,13 +1480,13 @@ public class SLEXStorage {
 		return result;
 	}
 
-	protected SLEXTraceResultSet getTracesOfPerspective(
+	public /*protected*/ SLEXTraceResultSet getTracesOfPerspective(
 			SLEXPerspective p) {
 		SLEXTraceResultSet trset = null;
 		Statement statement = null;
 		try {
 			statement = connection.createStatement();
-			ResultSet rset = statement.executeQuery("SELECT * FROM "+COLLECTION_ALIAS+".trace WHERE perspectiveID = "+p.getId());
+			ResultSet rset = statement.executeQuery("SELECT * FROM "+PERSPECTIVE_ALIAS+".trace WHERE perspectiveID = "+p.getId());
 			trset = new SLEXTraceResultSet(this, rset);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1384,6 +1496,7 @@ public class SLEXStorage {
 		return trset; 
 	}
 
+	@Override
 	public SLEXEventCollection getEventCollection(int id) {
 		SLEXEventCollectionResultSet ecrset = null;
 		SLEXEventCollection ec = null;
@@ -1400,12 +1513,6 @@ public class SLEXStorage {
 		}
 		
 		return ec; 
-	}
-
-	@Override
-	protected void finalize() throws Throwable {
-		super.finalize();
-		disconnect();
 	}
 	
 }
