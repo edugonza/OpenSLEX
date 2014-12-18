@@ -3,7 +3,16 @@ package org.processmining.openslex;
 import java.io.File;
 
 public class SLEXFactory {
-
+	
+	private String path = null;
+	
+	public SLEXFactory(String path) {
+		this.path = path;
+		if (path == null) {
+			this.path = SLEXStorage.PATH;
+		}
+	}
+	
 	private synchronized static File generateNameFile(String path, String ext) {
 		File f = null;
 		
@@ -26,7 +35,7 @@ public class SLEXFactory {
 		return f;
 	}
 	
-	public static SLEXStorageCollection createStorageCollection() {
+	public SLEXStorageCollection createStorageCollection() {
 		File f = generateNameFile(SLEXStorage.PATH, SLEXStorage.COLLECTION_FILE_EXTENSION);
 		SLEXStorageCollection st = null;
 		try {
@@ -37,7 +46,7 @@ public class SLEXFactory {
 		return st;
 	}
 	
-	public static SLEXStoragePerspective createStoragePerspective() {
+	public SLEXStoragePerspective createStoragePerspective() {
 		File f = generateNameFile(SLEXStorage.PATH, SLEXStorage.PERSPECTIVE_FILE_EXTENSION);
 		SLEXStoragePerspective st = null;
 		try {
@@ -48,7 +57,7 @@ public class SLEXFactory {
 		return st;
 	}
 	
-	public static SLEXStorageDataModel createStorageDataModel() {
+	public SLEXStorageDataModel createStorageDataModel() {
 		File f = generateNameFile(SLEXStorage.PATH, SLEXStorage.DATAMODEL_FILE_EXTENSION);
 		SLEXStorageDataModel st = null;
 		try {
@@ -58,4 +67,27 @@ public class SLEXFactory {
 		}
 		return st;
 	}
+	
+	public SLEXEventCollection createEventCollection(String name) {
+		SLEXStorageCollection st = createStorageCollection();
+		SLEXEventCollection ec = null;
+		
+		if (st != null) {
+			ec = st.createEventCollection(name);
+		}
+		
+		return ec;
+	}
+	
+	public SLEXPerspective createPerspective(SLEXEventCollection ec, String name) {
+		SLEXStoragePerspective st = createStoragePerspective();
+		SLEXPerspective p = null;
+		
+		if (st != null) {
+			p = st.createPerspective(ec, name);
+		}
+		
+		return p;
+	}
+	
 }
