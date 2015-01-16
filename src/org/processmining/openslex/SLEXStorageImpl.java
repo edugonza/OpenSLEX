@@ -975,14 +975,14 @@ public class SLEXStorageImpl implements SLEXStorageCollection, SLEXStorageDataMo
 		return result;
 	}
 	
-	public /*protected*/ synchronized boolean insert(SLEXTrace t) {
+	public /*protected*/ /*synchronized*/ boolean insert(SLEXTrace t) {
 		Statement statement = null;
 		boolean result = false;
 		try {
 			statement = connection.createStatement();
 			statement.setQueryTimeout(30);
-			statement.execute("INSERT INTO "+PERSPECTIVE_ALIAS+".trace (caseID,perspectiveID) VALUES ('"+t.getCaseId()+"','"+t.getPerspectiveId()+"')");
-			t.setId(getLastInsertedRowId(statement));
+			statement.execute("INSERT INTO "+PERSPECTIVE_ALIAS+".trace (id,caseID,perspectiveID) VALUES ('"+t.getId()+"','"+t.getCaseId()+"','"+t.getPerspectiveId()+"')");
+			//t.setId(getLastInsertedRowId(statement));
 			result = true;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1382,8 +1382,9 @@ public class SLEXStorageImpl implements SLEXStorageCollection, SLEXStorageDataMo
 	}
 	
 	@Override
-	public SLEXTrace createTrace(int perspectiveId, String caseId) {
+	public SLEXTrace createTrace(int traceId, int perspectiveId, String caseId) {
 		SLEXTrace t = new SLEXTrace(this);
+		t.setId(traceId);
 		t.setPerspectiveId(perspectiveId);
 		t.setCaseId(caseId);
 		if (isAutoCommitOnCreationEnabled()) {
@@ -1406,9 +1407,8 @@ public class SLEXStorageImpl implements SLEXStorageCollection, SLEXStorageDataMo
 	}
 
 	@Override
-	public SLEXTrace cloneTrace(SLEXTrace t) {
-		SLEXTrace ct = this.createTrace(t.getPerspectiveId(), t.getCaseId());		
-		
+	public SLEXTrace cloneTrace(SLEXTrace t, int idNewTrace) {
+		SLEXTrace ct = this.createTrace(idNewTrace,t.getPerspectiveId(), t.getCaseId());		
 		Statement statement = null;
 		try {
 			statement = connection.createStatement();
@@ -1421,17 +1421,16 @@ public class SLEXStorageImpl implements SLEXStorageCollection, SLEXStorageDataMo
 		} finally {
 			closeStatement(statement);
 		}
-		
 		return ct;
 	}
 
-	public /*protected*/ boolean addEventToTrace(SLEXTrace t, SLEXEvent e) {
+	public /*protected*/ boolean addEventToTrace(int traceId, int eventId) {
 		Statement statement = null;
 		boolean result = false;
 		try {
 			statement = connection.createStatement();
 			statement.setQueryTimeout(30);
-			statement.execute("INSERT INTO "+PERSPECTIVE_ALIAS+".trace_has_event (traceID,eventID,ordering) VALUES ('"+t.getId()+"','"+e.getId()+"',(SELECT IFNULL(MAX(ordering), 0) + 1 FROM "+PERSPECTIVE_ALIAS+".trace_has_event))");
+			statement.execute("INSERT INTO "+PERSPECTIVE_ALIAS+".trace_has_event (traceID,eventID,ordering) VALUES ('"+traceId+"','"+eventId+"',(SELECT IFNULL(MAX(ordering), 0) + 1 FROM "+PERSPECTIVE_ALIAS+".trace_has_event))");
 			result = true;
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -1439,8 +1438,11 @@ public class SLEXStorageImpl implements SLEXStorageCollection, SLEXStorageDataMo
 		} finally {
 			closeStatement(statement);
 		}
-		
 		return result;
+	}
+	
+	public /*protected*/ boolean addEventToTrace(SLEXTrace t, SLEXEvent e) {
+		return addEventToTrace(t.getId(),e.getId());
 	}
 
 	private boolean removeEventsFromTrace(SLEXTrace t) {
@@ -1513,6 +1515,25 @@ public class SLEXStorageImpl implements SLEXStorageCollection, SLEXStorageDataMo
 		}
 		
 		return ec; 
+	}
+
+	@Override
+	public int getMaxTraceId() {
+		int maxId = 0;
+		
+		Statement statement = null;
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT IFNULL(MAX(id),0) + 1 FROM "+PERSPECTIVE_ALIAS+".trace");
+			rset.next();
+			maxId = rset.getInt(1);
+			rset.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+				
+		return maxId;
 	}
 	
 }
