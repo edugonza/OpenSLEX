@@ -399,15 +399,17 @@ public class SLEXStorageImpl implements SLEXStorageCollection, SLEXStorageDataMo
 	public SLEXAttribute findAttribute(String className, String name) {
 		SLEXAttribute at = null;
 		Statement statement = null;
+		String classNameC = className.trim();
+		String nameC = name.trim();
 		try {
 			statement = connection.createStatement();
 			statement.setQueryTimeout(30);
 			ResultSet rset = statement.executeQuery("SELECT AT.id,AT.name,AT.classID FROM "
 														+COLLECTION_ALIAS+".attribute AS AT, "
 														+COLLECTION_ALIAS+".class as CL WHERE "
-															+" AT.name = '"+name+"' AND "
+															+" AT.name = '"+nameC+"' AND "
 															+" AT.classID = CL.id AND "
-															+" CL.name = '"+className+"'");
+															+" CL.name = '"+classNameC+"'");
 			
 			if (rset.next()) {
 				int classId = rset.getInt("classID");
