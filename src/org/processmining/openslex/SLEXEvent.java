@@ -53,5 +53,34 @@ public class SLEXEvent extends SLEXAbstractDatabaseObject {
 		}
 		return attributeValues;
 	}
+	
+	@Override
+	public String toString() {
+		return getCollectionId()+":"+getId();
+	}
+	
+	@Override
+	public int hashCode() {
+		return toString().hashCode();
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (!super.equals(obj)) {
+			if (obj instanceof SLEXEvent) {
+				SLEXEvent objat = (SLEXEvent) obj;
+				if (this.getId() == objat.getId() &&
+						this.getCollectionId() == objat.getCollectionId()) {
+					return true;
+				} else {
+					return false;
+				}
+			} else {
+				return false;
+			}
+		} else {
+			return true;
+		}
+	}
 
 }
