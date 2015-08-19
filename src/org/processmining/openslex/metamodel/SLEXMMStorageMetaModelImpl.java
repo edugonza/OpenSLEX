@@ -1168,12 +1168,18 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	
 	@Override
 	public List<SLEXMMAttribute> getAttributesForClass(SLEXMMClass cl) {
+		return getAttributesForClass(cl.getId());
+	}
+	
+
+	@Override
+	public List<SLEXMMAttribute> getAttributesForClass(int clId) {
 		List<SLEXMMAttribute> atList = new Vector<>();
 		Statement statement = null;
 		
 		try {
 			statement = connection.createStatement();
-			ResultSet rset = statement.executeQuery("SELECT * FROM "+METAMODEL_ALIAS+".attribute_name WHERE class_id = "+cl.getId());
+			ResultSet rset = statement.executeQuery("SELECT * FROM "+METAMODEL_ALIAS+".attribute_name WHERE class_id = '"+clId+"'");
 			while (rset.next()) {
 				int id = rset.getInt("id");
 				String name = rset.getString("name");
@@ -1836,6 +1842,11 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMObjectVersionResultSet getObjectVersionsForObjectOrdered(SLEXMMObject obj) {
+		return getObjectVersionsForObjectOrdered(obj.getId()); 
+	}
+	
+	@Override
+	public SLEXMMObjectVersionResultSet getObjectVersionsForObjectOrdered(int objId) {
 		SLEXMMObjectVersionResultSet erset = null;
 		Statement statement = null;
 		try {
@@ -1843,7 +1854,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 			ResultSet rset = statement.executeQuery("SELECT OBJV.id, OBJV.object_id, OBJV.event_id, EV.ordering FROM "
 					+METAMODEL_ALIAS+".object_version AS OBJV, "
 					+METAMODEL_ALIAS+".event AS EV "
-					+" WHERE OBJV.object_id = "+obj.getId()
+					+" WHERE OBJV.object_id = "+objId
 					+" AND OBJV.event_id = EV.id "
 					+" ORDER BY EV.ordering");
 			erset = new SLEXMMObjectVersionResultSet(this, rset);
@@ -1857,13 +1868,18 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	
 	@Override
 	public SLEXMMRelationResultSet getRelationsForSourceObject(SLEXMMObject obj) {
+		return getRelationsForSourceObject(obj.getId());
+	}
+	
+	@Override
+	public SLEXMMRelationResultSet getRelationsForSourceObject(int objId) {
 		SLEXMMRelationResultSet erset = null;
 		Statement statement = null;
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT * FROM "
 					+METAMODEL_ALIAS+".relation "
-					+" WHERE source_object_id = "+obj.getId());
+					+" WHERE source_object_id = "+objId);
 			erset = new SLEXMMRelationResultSet(this, rset);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1875,14 +1891,37 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	
 	@Override
 	public SLEXMMRelationResultSet getRelationsForTargetObject(SLEXMMObject obj) {
+		return getRelationsForTargetObject(obj.getId());
+	}
+	
+	@Override
+	public SLEXMMRelationResultSet getRelationsForTargetObject(int objId) {
 		SLEXMMRelationResultSet erset = null;
 		Statement statement = null;
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT * FROM "
 					+METAMODEL_ALIAS+".relation "
-					+" WHERE target_object_id = "+obj.getId());
+					+" WHERE target_object_id = "+objId);
 			erset = new SLEXMMRelationResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return erset; 
+	}
+
+	@Override
+	public SLEXMMObjectResultSet getObjects() {
+		SLEXMMObjectResultSet erset = null;
+		Statement statement = null;
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT OBJ.id, OBJ.class_id FROM "
+					+METAMODEL_ALIAS+".object AS OBJ "
+					+" ORDER BY OBJ.id");
+			erset = new SLEXMMObjectResultSet(this, rset);
 		} catch (Exception e) {
 			e.printStackTrace();
 			closeStatement(statement);

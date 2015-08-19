@@ -105,6 +105,8 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	public abstract SLEXMMDataModelResultSet getDataModels();
 
 	public abstract List<SLEXMMAttribute> getAttributesForClass(SLEXMMClass cl);
+	
+	public abstract List<SLEXMMAttribute> getAttributesForClass(int clId);
 
 	public abstract List<SLEXMMRelationship> getRelationshipsForClass(SLEXMMClass cl);
 
@@ -159,21 +161,31 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 
 	public abstract SLEXMMObjectVersionResultSet getObjectVersionsForObjectOrdered(
 			SLEXMMObject obj);
+	
+	public abstract SLEXMMObjectVersionResultSet getObjectVersionsForObjectOrdered(int objId);
+	
 
 	public abstract SLEXMMRelationshipAttributeValue createRelationshipAttributeValue(
 			int relationId, int relationshipAttributeId, String value,
 			String type);
 
-	SLEXMMRelation createRelation(int relationshipId, int sourceObjectId,
+	public abstract SLEXMMRelation createRelation(int relationshipId, int sourceObjectId,
 			int targetObjectId, int startSourceObjectVersionId,
 			int endSourceObjectVersionId, int startTargetObjectVersionId,
 			int endTargetObjectVersionId, int eventId);
 
-	SLEXMMObject createObject(int classId);
+	public abstract SLEXMMObject createObject(int classId);
 
-	SLEXMMObjectVersion createObjectVersion(int objectId, int eventId);
+	public abstract SLEXMMObjectVersion createObjectVersion(int objectId, int eventId);
 
-	SLEXMMRelationResultSet getRelationsForSourceObject(SLEXMMObject obj);
+	public abstract SLEXMMRelationResultSet getRelationsForSourceObject(SLEXMMObject obj);
 
-	SLEXMMRelationResultSet getRelationsForTargetObject(SLEXMMObject obj);
+	public abstract SLEXMMRelationResultSet getRelationsForSourceObject(int objId);
+	
+	public abstract SLEXMMRelationResultSet getRelationsForTargetObject(SLEXMMObject obj);
+	
+	public abstract SLEXMMRelationResultSet getRelationsForTargetObject(int objId);
+	
+	public abstract SLEXMMObjectResultSet getObjects();
+	
 }
