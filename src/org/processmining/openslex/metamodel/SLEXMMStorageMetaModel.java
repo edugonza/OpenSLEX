@@ -27,6 +27,8 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	
 	public abstract HashMap<SLEXMMEventAttribute, SLEXMMEventAttributeValue> getAttributeValuesForEvent(
 			SLEXMMEvent slexEvent);
+	
+	public abstract HashMap<SLEXMMEventAttribute, SLEXMMEventAttributeValue> getAttributeValuesForEvent(int evId);
 
 	public abstract boolean insert(SLEXMMEventCollection ec);
 
@@ -35,6 +37,8 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	public abstract SLEXMMEventResultSet getEventsOfCollection(
 			SLEXMMEventCollection slexEventCollection);
 
+	public abstract SLEXMMEventResultSet getEventsOfCollection(int ecId);
+	
 	public abstract SLEXMMEventResultSet getEventsOfCollectionOrderedBy(
 			SLEXMMEventCollection slexEventCollection,
 			List<SLEXMMEventAttribute> orderAttributes);

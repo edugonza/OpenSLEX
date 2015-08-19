@@ -996,13 +996,20 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		return ecrset;
 	}
 	
+	@Override
 	public SLEXMMEventResultSet getEventsOfCollection(
 			SLEXMMEventCollection ec) {
+		return getEventsOfCollection(ec.getId());
+	}
+	
+	@Override
+	public SLEXMMEventResultSet getEventsOfCollection(int ecId) {
 		SLEXMMEventResultSet erset = null;
 		Statement statement = null;
 		try {
 			statement = connection.createStatement();
-			ResultSet rset = statement.executeQuery("SELECT * FROM "+METAMODEL_ALIAS+".event WHERE collection_id = "+ec.getId());
+			ResultSet rset = statement.executeQuery("SELECT * FROM "
+					+METAMODEL_ALIAS+".event WHERE collection_id = '"+ecId+"'");
 			erset = new SLEXMMEventResultSet(this, rset);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1096,8 +1103,15 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		return erset;
 	}
 
+	@Override
 	public HashMap<SLEXMMEventAttribute, SLEXMMEventAttributeValue> getAttributeValuesForEvent(
 			SLEXMMEvent ev) {
+		return getAttributeValuesForEvent(ev.getId());
+	}
+	
+	@Override
+	public HashMap<SLEXMMEventAttribute, SLEXMMEventAttributeValue> getAttributeValuesForEvent(
+			int evId) {
 		HashMap<SLEXMMEventAttribute, SLEXMMEventAttributeValue> attributeValues = null;
 		Statement statement = null;
 		try {
@@ -1107,7 +1121,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 														METAMODEL_ALIAS+".event_attribute_name AS AT, "+
 														METAMODEL_ALIAS+".event_attribute_value AS ATV, "+
 														METAMODEL_ALIAS+".event AS EV "+
-														"WHERE EV.id = "+ev.getId()+" AND ATV.event_id = EV.id AND "
+														"WHERE EV.id = "+evId+" AND ATV.event_id = EV.id AND "
 																+ " ATV.event_attribute_name_id = AT.id ");
 			attributeValues = new HashMap<>();
 			
@@ -1117,7 +1131,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 				at.setName(rset.getString(2));
 				at.setDirty(false);
 				at.setInserted(true);
-				SLEXMMEventAttributeValue atv = new SLEXMMEventAttributeValue(this, at.getId(), ev.getId());
+				SLEXMMEventAttributeValue atv = new SLEXMMEventAttributeValue(this, at.getId(), evId);
 				atv.setValue(rset.getString(3));
 				atv.setType(rset.getString(4));
 				atv.setDirty(false);
