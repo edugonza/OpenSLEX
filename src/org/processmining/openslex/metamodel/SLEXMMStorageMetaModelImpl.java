@@ -1020,6 +1020,23 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 	
 	@Override
+	public SLEXMMEventResultSet getEventsOfCollectionOrdered(int ecId) {
+		SLEXMMEventResultSet erset = null;
+		Statement statement = null;
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT * FROM "
+					+METAMODEL_ALIAS+".event WHERE collection_id = '"+ecId+"' ORDER BY ordering ASC");
+			erset = new SLEXMMEventResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return erset; 
+	}
+	
+	@Override
 	public SLEXMMEventResultSet getEventsOfCollectionOrderedBy(
 			SLEXMMEventCollection ec,
 			List<SLEXMMEventAttribute> orderAttributes) {
@@ -1038,7 +1055,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					query += " ,"+METAMODEL_ALIAS+".event_attribute_value AS ATV"+i+" ";
 					wherequery += " AND ATV"+i+".event_id = E.id "+
 							" AND ATV"+i+".event_attribute_name_id = "+orderAttributes.get(i).getId()+" ";
-					orderquery += " CAST(ATV"+i+".value AS INTEGER) ";
+					orderquery += " CAST(ATV"+i+".value AS INTEGER) ASC ";
 					if (i < orderAttributes.size()-1) {
 						orderquery += ", ";
 					}
@@ -1154,7 +1171,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		try {
 			statement = connection.createStatement();
-			ResultSet rset = statement.executeQuery("SELECT * FROM "+METAMODEL_ALIAS+".class WHERE datamodel_id = "+dm.getId());
+			ResultSet rset = statement.executeQuery("SELECT * FROM "+METAMODEL_ALIAS+".class WHERE datamodel_id = '"+dm.getId()+"'");
 			crset = new SLEXMMClassResultSet(this, rset);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1222,7 +1239,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		
 		try {
 			statement = connection.createStatement();
-			ResultSet rset = statement.executeQuery("SELECT * FROM "+METAMODEL_ALIAS+".relationship WHERE source = "+cl.getId());
+			ResultSet rset = statement.executeQuery("SELECT * FROM "+METAMODEL_ALIAS+".relationship WHERE source = '"+cl.getId()+"'");
 			while (rset.next()) {
 				int id = rset.getInt("id");
 				String name = rset.getString("name");
@@ -1917,6 +1934,58 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 			ResultSet rset = statement.executeQuery("SELECT * FROM "
 					+METAMODEL_ALIAS+".relation "
 					+" WHERE target_object_id = "+objId);
+			erset = new SLEXMMRelationResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return erset; 
+	}
+	
+	@Override
+	public SLEXMMRelationResultSet getRelationsForSourceObjectOrdered(SLEXMMObject obj) {
+		return getRelationsForSourceObjectOrdered(obj.getId());
+	}
+	
+	@Override
+	public SLEXMMRelationResultSet getRelationsForSourceObjectOrdered(int objId) {
+		SLEXMMRelationResultSet erset = null;
+		Statement statement = null;
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT REL.* FROM "
+					+METAMODEL_ALIAS+".relation as REL, "
+					+METAMODEL_ALIAS+".event as EV "
+					+" WHERE REL.source_object_id = "+objId
+					+" AND REL.event_id = EV.id "
+					+" ORDER BY EV.ordering ASC ");
+			erset = new SLEXMMRelationResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return erset; 
+	}
+	
+	@Override
+	public SLEXMMRelationResultSet getRelationsForTargetObjectOrdered(SLEXMMObject obj) {
+		return getRelationsForTargetObject(obj.getId());
+	}
+	
+	@Override
+	public SLEXMMRelationResultSet getRelationsForTargetObjectOrdered(int objId) {
+		SLEXMMRelationResultSet erset = null;
+		Statement statement = null;
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT REL.* FROM "
+					+METAMODEL_ALIAS+".relation as REL, "
+					+METAMODEL_ALIAS+".event as EV "
+					+" WHERE REL.target_object_id = "+objId
+					+" AND REL.event_id = EV.id "
+					+" ORDER BY EV.ordering ASC ");
 			erset = new SLEXMMRelationResultSet(this, rset);
 		} catch (Exception e) {
 			e.printStackTrace();

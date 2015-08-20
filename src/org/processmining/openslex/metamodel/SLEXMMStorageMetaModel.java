@@ -39,6 +39,8 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 
 	public abstract SLEXMMEventResultSet getEventsOfCollection(int ecId);
 	
+	public abstract SLEXMMEventResultSet getEventsOfCollectionOrdered(int ecId);
+	
 	public abstract SLEXMMEventResultSet getEventsOfCollectionOrderedBy(
 			SLEXMMEventCollection slexEventCollection,
 			List<SLEXMMEventAttribute> orderAttributes);
@@ -189,6 +191,14 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	public abstract SLEXMMRelationResultSet getRelationsForTargetObject(SLEXMMObject obj);
 	
 	public abstract SLEXMMRelationResultSet getRelationsForTargetObject(int objId);
+	
+	public abstract SLEXMMRelationResultSet getRelationsForSourceObjectOrdered(SLEXMMObject obj);
+
+	public abstract SLEXMMRelationResultSet getRelationsForSourceObjectOrdered(int objId);
+	
+	public abstract SLEXMMRelationResultSet getRelationsForTargetObjectOrdered(SLEXMMObject obj);
+	
+	public abstract SLEXMMRelationResultSet getRelationsForTargetObjectOrdered(int objId);
 	
 	public abstract SLEXMMObjectResultSet getObjects();
 	

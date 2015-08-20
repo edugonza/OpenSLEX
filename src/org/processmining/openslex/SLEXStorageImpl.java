@@ -1097,7 +1097,7 @@ public class SLEXStorageImpl implements SLEXStorageCollection, SLEXStorageDataMo
 					query += " ,"+COLLECTION_ALIAS+".attribute_value AS ATV"+i+" ";
 					wherequery += " AND ATV"+i+".eventID = E.id "+
 							" AND ATV"+i+".attributeID = "+orderAttributes.get(i).getId()+" ";
-					orderquery += " CAST(ATV"+i+".value AS INTEGER) ";
+					orderquery += " CAST(ATV"+i+".value AS INTEGER) ASC ";
 					if (i < orderAttributes.size()-1) {
 						orderquery += ", ";
 					}

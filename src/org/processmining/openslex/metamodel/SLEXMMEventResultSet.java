@@ -22,7 +22,7 @@ public class SLEXMMEventResultSet extends SLEXMMAbstractResultSetObject {
 				ev.setId(id);
 				ev.setCollectionId(collectionId);
 				ev.setOrder(order);
-				ev.retrieveAttributeValues();
+				//ev.retrieveAttributeValues();
 				ev.setDirty(false);
 				ev.setInserted(true);
 			}
