@@ -14,10 +14,10 @@ public class SLEXMMCaseResultSet extends SLEXMMAbstractResultSetObject {
 			if (this.rset != null && this.rset.next()) {
 				
 				int id = this.rset.getInt("id");
-				int logId = this.rset.getInt("log_id");
+				String name = this.rset.getString("name");
 				t = new SLEXMMCase((SLEXMMStorageMetaModel) storage);
-				t.setLogId(logId);
 				t.setId(id);
+				t.setName(name);
 				t.setDirty(false);
 				t.setInserted(true);
 			}

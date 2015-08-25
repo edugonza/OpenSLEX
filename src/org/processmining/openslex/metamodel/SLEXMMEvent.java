@@ -5,7 +5,7 @@ import java.util.HashMap;
 public class SLEXMMEvent extends SLEXMMAbstractDatabaseObject {
 
 	private int id = -1;
-	private int collectionId = -1;
+	private int activityInstanceId = -1;
 	private int order = -1;
 	private HashMap<SLEXMMEventAttribute, SLEXMMEventAttributeValue> attributeValues = null;
 	
@@ -21,8 +21,8 @@ public class SLEXMMEvent extends SLEXMMAbstractDatabaseObject {
 		return this.id;
 	}
 	
-	public int getCollectionId() {
-		return this.collectionId;
+	public int getActivityInstanceId() {
+		return this.activityInstanceId;
 	}
 	
 	protected void setId(int id) {
@@ -34,8 +34,8 @@ public class SLEXMMEvent extends SLEXMMAbstractDatabaseObject {
 		setDirty(true);
 	}
 	
-	protected void setCollectionId(int id) {
-		this.collectionId = id;
+	public void setActivityInstanceId(int id) {
+		this.activityInstanceId = id;
 		setDirty(true);
 	}
 	

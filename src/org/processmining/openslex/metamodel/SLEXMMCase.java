@@ -3,7 +3,7 @@ package org.processmining.openslex.metamodel;
 public class SLEXMMCase extends SLEXMMAbstractDatabaseObject {
 
 	private int id = -1;
-	private int logId = -1;
+	private String name = null;
 	
 	protected SLEXMMCase(SLEXMMStorageMetaModel storage) {
 		super(storage);
@@ -17,21 +17,21 @@ public class SLEXMMCase extends SLEXMMAbstractDatabaseObject {
 		return this.id;
 	}
 	
-	public int getLogId() {
-		return this.logId;
-	}
-	
 	protected void setId(int id) {
 		this.id = id;
 	}
 	
-	protected void setLogId(int logId) {
-		this.logId = logId;
+	public String getName() {
+		return this.name;
+	}
+	
+	public void setName(String name) {
+		this.name = name;
 		setDirty(true);
 	}
 	
-	public boolean add(SLEXMMEvent e) {
-		return getStorage().addEventToCase(this,e);
+	public boolean add(SLEXMMActivityInstance ai) {
+		return getStorage().addActivityInstanceToCase(this,ai);
 	}
 	
 	@Override
@@ -44,12 +44,12 @@ public class SLEXMMCase extends SLEXMMAbstractDatabaseObject {
 		return getStorage().update((SLEXMMCase) t);
 	}
 
-	public SLEXMMEventResultSet getEventsResultSet() {
+//	public SLEXMMActivityInstanceResultSet getActivityInstanceResultSet() {
+//		return getStorage().getActivityInstancesOfCase(this);
+//	}
+	
+	public SLEXMMEventResultSet getEventResultSet() {
 		return getStorage().getEventsOfCase(this);
 	}
-
-	public int getNumberEvents() {
-		return getStorage().getNumberEventsOfCase(this);
-	}
-		
+	
 }

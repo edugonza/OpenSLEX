@@ -4,7 +4,6 @@ public class SLEXMMEventAttribute extends SLEXMMAbstractDatabaseObject {
 
 	private int id = -1;
 	private String name = null;
-	private int collectionId = -1;
 	
 	protected SLEXMMEventAttribute(SLEXMMStorageMetaModel storage) {
 		super(storage);
@@ -18,21 +17,12 @@ public class SLEXMMEventAttribute extends SLEXMMAbstractDatabaseObject {
 		return this.id;
 	}
 	
-	public int getCollectionId() {
-		return this.collectionId;
-	}
-	
 	public String getName() {
 		return this.name;
 	}
 	
 	protected void setId(int id) {
 		this.id = id;
-	}
-	
-	protected void setCollectionId(int id) {
-		this.collectionId = id;
-		setDirty(true);
 	}
 	
 	protected void setName(String name) {
@@ -52,7 +42,7 @@ public class SLEXMMEventAttribute extends SLEXMMAbstractDatabaseObject {
 
 	@Override
 	public String toString() {
-		return getCollectionId()+":"+getId()+":"+getName();
+		return getId()+":"+getName();
 	}
 	
 	@Override
@@ -66,7 +56,6 @@ public class SLEXMMEventAttribute extends SLEXMMAbstractDatabaseObject {
 			if (obj instanceof SLEXMMEventAttribute) {
 				SLEXMMEventAttribute objat = (SLEXMMEventAttribute) obj;
 				if (this.getId() == objat.getId() &&
-						this.getCollectionId() == objat.getCollectionId() &&
 						this.getName().equals(objat.getName())) {
 					return true;
 				} else {
