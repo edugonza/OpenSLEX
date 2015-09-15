@@ -1,8 +1,9 @@
 package org.processmining.openslex;
 
+import java.io.Serializable;
 import java.util.Hashtable;
 
-public class SLEXEvent extends SLEXAbstractDatabaseObject {
+public class SLEXEvent extends SLEXAbstractDatabaseObject implements Serializable {
 
 	private int id = -1;
 	private int collectionId = -1;

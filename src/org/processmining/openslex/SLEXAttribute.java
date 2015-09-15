@@ -1,6 +1,8 @@
 package org.processmining.openslex;
 
-public class SLEXAttribute extends SLEXAbstractDatabaseObject {
+import java.io.Serializable;
+
+public class SLEXAttribute extends SLEXAbstractDatabaseObject implements Serializable {
 
 	private int id = -1;
 	private String name = null;

@@ -34,6 +34,10 @@ public class SLEXMMCase extends SLEXMMAbstractDatabaseObject {
 		return getStorage().addActivityInstanceToCase(this,ai);
 	}
 	
+	public boolean add(int activityInstanceId) {
+		return getStorage().addActivityInstanceToCase(this.getId(),activityInstanceId);
+	}
+	
 	@Override
 	boolean insert(SLEXMMAbstractDatabaseObject t) {
 		return getStorage().insert((SLEXMMCase) t);

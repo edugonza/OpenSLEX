@@ -1,5 +1,6 @@
 package org.processmining.openslex.metamodel;
 
+import java.util.Date;
 import java.util.HashMap;
 
 public class SLEXMMObjectVersion extends SLEXMMAbstractDatabaseObject {
@@ -7,6 +8,9 @@ public class SLEXMMObjectVersion extends SLEXMMAbstractDatabaseObject {
 	private int id = -1;
 	private int objectId = -1;
 	private int eventId = -1;
+	private String eventLabel = null;
+	private Date startTimestamp = null;
+	private Date endTimestamp = null;
 	private HashMap<SLEXMMAttribute,SLEXMMAttributeValue> attributeValues = null;
 	
 	protected SLEXMMObjectVersion(SLEXMMStorageMetaModel storage) {
@@ -29,6 +33,18 @@ public class SLEXMMObjectVersion extends SLEXMMAbstractDatabaseObject {
 		return this.eventId;
 	}
 	
+	public String getEventLabel() {
+		return this.eventLabel;
+	}
+	
+	public Date getStartTimestamp() {
+		return this.startTimestamp;
+	}
+	
+	public Date getEndTimestamp() {
+		return this.endTimestamp;
+	}
+	
 	protected void setId(int id) {
 		this.id = id;
 	}
@@ -43,6 +59,21 @@ public class SLEXMMObjectVersion extends SLEXMMAbstractDatabaseObject {
 		setDirty(true);
 	}
 	
+	protected void setEventLabel(String label) {
+		this.eventLabel = label;
+		setDirty(true);
+	}
+	
+	protected void setStartTimestamp(Date timestamp) {
+		this.startTimestamp = timestamp;
+		setDirty(true);
+	}
+	
+	protected void setEndTimestamp(Date timestamp) {
+		this.endTimestamp = timestamp;
+		setDirty(true);
+	}
+		
 	@Override
 	boolean insert(SLEXMMAbstractDatabaseObject e) {
 		return getStorage().insert((SLEXMMObjectVersion)e);

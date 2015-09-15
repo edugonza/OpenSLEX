@@ -3,6 +3,7 @@ package org.processmining.openslex.metamodel;
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Date;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -1363,10 +1364,14 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 
 	@Override
-	public SLEXMMObjectVersion createObjectVersion(int objectId, int eventId) {
+	public SLEXMMObjectVersion createObjectVersion(int objectId, int eventId,
+			String eventLabel, Date startTimestamp, Date endTimestamp) {
 		SLEXMMObjectVersion objv = new SLEXMMObjectVersion(this);
 		objv.setObjectId(objectId);
 		objv.setEventId(eventId);
+		objv.setEventLabel(eventLabel);
+		objv.setStartTimestamp(startTimestamp);
+		objv.setEndTimestamp(endTimestamp);
 		if (isAutoCommitOnCreationEnabled()) {
 			objv.commit();
 		}
@@ -1379,10 +1384,13 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		boolean result = false;
 		try {
 			statement = connection.prepareStatement("INSERT INTO "+METAMODEL_ALIAS
-					+".object_version (object_id,event_id) VALUES (?,?)");
+					+".object_version (object_id,event_id,event_label,start_timestamp,end_timestamp) VALUES (?,?,?,?,?)");
 			statement.setQueryTimeout(30);
 			statement.setInt(1, objv.getObjectId());
 			statement.setInt(2, objv.getEventId());
+			statement.setString(3, objv.getEventLabel());
+			statement.setDate(4, (java.sql.Date) objv.getStartTimestamp());
+			statement.setDate(5, (java.sql.Date) objv.getEndTimestamp());
 			statement.execute();
 			objv.setId(getLastInsertedRowId(statement));
 			result = true;
@@ -1402,11 +1410,15 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		boolean result = false;
 		try {
 			statement = connection.prepareStatement("UPDATE "+METAMODEL_ALIAS
-					+".object_version SET object_id = ?, event_id = ? WHERE id = ? ");
+					+".object_version SET object_id = ?, event_id = ?, event_label = ?,"
+					+" start_timestamp = ?, end_timestamp = ? WHERE id = ? ");
 			statement.setQueryTimeout(30);
 			statement.setInt(1, objv.getObjectId());
 			statement.setInt(2, objv.getEventId());
-			statement.setInt(3, objv.getId());
+			statement.setString(3, objv.getEventLabel());
+			statement.setDate(4, (java.sql.Date) objv.getStartTimestamp());
+			statement.setDate(5, (java.sql.Date) objv.getEndTimestamp());
+			statement.setInt(6, objv.getId());
 			statement.execute();
 			result = true;
 		} catch (Exception e) {
@@ -1472,7 +1484,8 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		try {
 			statement = connection.createStatement();
-			ResultSet rset = statement.executeQuery("SELECT OBJV.id, OBJV.object_id, OBJV.event_id, EV.ordering FROM "
+			ResultSet rset = statement.executeQuery("SELECT OBJV.id, OBJV.object_id, OBJV.event_id, "
+					+" OBJV.event_label, OBJV.start_timestamp, OBJV.end_timestamp, EV.ordering FROM "
 					+METAMODEL_ALIAS+".object_version AS OBJV, "
 					+METAMODEL_ALIAS+".event AS EV "
 					+" WHERE OBJV.object_id = "+objId+" "
