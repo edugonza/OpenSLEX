@@ -127,7 +127,7 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	public abstract SLEXMMObject createObject(int classId);
 
 	public abstract SLEXMMObjectVersion createObjectVersion(int objectId, int eventId,
-			String eventLabel, Date startTimestamp, Date endTimestamp);
+			String eventLabel, long startTimestamp, long endTimestamp);
 
 	public abstract SLEXMMRelationResultSet getRelationsForSourceObject(SLEXMMObject obj);
 

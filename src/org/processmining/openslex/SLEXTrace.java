@@ -1,6 +1,8 @@
 package org.processmining.openslex;
 
-public class SLEXTrace extends SLEXAbstractDatabaseObject {
+import java.io.Serializable;
+
+public class SLEXTrace extends SLEXAbstractDatabaseObject implements Serializable {
 
 	private int id = -1;
 	private String caseId = null;

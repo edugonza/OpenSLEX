@@ -9,8 +9,8 @@ public class SLEXMMObjectVersion extends SLEXMMAbstractDatabaseObject {
 	private int objectId = -1;
 	private int eventId = -1;
 	private String eventLabel = null;
-	private Date startTimestamp = null;
-	private Date endTimestamp = null;
+	private long startTimestamp = -1;
+	private long endTimestamp = -1;
 	private HashMap<SLEXMMAttribute,SLEXMMAttributeValue> attributeValues = null;
 	
 	protected SLEXMMObjectVersion(SLEXMMStorageMetaModel storage) {
@@ -37,11 +37,11 @@ public class SLEXMMObjectVersion extends SLEXMMAbstractDatabaseObject {
 		return this.eventLabel;
 	}
 	
-	public Date getStartTimestamp() {
+	public long getStartTimestamp() {
 		return this.startTimestamp;
 	}
 	
-	public Date getEndTimestamp() {
+	public long getEndTimestamp() {
 		return this.endTimestamp;
 	}
 	
@@ -64,12 +64,12 @@ public class SLEXMMObjectVersion extends SLEXMMAbstractDatabaseObject {
 		setDirty(true);
 	}
 	
-	protected void setStartTimestamp(Date timestamp) {
+	protected void setStartTimestamp(long timestamp) {
 		this.startTimestamp = timestamp;
 		setDirty(true);
 	}
 	
-	protected void setEndTimestamp(Date timestamp) {
+	protected void setEndTimestamp(long timestamp) {
 		this.endTimestamp = timestamp;
 		setDirty(true);
 	}

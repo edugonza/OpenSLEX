@@ -20,8 +20,8 @@ public class SLEXMMObjectVersionResultSet extends SLEXMMAbstractResultSetObject 
 				int objectId = this.rset.getInt("object_id");
 				int eventId = this.rset.getInt("event_id");
 				String eventLabel = this.rset.getString("event_label");
-				Date startTimestamp = this.rset.getDate("start_timestamp");
-				Date endTimestamp = this.rset.getDate("end_timestamp");
+				long startTimestamp = this.rset.getLong("start_timestamp");
+				long endTimestamp = this.rset.getLong("end_timestamp");
 				ev = new SLEXMMObjectVersion((SLEXMMStorageMetaModel) storage);
 				ev.setId(id);
 				ev.setObjectId(objectId);

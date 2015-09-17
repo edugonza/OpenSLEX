@@ -1365,7 +1365,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMObjectVersion createObjectVersion(int objectId, int eventId,
-			String eventLabel, Date startTimestamp, Date endTimestamp) {
+			String eventLabel, long startTimestamp, long endTimestamp) {
 		SLEXMMObjectVersion objv = new SLEXMMObjectVersion(this);
 		objv.setObjectId(objectId);
 		objv.setEventId(eventId);
@@ -1389,8 +1389,8 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 			statement.setInt(1, objv.getObjectId());
 			statement.setInt(2, objv.getEventId());
 			statement.setString(3, objv.getEventLabel());
-			statement.setDate(4, (java.sql.Date) objv.getStartTimestamp());
-			statement.setDate(5, (java.sql.Date) objv.getEndTimestamp());
+			statement.setLong(4, objv.getStartTimestamp());
+			statement.setLong(5, objv.getEndTimestamp());
 			statement.execute();
 			objv.setId(getLastInsertedRowId(statement));
 			result = true;
@@ -1416,8 +1416,8 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 			statement.setInt(1, objv.getObjectId());
 			statement.setInt(2, objv.getEventId());
 			statement.setString(3, objv.getEventLabel());
-			statement.setDate(4, (java.sql.Date) objv.getStartTimestamp());
-			statement.setDate(5, (java.sql.Date) objv.getEndTimestamp());
+			statement.setLong(4, objv.getStartTimestamp());
+			statement.setLong(5, objv.getEndTimestamp());
 			statement.setInt(6, objv.getId());
 			statement.execute();
 			result = true;
@@ -1793,7 +1793,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMEventResultSet getEventsForCaseOrdered(SLEXMMCase c) {
-		return getEventsOfCase(c.getId());
+		return getEventsForCaseOrdered(c.getId());
 	}
 	
 	@Override
@@ -1802,12 +1802,14 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		try {
 			statement = connection.createStatement();
-			ResultSet rset = statement.executeQuery("SELECT EV.* FROM "
+			String query = "SELECT EV.* FROM "
 					+METAMODEL_ALIAS+".event as EV, "
 					+METAMODEL_ALIAS+".activity_instance_to_case as AITC "
 					+" WHERE EV.activity_instance_id = AITC.activity_instance_id "
 					+" AND AITC.case_id = '"+caseId+"' "
-					+" ORDER BY EV.ordering ASC ");
+					+" ORDER BY EV.ordering ASC ";
+			ResultSet rset = statement.executeQuery(query);
+			System.out.println(query);
 			erset = new SLEXMMEventResultSet(this, rset);
 		} catch (Exception e) {
 			e.printStackTrace();
