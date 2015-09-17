@@ -1809,7 +1809,6 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+" AND AITC.case_id = '"+caseId+"' "
 					+" ORDER BY EV.ordering ASC ";
 			ResultSet rset = statement.executeQuery(query);
-			System.out.println(query);
 			erset = new SLEXMMEventResultSet(this, rset);
 		} catch (Exception e) {
 			e.printStackTrace();
