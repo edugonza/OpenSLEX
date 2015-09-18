@@ -18,10 +18,16 @@ public class SLEXMMRelationResultSet extends SLEXMMAbstractResultSetObject {
 				int id = this.rset.getInt("id");
 				int sourceObjectId = this.rset.getInt("source_object_version_id");
 				int targetObjectId = this.rset.getInt("target_object_version_id");
+				int relationshipId = this.rset.getInt("relationship_id");
+				long startTimestamp = this.rset.getLong("start_timestamp");
+				long endTimestamp = this.rset.getLong("end_timestamp");
 				ev = new SLEXMMRelation((SLEXMMStorageMetaModel) storage);
 				ev.setId(id);
 				ev.setSourceObjectVersionId(sourceObjectId);
 				ev.setTargetObjectVersionId(targetObjectId);
+				ev.setRelationshipId(relationshipId);
+				ev.setStartTimestamp(startTimestamp);
+				ev.setEndTimestamp(endTimestamp);
 				ev.setDirty(false);
 				ev.setInserted(true);
 			}

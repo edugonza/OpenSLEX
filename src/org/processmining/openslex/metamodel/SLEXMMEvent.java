@@ -8,6 +8,9 @@ public class SLEXMMEvent extends SLEXMMAbstractDatabaseObject {
 	private int activityInstanceId = -1;
 	private int order = -1;
 	private HashMap<SLEXMMEventAttribute, SLEXMMEventAttributeValue> attributeValues = null;
+	private String lifecycle = null;
+	private long timestamp = -1;
+	private String resource = null;
 	
 	protected SLEXMMEvent(SLEXMMStorageMetaModel storage) {
 		super(storage);
@@ -41,6 +44,33 @@ public class SLEXMMEvent extends SLEXMMAbstractDatabaseObject {
 	
 	public int getOrder() {
 		return this.order;
+	}
+	
+	public String getLifecycle() {
+		return this.lifecycle;
+	}
+	
+	public String getResource() {
+		return this.resource;
+	}
+	
+	public long getTimestamp() {
+		return this.timestamp;
+	}
+	
+	protected void setLifecycle(String lifecycle) {
+		this.lifecycle = lifecycle;
+		setDirty(true);
+	}
+	
+	protected void setResource(String resource) {
+		this.resource = resource;
+		setDirty(true);
+	}
+	
+	protected void setTimestamp(long timestamp) {
+		this.timestamp = timestamp;
+		setDirty(true);
 	}
 	
 	@Override

@@ -1,12 +1,12 @@
 package org.processmining.openslex.metamodel;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
 public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	
-	public abstract SLEXMMEvent createEvent(int order, int activity_instance_id);
+	public abstract SLEXMMEvent createEvent(int order, int activity_instance_id,
+			String lifecycle, String resource, long timestamp);
 	
 	public abstract SLEXMMEventAttribute createEventAttribute(String name);
 
@@ -122,7 +122,8 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	public abstract SLEXMMObjectVersionResultSet getObjectVersionsForObjectOrdered(int objId);
 
 	public abstract SLEXMMRelation createRelation(int sourceObjectVersionId,
-			int targetObjectVersionId);
+			int targetObjectVersionId, int relationshipId,
+			long startTimestamp, long endTimestamp);
 
 	public abstract SLEXMMObject createObject(int classId);
 
@@ -170,5 +171,7 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	public abstract SLEXMMActivity createActivity(int processId, String name);
 
 	public abstract SLEXMMActivityInstance createActivityInstance(SLEXMMActivity act);
+	
+	public abstract SLEXMMEvent getEventForId(int evId);
 	
 }

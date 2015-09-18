@@ -18,10 +18,16 @@ public class SLEXMMEventResultSet extends SLEXMMAbstractResultSetObject {
 				int id = this.rset.getInt("id");
 				int activityInstanceId = this.rset.getInt("activity_instance_id");
 				int order = this.rset.getInt("ordering");
+				String lifecycle = this.rset.getString("lifecycle");
+				String resource = this.rset.getString("resource");
+				long timestamp = this.rset.getLong("timestamp");
 				ev = new SLEXMMEvent((SLEXMMStorageMetaModel) storage);
 				ev.setId(id);
 				ev.setActivityInstanceId(activityInstanceId);
 				ev.setOrder(order);
+				ev.setTimestamp(timestamp);
+				ev.setLifecycle(lifecycle);
+				ev.setResource(resource);
 				//ev.retrieveAttributeValues();
 				ev.setDirty(false);
 				ev.setInserted(true);

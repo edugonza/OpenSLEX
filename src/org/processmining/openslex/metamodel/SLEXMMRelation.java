@@ -5,6 +5,9 @@ public class SLEXMMRelation extends SLEXMMAbstractDatabaseObject {
 	private int id = -1;
 	private int sourceObjectVersionId = -1;
 	private int targetObjectVersionId = -1;
+	private int relationshipId = -1;
+	private long startTimestamp = -1;
+	private long endTimestamp = -1;
 	
 	protected SLEXMMRelation(SLEXMMStorageMetaModel storage) {
 		super(storage);
@@ -37,6 +40,33 @@ public class SLEXMMRelation extends SLEXMMAbstractDatabaseObject {
 	
 	protected void setTargetObjectVersionId(int id) {
 		this.targetObjectVersionId = id;
+		setDirty(true);
+	}
+	
+	public int getRelationshipId() {
+		return this.relationshipId;
+	}
+	
+	protected void setRelationshipId(int id) {
+		this.relationshipId = id;
+		setDirty(true);
+	}
+	
+	public long getStartTimestamp() {
+		return this.startTimestamp;
+	}
+	
+	public long getEndTimestamp() {
+		return this.endTimestamp;
+	}
+	
+	protected void setStartTimestamp(long timestamp) {
+		this.startTimestamp = timestamp;
+		setDirty(true);
+	}
+	
+	protected void setEndTimestamp(long timestamp) {
+		this.endTimestamp = timestamp;
 		setDirty(true);
 	}
 	

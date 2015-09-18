@@ -3,7 +3,6 @@ package org.processmining.openslex.metamodel;
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Date;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -286,10 +285,13 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 	
 	@Override
-	public SLEXMMEvent createEvent(int order, int activity_instance_id) {
+	public SLEXMMEvent createEvent(int order, int activity_instance_id, String lifecycle, String resource, long timestamp) {
 		SLEXMMEvent ev = new SLEXMMEvent(this);
 		ev.setOrder(order);
 		ev.setActivityInstanceId(activity_instance_id);
+		ev.setLifecycle(lifecycle);
+		ev.setResource(resource);
+		ev.setTimestamp(timestamp);
 		if (isAutoCommitOnCreationEnabled()) {
 			ev.commit();
 		}
@@ -451,8 +453,8 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		try {
 			statement = connection.createStatement();
 			statement.setQueryTimeout(30);
-			statement.execute("INSERT INTO "+METAMODEL_ALIAS+".event (activity_instance_id,ordering) VALUES ('"+
-					ev.getActivityInstanceId()+"','"+ev.getOrder()+"')");
+			statement.execute("INSERT INTO "+METAMODEL_ALIAS+".event (activity_instance_id,ordering,lifecycle,timestamp,resource) VALUES ('"+
+					ev.getActivityInstanceId()+"','"+ev.getOrder()+"','"+ev.getLifecycle()+"','"+ev.getTimestamp()+"','"+ev.getResource()+"')");
 			ev.setId(getLastInsertedRowId(statement));
 			// TODO Insert all the attributes and attribute-values in the event, if any
 			result = true;
@@ -473,8 +475,13 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		try {
 			statement = connection.createStatement();
 			statement.setQueryTimeout(30);
-			statement.execute("UPDATE "+METAMODEL_ALIAS+".event SET activity_instance_id = '"+ev.getActivityInstanceId()+"' "+
-					" AND ordering = '"+ev.getOrder()+"' WHERE id = '"+ev.getId()+"'");
+			statement.execute("UPDATE "+METAMODEL_ALIAS+".event"+
+					" SET activity_instance_id = '"+ev.getActivityInstanceId()+"' "+
+					" AND ordering = '"+ev.getOrder()+"'"+
+					" AND lifecycle = '"+ev.getLifecycle()+"'"+
+					" AND resource = '"+ev.getResource()+"'"+
+					" AND timestamp = '"+ev.getTimestamp()+"'"+
+					" WHERE id = '"+ev.getId()+"'");
 			result = true;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1249,10 +1256,15 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 
 	@Override
-	public SLEXMMRelation createRelation(int sourceObjectVersionId, int targetObjectVersionId) {
+	public SLEXMMRelation createRelation(int sourceObjectVersionId,
+			int targetObjectVersionId, int relationshipId,
+			long startTimestamp, long endTimestamp) {
 		SLEXMMRelation rt = new SLEXMMRelation(this);
 		rt.setSourceObjectVersionId(sourceObjectVersionId);
 		rt.setTargetObjectVersionId(targetObjectVersionId);
+		rt.setStartTimestamp(startTimestamp);
+		rt.setEndTimestamp(endTimestamp);
+		rt.setRelationshipId(relationshipId);
 		if (isAutoCommitOnCreationEnabled()) {
 			rt.commit();
 		}
@@ -1266,11 +1278,15 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		try {
 			statement = connection.prepareStatement("INSERT INTO "+METAMODEL_ALIAS
 					+".relation (source_object_version_id,"
-					+"target_object_version_id)"
-					+" VALUES (?,?)");
+					+"target_object_version_id,relationship_id,"
+					+"start_timestamp,end_timestamp)"
+					+" VALUES (?,?,?,?,?)");
 			statement.setQueryTimeout(30);
 			statement.setInt(1, rt.getSourceObjectVersionId());
 			statement.setInt(2, rt.getTargetObjectVersionId());
+			statement.setInt(3, rt.getRelationshipId());
+			statement.setLong(4, rt.getStartTimestamp());
+			statement.setLong(5, rt.getEndTimestamp());
 			rt.setId(getLastInsertedRowId(statement));
 			statement.execute();
 			result = true;
@@ -1291,12 +1307,18 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		try {
 			statement = connection.prepareStatement("UPDATE "+METAMODEL_ALIAS
 					+".relation SET source_object_version_id = ? , "
-					+"target_object_version_id = ? "
+					+"target_object_version_id = ? , "
+					+"relationship_id = ? , "
+					+"start_timestamp = ? , "
+					+"end_timestamp = ? "
 					+" WHERE id = ? ");
 			statement.setQueryTimeout(30);
 			statement.setInt(1, rt.getSourceObjectVersionId());
 			statement.setInt(2, rt.getTargetObjectVersionId());
-			statement.setInt(3, rt.getId());
+			statement.setInt(3, rt.getRelationshipId());
+			statement.setLong(4, rt.getStartTimestamp());
+			statement.setLong(5, rt.getEndTimestamp());
+			statement.setInt(6, rt.getId());
 			statement.execute();
 			result = true;
 		} catch (Exception e) {
@@ -1846,5 +1868,29 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		}
 		return actIn;
 	}
+	
+	@Override
+	public SLEXMMEvent getEventForId(int evId) {
+		SLEXMMEvent e = null;
+		
+		SLEXMMEventResultSet erset = null;
+		Statement statement = null;
+		try {
+			statement = connection.createStatement();
+			String query = "SELECT EV.* FROM "
+					+METAMODEL_ALIAS+".event as EV "
+					+" WHERE EV.id = '"+evId+"' ";
+			ResultSet rset = statement.executeQuery(query);
+			erset = new SLEXMMEventResultSet(this, rset);
+			e = erset.getNext();
+			closeStatement(statement);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return e;
+	}
+	
 	
 }
