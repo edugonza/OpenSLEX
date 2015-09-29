@@ -6,6 +6,9 @@ abstract class SLEXAbstractDatabaseObject {
 	private boolean dirty = true;
 	private boolean inserted = false;
 	
+	public SLEXAbstractDatabaseObject() {
+	}
+	
 	public SLEXAbstractDatabaseObject(SLEXStorage storage) {
 		this.storage = storage;
 	}

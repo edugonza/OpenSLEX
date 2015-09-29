@@ -8,10 +8,36 @@ public class SLEXTrace extends SLEXAbstractDatabaseObject implements Serializabl
 	private String caseId = null;
 	private int perspectiveId = -1;
 	
+	public SLEXTrace() {
+		super(null);
+	}
+	
 	protected SLEXTrace(SLEXStoragePerspective storage) {
 		super(storage);
 	}
 
+	@Override
+	public int hashCode() {
+		String strHash = id+"#"+caseId+"#"+perspectiveId;
+		return strHash.hashCode();
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof SLEXTrace) {
+			SLEXTrace oT = (SLEXTrace) obj;
+			if (this.id == oT.id) {
+				if (this.caseId.equals(oT.caseId)) {
+					if (this.perspectiveId == oT.perspectiveId) {
+						return true;
+					}
+				}
+			}
+		}
+		
+		return false;
+	}
+	
 	public SLEXStoragePerspective getStorage() {
 		return (SLEXStoragePerspective) super.storage;
 	}
