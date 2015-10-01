@@ -1645,6 +1645,25 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		
 		return erset; 
 	}
+	
+	@Override
+	public SLEXMMObjectResultSet getObjectsPerClass(int classId) {
+		SLEXMMObjectResultSet erset = null;
+		Statement statement = null;
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT OBJ.id, OBJ.class_id FROM "
+					+METAMODEL_ALIAS+".object AS OBJ "
+					+" WHERE OBJ.class_id = "+classId
+					+" ORDER BY OBJ.id");
+			erset = new SLEXMMObjectResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return erset; 
+	}
 
 	@Override
 	public SLEXMMEventResultSet getEvents() {
