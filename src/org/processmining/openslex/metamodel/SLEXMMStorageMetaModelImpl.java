@@ -1891,6 +1891,33 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		
 		return e;
 	}
+
+	@Override
+	public List<SLEXMMActivity> getActivities() {
+		List<SLEXMMActivity> actList = new Vector<>();
+		Statement statement = null;
+		
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT * FROM "+METAMODEL_ALIAS+".activity");
+			while (rset.next()) {
+				int id = rset.getInt("id");
+				String name = rset.getString("name");
+				int processId = rset.getInt("process_id");
+				SLEXMMActivity act = new SLEXMMActivity(this,name,processId);
+				act.setId(id);
+				act.setDirty(false);
+				act.setInserted(true);
+				actList.add(act);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			actList = null;
+		} finally {
+			closeStatement(statement);
+		}
+		return actList;
+	}
 	
 	
 }
