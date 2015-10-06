@@ -1456,6 +1456,12 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	@Override
 	public HashMap<SLEXMMAttribute, SLEXMMAttributeValue> getAttributeValuesForObjectVersion(
 			SLEXMMObjectVersion objv) {
+		return getAttributeValuesForObjectVersion(objv.getId());
+	}
+	
+	@Override
+	public HashMap<SLEXMMAttribute, SLEXMMAttributeValue> getAttributeValuesForObjectVersion(
+			int objvId) {
 		HashMap<SLEXMMAttribute, SLEXMMAttributeValue> attributeValues = null;
 		Statement statement = null;
 		try {
@@ -1465,7 +1471,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 														METAMODEL_ALIAS+".attribute_name AS AT, "+
 														METAMODEL_ALIAS+".attribute_value AS ATV, "+
 														METAMODEL_ALIAS+".object_version AS OBJV "+
-														"WHERE OBJV.id = "+objv.getId()+" AND "+
+														"WHERE OBJV.id = "+objvId+" AND "+
 														"ATV.object_version_id = OBJV.id AND "+
 														"ATV.attribute_name_id = AT.id ");
 			attributeValues = new HashMap<>();
@@ -1477,7 +1483,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 				at.setClassId(rset.getInt(3));
 				at.setDirty(false);
 				at.setInserted(true);
-				SLEXMMAttributeValue atv = new SLEXMMAttributeValue(this, at.getId(), objv.getId());
+				SLEXMMAttributeValue atv = new SLEXMMAttributeValue(this, at.getId(), objvId);
 				atv.setId(rset.getInt(4));
 				atv.setValue(rset.getString(5));
 				atv.setType(rset.getString(6));
@@ -1512,6 +1518,27 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+METAMODEL_ALIAS+".event AS EV "
 					+" WHERE OBJV.object_id = "+objId+" "
 					+" AND OBJV.event_id = EV.id "
+					+" ORDER BY EV.ordering");
+			erset = new SLEXMMObjectVersionResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return erset; 
+	}
+	
+	@Override
+	public SLEXMMObjectVersionResultSet getObjectVersions() {
+		SLEXMMObjectVersionResultSet erset = null;
+		Statement statement = null;
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT OBJV.id, OBJV.object_id, OBJV.event_id, "
+					+" OBJV.event_label, OBJV.start_timestamp, OBJV.end_timestamp, EV.ordering FROM "
+					+METAMODEL_ALIAS+".object_version AS OBJV, "
+					+METAMODEL_ALIAS+".event AS EV "
+					+" WHERE OBJV.event_id = EV.id "
 					+" ORDER BY EV.ordering");
 			erset = new SLEXMMObjectVersionResultSet(this, rset);
 		} catch (Exception e) {

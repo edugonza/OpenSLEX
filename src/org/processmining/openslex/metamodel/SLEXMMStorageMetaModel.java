@@ -115,6 +115,9 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 
 	public abstract HashMap<SLEXMMAttribute, SLEXMMAttributeValue> getAttributeValuesForObjectVersion(
 			SLEXMMObjectVersion objv);
+	
+	public abstract HashMap<SLEXMMAttribute, SLEXMMAttributeValue> getAttributeValuesForObjectVersion(
+			int objvId);
 
 	public abstract SLEXMMObjectVersionResultSet getObjectVersionsForObjectOrdered(
 			SLEXMMObject obj);
@@ -180,5 +183,7 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 
 	public abstract SLEXMMObjectVersionResultSet getObjectVersionsForActivity(
 			SLEXMMActivity ob);
+
+	public abstract SLEXMMObjectVersionResultSet getObjectVersions();
 	
 }
