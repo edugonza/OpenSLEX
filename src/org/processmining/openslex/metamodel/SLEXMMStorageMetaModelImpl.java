@@ -1937,6 +1937,33 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		}
 		return actList;
 	}
+
+	@Override
+	public SLEXMMObjectVersionResultSet getObjectVersionsForActivity(
+			SLEXMMActivity act) {
+		SLEXMMObjectVersionResultSet erset = null;
+		Statement statement = null;
+		String query = "";
+		try {
+			statement = connection.createStatement();
+			query = "SELECT DISTINCT OBJV.id, OBJV.object_id, OBJV.event_id, "
+					+" OBJV.event_label, OBJV.start_timestamp, OBJV.end_timestamp FROM "
+					+METAMODEL_ALIAS+".object_version AS OBJV, "
+					+METAMODEL_ALIAS+".event AS EV, "
+					+METAMODEL_ALIAS+".activity_instance AS AI "
+					+" WHERE OBJV.event_id = EV.id "
+					+" AND EV.activity_instance_id = AI.id "
+					+" AND AI.activity_id = "+ act.getId()+" ";
+			ResultSet rset = statement.executeQuery(query);
+			erset = new SLEXMMObjectVersionResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.err.println(query);
+			closeStatement(statement);
+		}
+		
+		return erset; 
+	}
 	
 	
 }

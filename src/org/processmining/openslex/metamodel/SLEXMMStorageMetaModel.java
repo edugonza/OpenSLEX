@@ -177,5 +177,8 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	public abstract List<SLEXMMActivity> getActivities();
 
 	public abstract SLEXMMObjectResultSet getObjectsPerClass(int classId);
+
+	public abstract SLEXMMObjectVersionResultSet getObjectVersionsForActivity(
+			SLEXMMActivity ob);
 	
 }
