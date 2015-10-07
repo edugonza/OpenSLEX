@@ -1991,6 +1991,75 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		
 		return erset; 
 	}
+
+	@Override
+	public SLEXMMObjectVersionResultSet getVersionsRelatedToObjectVersion(
+			SLEXMMObjectVersion ob) {
+		
+		SLEXMMObjectVersionResultSet erset = null;
+		Statement statement = null;
+		String query = "";
+		try {
+			statement = connection.createStatement();
+			query = "SELECT DISTINCT OBJV.id, OBJV.object_id, OBJV.event_id, "
+					+" OBJV.event_label, OBJV.start_timestamp, OBJV.end_timestamp FROM "
+					+METAMODEL_ALIAS+".object_version AS OBJV, "
+					+METAMODEL_ALIAS+".relation AS RL "
+					+" WHERE ( RL.source_object_version_id = "+ob.getId()+" AND OBJV.id = RL.target_object_version_id ) "
+					+" OR ( RL.target_object_version_id = "+ob.getId()+" AND OBJV.id = RL.source_object_version_id ) ";
+			ResultSet rset = statement.executeQuery(query);
+			erset = new SLEXMMObjectVersionResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.err.println(query);
+			closeStatement(statement);
+		}
+		
+		return erset; 
+		 
+	}
+
+	@Override
+	public SLEXMMEventResultSet getEventsForActivity(SLEXMMActivity act) {
+		SLEXMMEventResultSet erset = null;
+		Statement statement = null;
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT DISTINCT EV.* FROM "
+					+METAMODEL_ALIAS+".event as EV, "
+					+METAMODEL_ALIAS+".activity_instance as AI "
+					+" WHERE EV.activity_instance_id = AI.id "
+					+" AND AI.activity_id = "+act.getId()+" "
+					+" ORDER BY EV.ordering ASC ");
+			erset = new SLEXMMEventResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return erset;
+	}
+
+	@Override
+	public SLEXMMObjectResultSet getObjectsForEvent(SLEXMMEvent ev) {
+		SLEXMMObjectResultSet erset = null;
+		Statement statement = null;
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT OBJ.id, OBJ.class_id FROM "
+					+METAMODEL_ALIAS+".object AS OBJ, "
+					+METAMODEL_ALIAS+".object_version AS OBJV "
+					+" WHERE OBJ.id = OBJV.object_id "
+					+" AND OBJV.event_id = "+ev.getId()+" "
+					+" ORDER BY OBJ.id");
+			erset = new SLEXMMObjectResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return erset; 
+	}
 	
 	
 }

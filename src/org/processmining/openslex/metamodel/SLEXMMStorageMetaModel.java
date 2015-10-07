@@ -185,5 +185,12 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 			SLEXMMActivity ob);
 
 	public abstract SLEXMMObjectVersionResultSet getObjectVersions();
+
+	public abstract SLEXMMObjectVersionResultSet getVersionsRelatedToObjectVersion(
+			SLEXMMObjectVersion ob);
+
+	public abstract SLEXMMEventResultSet getEventsForActivity(SLEXMMActivity act);
+
+	public abstract SLEXMMObjectResultSet getObjectsForEvent(SLEXMMEvent ob);
 	
 }
