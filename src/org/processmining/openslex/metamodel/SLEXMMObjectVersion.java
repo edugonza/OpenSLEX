@@ -7,8 +7,6 @@ public class SLEXMMObjectVersion extends SLEXMMAbstractDatabaseObject {
 
 	private int id = -1;
 	private int objectId = -1;
-	private int eventId = -1;
-	private String eventLabel = null;
 	private long startTimestamp = -1;
 	private long endTimestamp = -1;
 	private HashMap<SLEXMMAttribute,SLEXMMAttributeValue> attributeValues = null;
@@ -28,15 +26,7 @@ public class SLEXMMObjectVersion extends SLEXMMAbstractDatabaseObject {
 	public int getObjectId() {
 		return this.objectId;
 	}
-	
-	public int getEventId() {
-		return this.eventId;
-	}
-	
-	public String getEventLabel() {
-		return this.eventLabel;
-	}
-	
+		
 	public long getStartTimestamp() {
 		return this.startTimestamp;
 	}
@@ -54,16 +44,6 @@ public class SLEXMMObjectVersion extends SLEXMMAbstractDatabaseObject {
 		setDirty(true);
 	}
 	
-	protected void setEventId(int id) {
-		this.eventId = id;
-		setDirty(true);
-	}
-	
-	protected void setEventLabel(String label) {
-		this.eventLabel = label;
-		setDirty(true);
-	}
-	
 	protected void setStartTimestamp(long timestamp) {
 		this.startTimestamp = timestamp;
 		setDirty(true);
@@ -74,6 +54,14 @@ public class SLEXMMObjectVersion extends SLEXMMAbstractDatabaseObject {
 		setDirty(true);
 	}
 		
+	public boolean add(SLEXMMEvent ev, String label) {
+		return getStorage().addEventToObjectVersion(this,ev,label);
+	}
+	
+	public boolean add(int eventId, String label) {
+		return getStorage().addEventToObjectVersion(this.getId(),eventId,label);
+	}
+	
 	@Override
 	boolean insert(SLEXMMAbstractDatabaseObject e) {
 		return getStorage().insert((SLEXMMObjectVersion)e);

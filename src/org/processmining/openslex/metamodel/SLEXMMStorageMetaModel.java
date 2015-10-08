@@ -130,8 +130,8 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 
 	public abstract SLEXMMObject createObject(int classId);
 
-	public abstract SLEXMMObjectVersion createObjectVersion(int objectId, int eventId,
-			String eventLabel, long startTimestamp, long endTimestamp);
+	public abstract SLEXMMObjectVersion createObjectVersion(int objectId, 
+			long startTimestamp, long endTimestamp);
 
 	public abstract SLEXMMRelationResultSet getRelationsForSourceObject(SLEXMMObject obj);
 
@@ -196,5 +196,9 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	public abstract SLEXMMObject getObjectPerId(int objectId);
 
 	public abstract SLEXMMEventResultSet getEventsForObjectVersion(int id);
+
+	public abstract boolean addEventToObjectVersion(
+			SLEXMMObjectVersion ov, SLEXMMEvent ev, String label);
+	public abstract boolean addEventToObjectVersion(int ovId, int evId, String label);
 	
 }

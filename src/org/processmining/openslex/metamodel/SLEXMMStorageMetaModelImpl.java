@@ -901,107 +901,6 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		return erset; 
 	}
 	
-//	@Override
-//	public SLEXMMEventResultSet getEventsOfCollectionOrdered(int ecId) {
-//		SLEXMMEventResultSet erset = null;
-//		Statement statement = null;
-//		try {
-//			statement = connection.createStatement();
-//			ResultSet rset = statement.executeQuery("SELECT * FROM "
-//					+METAMODEL_ALIAS+".event WHERE collection_id = '"+ecId+"' ORDER BY ordering ASC");
-//			erset = new SLEXMMEventResultSet(this, rset);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			closeStatement(statement);
-//		}
-//		
-//		return erset; 
-//	}
-//	
-//	@Override
-//	public SLEXMMEventResultSet getEventsOfCollectionOrderedBy(
-//			SLEXMMEventCollection ec,
-//			List<SLEXMMEventAttribute> orderAttributes) {
-//		SLEXMMEventResultSet erset = null;
-//		Statement statement = null;
-//		try {
-//			statement = connection.createStatement();
-//			String wherequery = " WHERE E.collection_id = "+ec.getId();
-//			String orderquery = " ";
-//			String query = 			
-//					" SELECT * FROM "+METAMODEL_ALIAS+".event AS E ";
-//			
-//			if (orderAttributes != null) {
-//				orderquery = " ORDER BY ";
-//				for (int i=0;i<orderAttributes.size();i++) {
-//					query += " ,"+METAMODEL_ALIAS+".event_attribute_value AS ATV"+i+" ";
-//					wherequery += " AND ATV"+i+".event_id = E.id "+
-//							" AND ATV"+i+".event_attribute_name_id = "+orderAttributes.get(i).getId()+" ";
-//					orderquery += " CAST(ATV"+i+".value AS INTEGER) ASC ";
-//					if (i < orderAttributes.size()-1) {
-//						orderquery += ", ";
-//					}
-//				}
-//			}
-//			query += wherequery + orderquery;
-//			ResultSet rset = statement.executeQuery(query);
-//			erset = new SLEXMMEventResultSet(this, rset);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			closeStatement(statement);
-//		}
-//		
-//		return erset;
-//	}
-	
-//	@Override
-//	public SLEXMMEventResultSet getEventsOfCollectionBetweenDatesOrderedBy( 
-//			SLEXMMEventCollection ec, List<SLEXMMEventAttribute> orderAttributes, SLEXMMEventAttribute timestampAttr,
-//			String startDate, String endDate) {
-//		SLEXMMEventResultSet erset = null;
-//		Statement statement = null;
-//		try {
-//			statement = connection.createStatement();
-//			String wherequery = " WHERE E.collection_id = " + ec.getId();
-//			String orderquery = " ";
-//			String query = " SELECT * FROM " + METAMODEL_ALIAS
-//					+ ".event AS E ";
-//			int i = 0;
-//			
-//			if (orderAttributes != null) {
-//				orderquery = " ORDER BY ";
-//				for (i = 0; i < orderAttributes.size(); i++) {
-//					query += " ," + METAMODEL_ALIAS + ".event_attribute_value AS ATV"
-//							+ i + " ";
-//					wherequery += " AND ATV" + i + ".event_id = E.id " + " AND ATV"
-//							+ i + ".event_attribute_name_id = "
-//							+ orderAttributes.get(i).getId() + " ";
-//					orderquery += " CAST(ATV" + i + ".value AS INTEGER) ";
-//					if (i < orderAttributes.size() - 1) {
-//						orderquery += ", ";
-//					}
-//				}
-//			}
-//			
-//			if (timestampAttr != null) {
-//				i++;
-//				query += " , "+METAMODEL_ALIAS +".event_attribute_value AS ATV"+i+" ";
-//				wherequery += " AND ATV"+i+".event_id = E.id " +
-//							  " AND ATV"+i+".event_attribute_name_id = "+timestampAttr.getId()+" " +
-//							  " AND CAST(julianday(ATV"+i+".value) AS FLOAT) BETWEEN julianday('"+startDate+"') AND julianday('"+endDate+"') ";
-//			}
-//			
-//			query += wherequery + orderquery;
-//			ResultSet rset = statement.executeQuery(query);
-//			erset = new SLEXMMEventResultSet(this, rset);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			closeStatement(statement);
-//		}
-//
-//		return erset;
-//	}
-
 	@Override
 	public HashMap<SLEXMMEventAttribute, SLEXMMEventAttributeValue> getAttributeValuesForEvent(
 			SLEXMMEvent ev) {
@@ -1386,12 +1285,9 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 
 	@Override
-	public SLEXMMObjectVersion createObjectVersion(int objectId, int eventId,
-			String eventLabel, long startTimestamp, long endTimestamp) {
+	public SLEXMMObjectVersion createObjectVersion(int objectId, long startTimestamp, long endTimestamp) {
 		SLEXMMObjectVersion objv = new SLEXMMObjectVersion(this);
 		objv.setObjectId(objectId);
-		objv.setEventId(eventId);
-		objv.setEventLabel(eventLabel);
 		objv.setStartTimestamp(startTimestamp);
 		objv.setEndTimestamp(endTimestamp);
 		if (isAutoCommitOnCreationEnabled()) {
@@ -1406,13 +1302,11 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		boolean result = false;
 		try {
 			statement = connection.prepareStatement("INSERT INTO "+METAMODEL_ALIAS
-					+".object_version (object_id,event_id,event_label,start_timestamp,end_timestamp) VALUES (?,?,?,?,?)");
+					+".object_version (object_id,start_timestamp,end_timestamp) VALUES (?,?,?)");
 			statement.setQueryTimeout(30);
 			statement.setInt(1, objv.getObjectId());
-			statement.setInt(2, objv.getEventId());
-			statement.setString(3, objv.getEventLabel());
-			statement.setLong(4, objv.getStartTimestamp());
-			statement.setLong(5, objv.getEndTimestamp());
+			statement.setLong(2, objv.getStartTimestamp());
+			statement.setLong(3, objv.getEndTimestamp());
 			statement.execute();
 			objv.setId(getLastInsertedRowId(statement));
 			result = true;
@@ -1432,15 +1326,13 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		boolean result = false;
 		try {
 			statement = connection.prepareStatement("UPDATE "+METAMODEL_ALIAS
-					+".object_version SET object_id = ?, event_id = ?, event_label = ?,"
+					+".object_version SET object_id = ?, "
 					+" start_timestamp = ?, end_timestamp = ? WHERE id = ? ");
 			statement.setQueryTimeout(30);
 			statement.setInt(1, objv.getObjectId());
-			statement.setInt(2, objv.getEventId());
-			statement.setString(3, objv.getEventLabel());
-			statement.setLong(4, objv.getStartTimestamp());
-			statement.setLong(5, objv.getEndTimestamp());
-			statement.setInt(6, objv.getId());
+			statement.setLong(2, objv.getStartTimestamp());
+			statement.setLong(3, objv.getEndTimestamp());
+			statement.setInt(4, objv.getId());
 			statement.execute();
 			result = true;
 		} catch (Exception e) {
@@ -1512,13 +1404,10 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		try {
 			statement = connection.createStatement();
-			ResultSet rset = statement.executeQuery("SELECT OBJV.id, OBJV.object_id, OBJV.event_id, "
-					+" OBJV.event_label, OBJV.start_timestamp, OBJV.end_timestamp, EV.ordering FROM "
-					+METAMODEL_ALIAS+".object_version AS OBJV, "
-					+METAMODEL_ALIAS+".event AS EV "
+			ResultSet rset = statement.executeQuery("SELECT OBJV.* FROM "
+					+METAMODEL_ALIAS+".object_version AS OBJV "
 					+" WHERE OBJV.object_id = "+objId+" "
-					+" AND OBJV.event_id = EV.id "
-					+" ORDER BY EV.ordering");
+					+" ORDER BY OBJV.start_timestamp ");
 			erset = new SLEXMMObjectVersionResultSet(this, rset);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1534,12 +1423,9 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		try {
 			statement = connection.createStatement();
-			ResultSet rset = statement.executeQuery("SELECT OBJV.id, OBJV.object_id, OBJV.event_id, "
-					+" OBJV.event_label, OBJV.start_timestamp, OBJV.end_timestamp, EV.ordering FROM "
-					+METAMODEL_ALIAS+".object_version AS OBJV, "
-					+METAMODEL_ALIAS+".event AS EV "
-					+" WHERE OBJV.event_id = EV.id "
-					+" ORDER BY EV.ordering");
+			ResultSet rset = statement.executeQuery("SELECT OBJV.* FROM "
+					+METAMODEL_ALIAS+".object_version AS OBJV "
+					+" ORDER BY OBJV.start_timestamp ");
 			erset = new SLEXMMObjectVersionResultSet(this, rset);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1605,19 +1491,17 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 	
 	@Override
-	public SLEXMMRelationResultSet getRelationsForSourceObjectOrdered(int objId) {
+	public SLEXMMRelationResultSet getRelationsForSourceObjectOrdered(int objId) { // TODO Check
 		SLEXMMRelationResultSet erset = null;
 		Statement statement = null;
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT REL.* FROM "
 					+METAMODEL_ALIAS+".relation as REL, "
-					+METAMODEL_ALIAS+".object_version OBJV, "
-					+METAMODEL_ALIAS+".event as EV "
+					+METAMODEL_ALIAS+".object_version OBJV "
 					+" WHERE REL.source_object_version_id = OBJV.id "
 					+" AND OBJV.object_id = "+objId+" "
-					+" AND OBJV.event_id = EV.id "
-					+" ORDER BY EV.ordering ASC ");
+					+" ORDER BY OBJV.start_timestamp ");
 			erset = new SLEXMMRelationResultSet(this, rset);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1633,19 +1517,17 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 	
 	@Override
-	public SLEXMMRelationResultSet getRelationsForTargetObjectOrdered(int objId) {
+	public SLEXMMRelationResultSet getRelationsForTargetObjectOrdered(int objId) { // TODO Check
 		SLEXMMRelationResultSet erset = null;
 		Statement statement = null;
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT REL.* FROM "
 					+METAMODEL_ALIAS+".relation as REL, "
-					+METAMODEL_ALIAS+".object_version OBJV, "
-					+METAMODEL_ALIAS+".event as EV "
+					+METAMODEL_ALIAS+".object_version OBJV "
 					+" WHERE REL.target_object_version_id = OBJV.id "
 					+" AND OBJV.object_id = "+objId+" "
-					+" AND OBJV.event_id = EV.id "
-					+" ORDER BY EV.ordering ASC ");
+					+" ORDER BY OBJV.start_timestamp ASC ");
 			erset = new SLEXMMRelationResultSet(this, rset);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1966,19 +1848,20 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 
 	@Override
-	public SLEXMMObjectVersionResultSet getObjectVersionsForActivity(
+	public SLEXMMObjectVersionResultSet getObjectVersionsForActivity( // TODO CHECK
 			SLEXMMActivity act) {
 		SLEXMMObjectVersionResultSet erset = null;
 		Statement statement = null;
 		String query = "";
 		try {
 			statement = connection.createStatement();
-			query = "SELECT DISTINCT OBJV.id, OBJV.object_id, OBJV.event_id, "
-					+" OBJV.event_label, OBJV.start_timestamp, OBJV.end_timestamp FROM "
+			query = "SELECT DISTINCT OBJV.* FROM "
 					+METAMODEL_ALIAS+".object_version AS OBJV, "
+					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
 					+METAMODEL_ALIAS+".event AS EV, "
 					+METAMODEL_ALIAS+".activity_instance AS AI "
-					+" WHERE OBJV.event_id = EV.id "
+					+" WHERE OBJV.id = ETOV.object_version_id "
+					+" AND ETOV.event_id = EV.id "
 					+" AND EV.activity_instance_id = AI.id "
 					+" AND AI.activity_id = "+ act.getId()+" ";
 			ResultSet rset = statement.executeQuery(query);
@@ -1989,7 +1872,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 			closeStatement(statement);
 		}
 		
-		return erset; 
+		return erset;
 	}
 
 	@Override
@@ -2001,8 +1884,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String query = "";
 		try {
 			statement = connection.createStatement();
-			query = "SELECT DISTINCT OBJV.id, OBJV.object_id, OBJV.event_id, "
-					+" OBJV.event_label, OBJV.start_timestamp, OBJV.end_timestamp FROM "
+			query = "SELECT DISTINCT OBJV.* FROM "
 					+METAMODEL_ALIAS+".object_version AS OBJV, "
 					+METAMODEL_ALIAS+".relation AS RL "
 					+" WHERE ( RL.source_object_version_id = "+ob.getId()+" AND OBJV.id = RL.target_object_version_id ) "
@@ -2041,16 +1923,18 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 
 	@Override
-	public SLEXMMObjectResultSet getObjectsForEvent(SLEXMMEvent ev) {
+	public SLEXMMObjectResultSet getObjectsForEvent(SLEXMMEvent ev) { // TODO Check
 		SLEXMMObjectResultSet erset = null;
 		Statement statement = null;
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT OBJ.id, OBJ.class_id FROM "
 					+METAMODEL_ALIAS+".object AS OBJ, "
+					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
 					+METAMODEL_ALIAS+".object_version AS OBJV "
 					+" WHERE OBJ.id = OBJV.object_id "
-					+" AND OBJV.event_id = "+ev.getId()+" "
+					+" AND OBJV.id = ETOV.object_version_id "
+					+" AND ETOV.event_id = "+ev.getId()+" "
 					+" ORDER BY OBJ.id");
 			erset = new SLEXMMObjectResultSet(this, rset);
 		} catch (Exception e) {
@@ -2085,17 +1969,16 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 
 	@Override
-	public SLEXMMEventResultSet getEventsForObjectVersion(int objvId) {
-		// FIXME
+	public SLEXMMEventResultSet getEventsForObjectVersion(int objvId) { // TODO Check
 		SLEXMMEventResultSet erset = null;
 		Statement statement = null;
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT EV.* FROM "
 					+METAMODEL_ALIAS+".event as EV, "
-					+METAMODEL_ALIAS+".object_version as OBJV "
-					+" WHERE EV.id = OBJV.event_id "
-					+" AND OBJV.id = '"+objvId+"'");
+					+METAMODEL_ALIAS+".event_to_object_version as ETOV "
+					+" WHERE EV.id = ETOV.event_id "
+					+" AND ETOV.object_version_id = '"+objvId+"' ");
 			erset = new SLEXMMEventResultSet(this, rset);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -2104,6 +1987,33 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		
 		return erset; 
 	}
-	
+
+	@Override
+	public boolean addEventToObjectVersion(SLEXMMObjectVersion ov, // TODO Check
+			SLEXMMEvent ev, String label) {
+		return addEventToObjectVersion(ov.getId(),ev.getId(),label);
+	}
+
+	@Override
+	public boolean addEventToObjectVersion(int ovId, int evId, String label) { // TODO Check
+		Statement statement = null;
+		boolean result = false;
+		try {
+			statement = connection.createStatement();
+			statement.setQueryTimeout(30);
+			statement.execute("INSERT INTO "+METAMODEL_ALIAS+".event_to_object_version "
+					+" (event_id,object_version_id,label) VALUES ('"
+					+evId+"','"
+					+ovId+"','"
+					+label+"')");
+			result = true;
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			result = false;
+		} finally {
+			closeStatement(statement);
+		}
+		return result;
+	}	
 	
 }
