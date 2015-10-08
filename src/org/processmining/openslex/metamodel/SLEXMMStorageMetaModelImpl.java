@@ -889,7 +889,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT EV.* FROM "
 					+METAMODEL_ALIAS+".event as EV, "
-					+METAMODEL_ALIAS+".activity_instance_to_case as AITC, "
+					+METAMODEL_ALIAS+".activity_instance_to_case as AITC "
 					+" WHERE EV.activity_instance_id = AITC.activity_instance_id "
 					+" AND AITC.case_id = '"+cId+"'");
 			erset = new SLEXMMEventResultSet(this, rset);
@@ -2082,6 +2082,27 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		}
 		
 		return ob;
+	}
+
+	@Override
+	public SLEXMMEventResultSet getEventsForObjectVersion(int objvId) {
+		// FIXME
+		SLEXMMEventResultSet erset = null;
+		Statement statement = null;
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT EV.* FROM "
+					+METAMODEL_ALIAS+".event as EV, "
+					+METAMODEL_ALIAS+".object_version as OBJV "
+					+" WHERE EV.id = OBJV.event_id "
+					+" AND OBJV.id = '"+objvId+"'");
+			erset = new SLEXMMEventResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return erset; 
 	}
 	
 	
