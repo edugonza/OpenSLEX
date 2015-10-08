@@ -2060,6 +2060,29 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		
 		return erset; 
 	}
+
+	@Override
+	public SLEXMMObject getObjectPerId(int objectId) {
+		SLEXMMObject ob = null;
+			
+		SLEXMMObjectResultSet orset = null;
+		Statement statement = null;
+		try {
+			statement = connection.createStatement();
+			String query = "SELECT OBJ.* FROM "
+					+METAMODEL_ALIAS+".object as OBJ "
+					+" WHERE OBJ.id = '"+objectId+"' ";
+			ResultSet rset = statement.executeQuery(query);
+			orset = new SLEXMMObjectResultSet(this, rset);
+			ob = orset.getNext();
+			closeStatement(statement);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return ob;
+	}
 	
 	
 }
