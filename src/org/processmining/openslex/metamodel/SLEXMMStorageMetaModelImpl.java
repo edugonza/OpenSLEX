@@ -9,6 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
@@ -2014,6 +2015,71 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 			closeStatement(statement);
 		}
 		return result;
+	}
+
+	@Override
+	public SLEXMMRelationResultSet getRelations() {
+		SLEXMMRelationResultSet erset = null;
+		Statement statement = null;
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT RL.* FROM "
+					+METAMODEL_ALIAS+".relation RL ");
+			erset = new SLEXMMRelationResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return erset; 
+	}
+
+	@Override
+	public Collection<? extends Object> getRelationships() {
+		List<SLEXMMRelationship> kList = new Vector<>();
+		Statement statement = null;
+		
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT * FROM "+METAMODEL_ALIAS+".relationship ");
+			while (rset.next()) {
+				int id = rset.getInt("id");
+				String name = rset.getString("name");
+				int sourceId = rset.getInt("source");
+				int targetId = rset.getInt("target");
+				SLEXMMRelationship k = new SLEXMMRelationship(this);
+				k.setId(id);
+				k.setName(name);
+				k.setSourceClassId(sourceId);
+				k.setTargetClassId(targetId);
+				k.setDirty(false);
+				k.setInserted(true);
+				kList.add(k);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			kList = null;
+		} finally {
+			closeStatement(statement);
+		}
+		return kList;
+	}
+
+	@Override
+	public SLEXMMActivityInstanceResultSet getActivityInstances() {
+		SLEXMMActivityInstanceResultSet airset = null;
+		Statement statement = null;
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT AI.* FROM "
+					+METAMODEL_ALIAS+".activity_instance AI ");
+			airset = new SLEXMMActivityInstanceResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return airset;
 	}	
 	
 }

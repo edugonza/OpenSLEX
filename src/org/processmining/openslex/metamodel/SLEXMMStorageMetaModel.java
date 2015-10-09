@@ -1,5 +1,6 @@
 package org.processmining.openslex.metamodel;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -200,5 +201,11 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	public abstract boolean addEventToObjectVersion(
 			SLEXMMObjectVersion ov, SLEXMMEvent ev, String label);
 	public abstract boolean addEventToObjectVersion(int ovId, int evId, String label);
+
+	public abstract SLEXMMRelationResultSet getRelations();
+
+	public abstract Collection<? extends Object> getRelationships();
+
+	public abstract SLEXMMActivityInstanceResultSet getActivityInstances();
 	
 }
