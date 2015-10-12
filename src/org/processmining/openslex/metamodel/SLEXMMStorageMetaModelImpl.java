@@ -1935,7 +1935,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+METAMODEL_ALIAS+".object_version AS OBJV "
 					+" WHERE OBJ.id = OBJV.object_id "
 					+" AND OBJV.id = ETOV.object_version_id "
-					+" AND ETOV.event_id = "+ev.getId()+" "
+					+" AND ETOV.event_id = '"+ev.getId()+"' "
 					+" ORDER BY OBJ.id");
 			erset = new SLEXMMObjectResultSet(this, rset);
 		} catch (Exception e) {
