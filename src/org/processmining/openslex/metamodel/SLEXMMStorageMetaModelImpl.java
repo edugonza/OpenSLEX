@@ -2080,6 +2080,22 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		}
 		
 		return airset;
+	}
+
+	@Override
+	public SLEXMMSQLResultSet executeSQL(String query) {
+		SLEXMMSQLResultSet sqlrset = null;
+		Statement statement = null;
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery(query);
+			sqlrset = new SLEXMMSQLResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return sqlrset;
 	}	
 	
 }
