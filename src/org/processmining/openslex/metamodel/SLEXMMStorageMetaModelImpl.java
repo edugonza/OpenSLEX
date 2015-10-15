@@ -2083,7 +2083,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 
 	@Override
-	public SLEXMMSQLResultSet executeSQL(String query) {
+	public SLEXMMSQLResultSet executeSQL(String query) throws Exception {
 		SLEXMMSQLResultSet sqlrset = null;
 		Statement statement = null;
 		try {
@@ -2091,8 +2091,8 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 			ResultSet rset = statement.executeQuery(query);
 			sqlrset = new SLEXMMSQLResultSet(this, rset);
 		} catch (Exception e) {
-			e.printStackTrace();
 			closeStatement(statement);
+			throw e;
 		}
 		
 		return sqlrset;
