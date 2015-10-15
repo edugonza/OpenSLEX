@@ -9,6 +9,7 @@ public class SLEXMMSQLResultSet extends SLEXMMAbstractResultSetObject {
 	private ResultSetMetaData metadata = null;
 	private int numColumns = 0;
 	private String[] columnNames = null;
+	private int rowCount = 0;
 	
 	protected SLEXMMSQLResultSet(SLEXMMStorageMetaModel storage, ResultSet rset) {
 		super(storage, rset);
@@ -21,6 +22,8 @@ public class SLEXMMSQLResultSet extends SLEXMMAbstractResultSetObject {
 			
 			columnNames = new String[numColumns];
 			
+			rowCount = this.rset.getFetchSize();
+			
 			for (int i = 1; i <= numColumns; i++) {
 				columnNames[i-1] = metadata.getColumnName(i);
 			}
@@ -28,6 +31,14 @@ public class SLEXMMSQLResultSet extends SLEXMMAbstractResultSetObject {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public String[] getColumnNames() {
+		return this.columnNames;
+	}
+	
+	public int getRowCount() {
+		return this.rowCount;
 	}
 	
 	public SLEXMMSQLResult getNext() {
