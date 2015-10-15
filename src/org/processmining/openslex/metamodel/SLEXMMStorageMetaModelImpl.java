@@ -2083,6 +2083,23 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 
 	@Override
+	public SLEXMMAttributeResultSet getAttributes() {
+		SLEXMMAttributeResultSet arset = null;
+		Statement statement = null;
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT DISTINCT A.* FROM "
+					+METAMODEL_ALIAS+".attribute_name A ");
+			arset = new SLEXMMAttributeResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return arset;
+	}
+	
+	@Override
 	public SLEXMMSQLResultSet executeSQL(String query) throws Exception {
 		SLEXMMSQLResultSet sqlrset = null;
 		Statement statement = null;

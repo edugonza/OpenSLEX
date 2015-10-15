@@ -208,6 +208,8 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 
 	public abstract SLEXMMActivityInstanceResultSet getActivityInstances();
 	
+	public abstract SLEXMMAttributeResultSet getAttributes();
+	
 	public abstract SLEXMMSQLResultSet executeSQL(String query) throws Exception;
 	
 }
