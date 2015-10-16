@@ -1729,8 +1729,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT EV.* FROM "
-					+METAMODEL_ALIAS+".event as EV, "
-					+METAMODEL_ALIAS+".activity_instance_to_case as AITC, "
+					+METAMODEL_ALIAS+".event as EV "
 					+" WHERE EV.activity_instance_id = '"+aiId+"' "
 					+" ORDER BY EV.ordering ASC ");
 			erset = new SLEXMMEventResultSet(this, rset);
@@ -2113,6 +2112,44 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		}
 		
 		return sqlrset;
+	}
+
+	@Override
+	public SLEXMMActivityInstanceResultSet getActivityInstancesForCase(
+			int caseId) {
+		SLEXMMActivityInstanceResultSet airset = null;
+		Statement statement = null;
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT AI.* FROM "
+					+METAMODEL_ALIAS+".activity_instance AI, "
+					+METAMODEL_ALIAS+".activity_instance_to_case AIC "
+							+ " WHERE AI.id == AIC.activity_instance_id "
+							+ " AND AIC.case_id == '"+caseId+"' ");
+			airset = new SLEXMMActivityInstanceResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return airset;
+	}
+
+	@Override
+	public SLEXMMEventAttributeResultSet getEventAttributes() {
+		SLEXMMEventAttributeResultSet arset = null;
+		Statement statement = null;
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT DISTINCT EA.* FROM "
+					+METAMODEL_ALIAS+".event_attribute_name EA ");
+			arset = new SLEXMMEventAttributeResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return arset;
 	}	
 	
 }
