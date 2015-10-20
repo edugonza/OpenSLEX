@@ -40,5 +40,10 @@ public class SLEXMMProcess extends SLEXMMAbstractDatabaseObject {
 		this.name = name;
 		setDirty(true);
 	}
+	
+	@Override
+	public int hashCode() {
+		return ("process#"+getId()).hashCode();
+	}
 
 }

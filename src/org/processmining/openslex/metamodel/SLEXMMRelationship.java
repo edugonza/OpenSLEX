@@ -61,33 +61,7 @@ public class SLEXMMRelationship extends SLEXMMAbstractDatabaseObject {
 	}
 
 	@Override
-	public String toString() {
-		return getSourceClassId()+":"+getTargetClassId()+":"+getId()+":"+getName();
-	}
-	
-	@Override
 	public int hashCode() {
-		return toString().hashCode();
-	}
-	
-	@Override
-	public boolean equals(Object obj) {
-		if (!super.equals(obj)) {
-			if (obj instanceof SLEXMMRelationship) {
-				SLEXMMRelationship objat = (SLEXMMRelationship) obj;
-				if (this.getId() == objat.getId() &&
-						this.getSourceClassId() == objat.getSourceClassId() &&
-						this.getTargetClassId() == objat.getTargetClassId() &&
-						this.getName().equals(objat.getName())) {
-					return true;
-				} else {
-					return false;
-				}
-			} else {
-				return false;
-			}
-		} else {
-			return true;
-		}
+		return ("relationship#"+getId()).hashCode();
 	}
 }

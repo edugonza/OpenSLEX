@@ -41,31 +41,7 @@ public class SLEXMMEventAttribute extends SLEXMMAbstractDatabaseObject {
 	}
 
 	@Override
-	public String toString() {
-		return getId()+":"+getName();
-	}
-	
-	@Override
 	public int hashCode() {
-		return toString().hashCode();
-	}
-	
-	@Override
-	public boolean equals(Object obj) {
-		if (!super.equals(obj)) {
-			if (obj instanceof SLEXMMEventAttribute) {
-				SLEXMMEventAttribute objat = (SLEXMMEventAttribute) obj;
-				if (this.getId() == objat.getId() &&
-						this.getName().equals(objat.getName())) {
-					return true;
-				} else {
-					return false;
-				}
-			} else {
-				return false;
-			}
-		} else {
-			return true;
-		}
+		return ("event_attribute#"+getId()).hashCode();
 	}
 }

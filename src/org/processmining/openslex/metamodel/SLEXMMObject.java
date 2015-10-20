@@ -44,4 +44,8 @@ public class SLEXMMObject extends SLEXMMAbstractDatabaseObject {
 		return getStorage().getObjectVersionsForObjectOrdered(this);
 	}
 
+	@Override
+	public int hashCode() {
+		return ("object#"+getId()).hashCode();
+	}
 }

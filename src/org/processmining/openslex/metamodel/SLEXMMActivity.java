@@ -52,4 +52,9 @@ public class SLEXMMActivity extends SLEXMMAbstractDatabaseObject {
 		return getStorage().update((SLEXMMActivity) cl);
 	}
 
+	@Override
+	public int hashCode() {
+		return ("activity#"+getId()).hashCode();
+	}
+	
 }

@@ -80,4 +80,8 @@ public class SLEXMMRelation extends SLEXMMAbstractDatabaseObject {
 		return getStorage().update((SLEXMMRelation)e);
 	}
 
+	@Override
+	public int hashCode() {
+		return ("relation#"+getId()).hashCode();
+	}
 }

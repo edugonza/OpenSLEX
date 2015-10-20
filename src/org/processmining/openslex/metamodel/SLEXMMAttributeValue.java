@@ -61,5 +61,10 @@ public class SLEXMMAttributeValue extends SLEXMMAbstractDatabaseObject {
 	boolean update(SLEXMMAbstractDatabaseObject at) {
 		return getStorage().update((SLEXMMAttributeValue) at);
 	}
+	
+	@Override
+	public int hashCode() {
+		return ("attribute_value#"+getId()).hashCode();
+	}
 
 }

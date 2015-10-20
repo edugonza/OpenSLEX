@@ -44,4 +44,22 @@ public class SLEXMMActivityInstance extends SLEXMMAbstractDatabaseObject {
 //		return getStorage().getEventsForActivityInstanceOrdered(this);
 //	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (super.equals(obj)) {
+			return true;
+		}
+		
+		if (obj instanceof SLEXMMCase) {
+			return ((SLEXMMCase) obj).getId() == getId();
+		}
+		
+		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		return ("activity#"+getId()).hashCode();
+	}
+	
 }

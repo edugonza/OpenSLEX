@@ -51,32 +51,8 @@ public class SLEXMMAttribute extends SLEXMMAbstractDatabaseObject {
 	}
 
 	@Override
-	public String toString() {
-		return getClassId()+":"+getId()+":"+getName();
-	}
-	
-	@Override
 	public int hashCode() {
-		return toString().hashCode();
+		return ("attribute#"+getId()).hashCode();
 	}
 	
-	@Override
-	public boolean equals(Object obj) {
-		if (!super.equals(obj)) {
-			if (obj instanceof SLEXMMAttribute) {
-				SLEXMMAttribute objat = (SLEXMMAttribute) obj;
-				if (this.getId() == objat.getId() &&
-						this.getClassId() == objat.getClassId() &&
-						this.getName().equals(objat.getName())) {
-					return true;
-				} else {
-					return false;
-				}
-			} else {
-				return false;
-			}
-		} else {
-			return true;
-		}
-	}
 }

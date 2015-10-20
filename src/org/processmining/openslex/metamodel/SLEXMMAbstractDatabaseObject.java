@@ -45,4 +45,14 @@ abstract class SLEXMMAbstractDatabaseObject {
 		
 		return !isDirty();
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (super.equals(obj)) {
+			return true;
+		} else {
+			return this.hashCode() == obj.hashCode();
+		}
+	}
+	
 }

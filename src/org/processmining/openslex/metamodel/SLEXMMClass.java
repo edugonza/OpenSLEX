@@ -85,4 +85,8 @@ public class SLEXMMClass extends SLEXMMAbstractDatabaseObject {
 		return getStorage().update((SLEXMMClass) cl);
 	}
 
+	@Override
+	public int hashCode() {
+		return ("class#"+getId()).hashCode();
+	}
 }

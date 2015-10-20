@@ -56,4 +56,8 @@ public class SLEXMMCase extends SLEXMMAbstractDatabaseObject {
 		return getStorage().getEventsOfCase(this);
 	}
 	
+	@Override
+	public int hashCode() {
+		return ("case#"+getId()).hashCode();
+	}
 }

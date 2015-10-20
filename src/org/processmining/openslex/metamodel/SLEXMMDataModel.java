@@ -41,4 +41,8 @@ public class SLEXMMDataModel extends SLEXMMAbstractDatabaseObject {
 		setDirty(true);
 	}
 
+	@Override
+	public int hashCode() {
+		return ("datamodel#"+getId()).hashCode();
+	}
 }

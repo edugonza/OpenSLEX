@@ -83,4 +83,8 @@ public class SLEXMMObjectVersion extends SLEXMMAbstractDatabaseObject {
 		return attributeValues;
 	}
 
+	@Override
+	public int hashCode() {
+		return ("object_version#"+getId()).hashCode();
+	}
 }
