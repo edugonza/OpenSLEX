@@ -215,5 +215,33 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	public abstract SLEXMMSQLResultSet executeSQL(String query) throws Exception;
 	
 	public abstract SLEXMMEventAttributeResultSet getEventAttributes();
+
+	public abstract SLEXMMObjectResultSet getObjectsForCase(int caseId);
+
+	public abstract SLEXMMObjectResultSet getObjectsForActivity(int activityId);
+
+	public abstract SLEXMMObjectResultSet getObjectsForActivityInstance(int activityInstanceId);
+
+	public abstract SLEXMMObjectResultSet getObjectsForRelation(int relationId);
+
+	public abstract SLEXMMObjectResultSet getObjectsForRelationship(int relationshipId);
+
+	public abstract SLEXMMCaseResultSet getCasesForObject(int objectId);
+
+	public abstract SLEXMMCaseResultSet getCasesForEvent(int eventId);
+
+	public abstract SLEXMMCaseResultSet getCasesForActivity(int activityId);
+
+	public abstract SLEXMMCaseResultSet getCasesForClass(int classId);
+
+	public abstract SLEXMMCaseResultSet getCasesForRelationship(int RelationshipId);
+
+	public abstract SLEXMMCaseResultSet getCasesForObjectVersion(int objectVersionId);
+
+	public abstract SLEXMMCaseResultSet getCasesForRelation(int relationId);
+
+	public abstract SLEXMMCaseResultSet getCasesForActivityInstance(int activityInstanceId);
+
+	public abstract SLEXMMCaseResultSet getCasesForAttribute(int attributeId);
 	
 }

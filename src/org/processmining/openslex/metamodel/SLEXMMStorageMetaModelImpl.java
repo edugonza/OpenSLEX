@@ -2150,6 +2150,368 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		}
 		
 		return arset;
-	}	
+	}
+
+	@Override
+	public SLEXMMObjectResultSet getObjectsForCase(int caseId) {
+		SLEXMMObjectResultSet erset = null;
+		Statement statement = null;
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJ.* FROM "
+					+METAMODEL_ALIAS+".object AS OBJ, "
+					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
+					+METAMODEL_ALIAS+".event AS EV, "
+					+METAMODEL_ALIAS+".object_version AS OBJV, "
+					+METAMODEL_ALIAS+".activity_instance_to_case AS AITC "
+					+" WHERE OBJ.id = OBJV.object_id "
+					+" AND OBJV.id = ETOV.object_version_id "
+					+" AND ETOV.event_id = EV.id "
+					+" AND EV.activity_instance_id = AITC.activity_instance_id "
+					+" AND AITC.case_id = '"+caseId+"' "
+					+" ORDER BY OBJ.id");
+			erset = new SLEXMMObjectResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return erset; 
+	}
+
+	@Override
+	public SLEXMMObjectResultSet getObjectsForActivity(int activityId) {
+		SLEXMMObjectResultSet erset = null;
+		Statement statement = null;
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJ.* FROM "
+					+METAMODEL_ALIAS+".object AS OBJ, "
+					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
+					+METAMODEL_ALIAS+".event AS EV, "
+					+METAMODEL_ALIAS+".object_version AS OBJV, "
+					+METAMODEL_ALIAS+".activity_instance AS AI "
+					+" WHERE OBJ.id = OBJV.object_id "
+					+" AND OBJV.id = ETOV.object_version_id "
+					+" AND ETOV.event_id = EV.id "
+					+" AND EV.activity_instance_id = AI.id "
+					+" AND AI.activity_id = "+activityId+" "
+					+" ORDER BY OBJ.id");
+			erset = new SLEXMMObjectResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return erset; 
+	}
+
+	@Override
+	public SLEXMMObjectResultSet getObjectsForActivityInstance(
+			int activityInstanceId) {
+		SLEXMMObjectResultSet erset = null;
+		Statement statement = null;
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJ.* FROM "
+					+METAMODEL_ALIAS+".object AS OBJ, "
+					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
+					+METAMODEL_ALIAS+".event AS EV, "
+					+METAMODEL_ALIAS+".object_version AS OBJV "
+					+" WHERE OBJ.id = OBJV.object_id "
+					+" AND OBJV.id = ETOV.object_version_id "
+					+" AND ETOV.event_id = EV.id "
+					+" AND EV.activity_instance_id = '"+activityInstanceId+"' "
+					+" ORDER BY OBJ.id");
+			erset = new SLEXMMObjectResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return erset; 
+	}
+
+	@Override
+	public SLEXMMObjectResultSet getObjectsForRelation(int relationId) {
+		SLEXMMObjectResultSet erset = null;
+		Statement statement = null;
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJ.* FROM "
+					+METAMODEL_ALIAS+".object AS OBJ, "
+					+METAMODEL_ALIAS+".relation AS REL, "
+					+METAMODEL_ALIAS+".object_version AS OBJV "
+					+" WHERE OBJ.id = OBJV.object_id "
+					+" AND (OBJV.id = REL.source_object_version_id OR OBJV.id = REL.target_object_version_id) "
+					+" AND REL.id = '"+relationId+"' "
+					+" ORDER BY OBJ.id");
+			erset = new SLEXMMObjectResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return erset; 
+	}
+
+	@Override
+	public SLEXMMObjectResultSet getObjectsForRelationship(int relationshipId) {
+		SLEXMMObjectResultSet erset = null;
+		Statement statement = null;
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJ.* FROM "
+					+METAMODEL_ALIAS+".object AS OBJ, "
+					+METAMODEL_ALIAS+".relation AS REL, "
+					+METAMODEL_ALIAS+".object_version AS OBJV "
+					+" WHERE OBJ.id = OBJV.object_id "
+					+" AND (OBJV.id = REL.source_object_version_id OR OBJV.id = REL.target_object_version_id) "
+					+" AND REL.relationship_id = "+relationshipId+" "
+					+" ORDER BY OBJ.id");
+			erset = new SLEXMMObjectResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return erset;
+	}
+
+	@Override
+	public SLEXMMCaseResultSet getCasesForObject(int objectId) {
+		SLEXMMCaseResultSet crset = null;
+		Statement statement = null;
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
+					+METAMODEL_ALIAS+".pcase AS C, "
+					+METAMODEL_ALIAS+".object_version AS OBJV, "
+					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
+					+METAMODEL_ALIAS+".event AS EV, "
+					+METAMODEL_ALIAS+".activity_instance_to_case AS AITC "
+					+" WHERE C.id = AITC.case_id "
+					+" AND AITC.activity_instance_id = EV.activity_instance_id "
+					+" AND EV.id = ETOV.event_id "
+					+" AND ETOV.object_version_id = OBJV.id "
+					+" AND OBJV.object_id = "+objectId+" "
+					+" ORDER BY C.id");
+			crset = new SLEXMMCaseResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return crset;
+	}
+
+	@Override
+	public SLEXMMCaseResultSet getCasesForEvent(int eventId) {
+		SLEXMMCaseResultSet crset = null;
+		Statement statement = null;
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
+					+METAMODEL_ALIAS+".pcase AS C, "
+					+METAMODEL_ALIAS+".event AS EV, "
+					+METAMODEL_ALIAS+".activity_instance_to_case AS AITC "
+					+" WHERE C.id = AITC.case_id "
+					+" AND AITC.activity_instance_id = EV.activity_instance_id "
+					+" AND EV.id = '"+eventId+"' "
+					+" ORDER BY C.id");
+			crset = new SLEXMMCaseResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return crset;
+	}
+
+	@Override
+	public SLEXMMCaseResultSet getCasesForActivity(int activityId) {
+		SLEXMMCaseResultSet crset = null;
+		Statement statement = null;
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
+					+METAMODEL_ALIAS+".pcase AS C, "
+					+METAMODEL_ALIAS+".activity_instance AS AI, "
+					+METAMODEL_ALIAS+".activity_instance_to_case AS AITC "
+					+" WHERE C.id = AITC.case_id "
+					+" AND AITC.activity_instance_id = AI.id "
+					+" AND AI.activity_id = "+activityId+" "
+					+" ORDER BY C.id");
+			crset = new SLEXMMCaseResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return crset;
+	}
+
+	@Override
+	public SLEXMMCaseResultSet getCasesForClass(int classId) {
+		SLEXMMCaseResultSet crset = null;
+		Statement statement = null;
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
+					+METAMODEL_ALIAS+".pcase AS C, "
+					+METAMODEL_ALIAS+".object AS OBJ, "
+					+METAMODEL_ALIAS+".object_version AS OBJV, "
+					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
+					+METAMODEL_ALIAS+".event AS EV, "
+					+METAMODEL_ALIAS+".activity_instance_to_case AS AITC "
+					+" WHERE C.id = AITC.case_id "
+					+" AND AITC.activity_instance_id = EV.activity_instance_id "
+					+" AND EV.id = ETOV.event_id "
+					+" AND ETOV.object_version_id = OBJV.id "
+					+" AND OBJV.object_id = OBJ.id "
+					+" AND OBJ.class_id = "+classId+" "
+					+" ORDER BY C.id");
+			crset = new SLEXMMCaseResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return crset;
+	}
+
+	@Override
+	public SLEXMMCaseResultSet getCasesForRelationship(int relationshipId) {
+		SLEXMMCaseResultSet crset = null;
+		Statement statement = null;
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
+					+METAMODEL_ALIAS+".pcase AS C, "
+					+METAMODEL_ALIAS+".relation AS REL, "
+					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
+					+METAMODEL_ALIAS+".event AS EV, "
+					+METAMODEL_ALIAS+".object_version AS OBJV, "
+					+METAMODEL_ALIAS+".activity_instance_to_case AS AITC "
+					+" WHERE C.id = AITC.case_id "
+					+" AND AITC.activity_instance_id = EV.activity_instance_id "
+					+" AND EV.id = ETOV.event_id "
+					+" AND OBJV.id = ETOV.object_version_id "
+					+" AND (OBJV.id = REL.source_object_version_id OR OBJV.id = REL.target_object_version_id) "
+					+" AND REL.relationship_id = "+relationshipId+" "
+					+" ORDER BY C.id");
+			crset = new SLEXMMCaseResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return crset;
+	}
+
+	@Override
+	public SLEXMMCaseResultSet getCasesForObjectVersion(int objectVersionId) {
+		SLEXMMCaseResultSet crset = null;
+		Statement statement = null;
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
+					+METAMODEL_ALIAS+".pcase AS C, "
+					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
+					+METAMODEL_ALIAS+".event AS EV, "
+					+METAMODEL_ALIAS+".activity_instance_to_case AS AITC "
+					+" WHERE C.id = AITC.case_id "
+					+" AND AITC.activity_instance_id = EV.activity_instance_id "
+					+" AND EV.id = ETOV.event_id "
+					+" AND ETOV.object_version_id = '"+objectVersionId+"' "
+					+" ORDER BY C.id");
+			crset = new SLEXMMCaseResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return crset;
+	}
+
+	@Override
+	public SLEXMMCaseResultSet getCasesForRelation(int relationId) {
+		SLEXMMCaseResultSet crset = null;
+		Statement statement = null;
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
+					+METAMODEL_ALIAS+".pcase AS C, "
+					+METAMODEL_ALIAS+".relation AS REL, "
+					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
+					+METAMODEL_ALIAS+".event AS EV, "
+					+METAMODEL_ALIAS+".object_version AS OBJV, "
+					+METAMODEL_ALIAS+".activity_instance_to_case AS AITC "
+					+" WHERE C.id = AITC.case_id "
+					+" AND AITC.activity_instance_id = EV.activity_instance_id "
+					+" AND EV.id = ETOV.event_id "
+					+" AND OBJV.id = ETOV.object_version_id "
+					+" AND (OBJV.id = REL.source_object_version_id OR OBJV.id = REL.target_object_version_id) "
+					+" AND REL.id = '"+relationId+"' "
+					+" ORDER BY C.id");
+			crset = new SLEXMMCaseResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return crset;
+	}
+
+	@Override
+	public SLEXMMCaseResultSet getCasesForActivityInstance(
+			int activityInstanceId) {
+		SLEXMMCaseResultSet crset = null;
+		Statement statement = null;
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
+					+METAMODEL_ALIAS+".pcase AS C, "
+					+METAMODEL_ALIAS+".activity_instance_to_case AS AITC "
+					+" WHERE C.id = AITC.case_id "
+					+" AND AITC.activity_instance_id = '"+activityInstanceId+"' "
+					+" ORDER BY C.id");
+			crset = new SLEXMMCaseResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return crset;
+	}
+
+	@Override
+	public SLEXMMCaseResultSet getCasesForAttribute(int attributeId) {
+		SLEXMMCaseResultSet crset = null;
+		Statement statement = null;
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
+					+METAMODEL_ALIAS+".pcase AS C, "
+					+METAMODEL_ALIAS+".attribute_value AS ATV, "
+					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
+					+METAMODEL_ALIAS+".event AS EV, "
+					+METAMODEL_ALIAS+".object_version AS OBJV, "
+					+METAMODEL_ALIAS+".activity_instance_to_case AS AITC "
+					+" WHERE C.id = AITC.case_id "
+					+" AND AITC.activity_instance_id = EV.activity_instance_id "
+					+" AND EV.id = ETOV.event_id "
+					+" AND ETOV.object_version_id = OBJV.id "
+					+" AND OBJV.id = ATV.object_version_id "
+					+" AND ATV.attribute_name_id = "+attributeId+" "
+					+" ORDER BY C.id");
+			crset = new SLEXMMCaseResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return crset;
+	}
 	
 }
