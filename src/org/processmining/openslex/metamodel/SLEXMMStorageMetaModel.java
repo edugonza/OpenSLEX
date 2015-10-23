@@ -225,6 +225,8 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	public abstract SLEXMMObjectResultSet getObjectsForRelation(int relationId);
 
 	public abstract SLEXMMObjectResultSet getObjectsForRelationship(int relationshipId);
+	
+	public abstract SLEXMMObjectResultSet getObjectsForAttribute(int attributeId);
 
 	public abstract SLEXMMCaseResultSet getCasesForObject(int objectId);
 
@@ -243,5 +245,118 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	public abstract SLEXMMCaseResultSet getCasesForActivityInstance(int activityInstanceId);
 
 	public abstract SLEXMMCaseResultSet getCasesForAttribute(int attributeId);
+
+	public abstract SLEXMMEventResultSet getEventsForObject(int objectId);
+
+	public abstract SLEXMMEventResultSet getEventsForClass(int classId);
+
+	public abstract SLEXMMEventResultSet getEventsForRelationship(int relationshipId);
+
+	public abstract SLEXMMEventResultSet getEventsForRelation(int relationId);
+
+	public abstract SLEXMMEventResultSet getEventsForActivityInstance(int activityInstanceId);
+
+	public abstract SLEXMMEventResultSet getEventsForAttribute(int attributeId);
+
+	public abstract SLEXMMObjectVersionResultSet getObjectVersionsForEvent(
+			int eventId);
+
+	public abstract SLEXMMObjectVersionResultSet getObjectVersionsForCase(int caseId);
+
+	public abstract SLEXMMObjectVersionResultSet getObjectVersionsForClass(
+			int classId);
+
+	public abstract SLEXMMObjectVersionResultSet getObjectVersionsForRelationship(
+			int relationshipId);
+
+	public abstract SLEXMMObjectVersionResultSet getObjectVersionsForRelation(
+			int relationId);
+
+	public abstract SLEXMMObjectVersionResultSet getObjectVersionsForActivityInstance(
+			int activityInstanceId);
+
+	public abstract SLEXMMObjectVersionResultSet getObjectVersionsForAttribute(
+			int attributeId);
+
+	public abstract SLEXMMActivityResultSet getActivitiesForObject(int objectId);
+
+	public abstract SLEXMMActivityResultSet getActivitiesForEvent(int eventId);
+
+	public abstract SLEXMMActivityResultSet getActivitiesForCase(int caseId);
+
+	public abstract SLEXMMActivityResultSet getActivitiesForClass(int classId);
+
+	public abstract SLEXMMActivityResultSet getActivitiesForRelationship(int relationshipId);
+
+	public abstract SLEXMMActivityResultSet getActivitiesForObjectVersion(int objectVersionId);
+
+	public abstract SLEXMMActivityResultSet getActivitiesForRelation(int relationId);
+
+	public abstract SLEXMMActivityResultSet getActivitiesForActivityInstance(
+			int activityInstanceId);
+
+	public abstract SLEXMMActivityResultSet getActivitiesForAttribute(int attributeId);
+
+	public abstract SLEXMMClassResultSet getClassesForObject(int objectId);
+
+	public abstract SLEXMMClassResultSet getClassesForEvent(int eventId);
+
+	public abstract SLEXMMClassResultSet getClassesForCase(int caseId);
+
+	public abstract SLEXMMClassResultSet getClassesForActivity(int activityId);
+
+	public abstract SLEXMMClassResultSet getClassesForRelationship(int relationshipId);
+
+	public abstract SLEXMMClassResultSet getClassesForObjectVersion(int objectVersionId);
+
+	public abstract SLEXMMClassResultSet getClassesForRelation(int relationId);
+
+	public abstract SLEXMMClassResultSet getClassesForActivityInstance(int activityInstanceId);
+
+	public abstract SLEXMMClassResultSet getClassesForAttribute(int attributeId);
+
+	public abstract SLEXMMRelationResultSet getRelationsForObject(int objectId);
+
+	public abstract SLEXMMRelationResultSet getRelationsForEvent(int eventId);
+
+	public abstract SLEXMMRelationResultSet getRelationsForCase(int caseId);
+	public abstract SLEXMMRelationResultSet getRelationsForCases(int[] caseIds);
+
+	public abstract SLEXMMRelationResultSet getRelationsForActivity(int activityId);
+
+	public abstract SLEXMMRelationResultSet getRelationsForClass(int classId);
+	public abstract SLEXMMRelationResultSet getRelationsForClasses(int[] classIds);
+
+	public abstract SLEXMMRelationResultSet getRelationsForRelationship(int relationshipId);
+
+	public abstract SLEXMMRelationResultSet getRelationsForObjectVersion(int objectVersionId);
+
+	public abstract SLEXMMRelationResultSet getRelationsForActivityInstance(
+			int activityInstanceId);
+
+	public abstract SLEXMMRelationResultSet getRelationsForAttribute(int attributeId);
+
+	public abstract SLEXMMRelationshipResultSet getRelationshipsForObject(int objectId);
+
+	public abstract SLEXMMRelationshipResultSet getRelationshipsForEvent(int eventId);
+
+	public abstract SLEXMMRelationshipResultSet getRelationshipsForCase(int caseId);
+
+	public abstract SLEXMMRelationshipResultSet getRelationshipsForActivity(
+			int activityId);
+
+	public abstract SLEXMMRelationshipResultSet getRelationshipsForClass(int classId);
+
+	public abstract SLEXMMRelationshipResultSet getRelationshipsForObjectVersion(
+			int objectVersionId);
+
+	public abstract SLEXMMRelationshipResultSet getRelationshipsForRelation(
+			int relationId);
+
+	public abstract SLEXMMRelationshipResultSet getRelationshipsForActivityInstance(
+			int activityInstanceId);
+
+	public abstract SLEXMMRelationshipResultSet getRelationshipsForAttribute(
+			int attributeId);
 	
 }
