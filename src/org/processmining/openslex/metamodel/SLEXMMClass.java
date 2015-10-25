@@ -52,7 +52,7 @@ public class SLEXMMClass extends SLEXMMAbstractDatabaseObject {
 	}
 	
 	protected void retrieveAttributes() {		
-		this.attributes = getStorage().getAttributesForClass(this);
+		this.attributes = getStorage().getListAttributesForClass(this);
 	}
 	
 	protected void retrieveRelationships() {

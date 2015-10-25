@@ -980,13 +980,13 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 	
 	@Override
-	public List<SLEXMMAttribute> getAttributesForClass(SLEXMMClass cl) {
-		return getAttributesForClass(cl.getId());
+	public List<SLEXMMAttribute> getListAttributesForClass(SLEXMMClass cl) {
+		return getListAttributesForClass(cl.getId());
 	}
 	
 
 	@Override
-	public List<SLEXMMAttribute> getAttributesForClass(int clId) {
+	public List<SLEXMMAttribute> getListAttributesForClass(int clId) {
 		List<SLEXMMAttribute> atList = new Vector<>();
 		Statement statement = null;
 		
@@ -1393,30 +1393,8 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		}
 		return attributeValues;
 	}
-
-	@Override
-	public SLEXMMObjectVersionResultSet getObjectVersionsForObjectOrdered(SLEXMMObject obj) {
-		return getObjectVersionsForObjectOrdered(obj.getId()); 
-	}
 	
-	@Override
-	public SLEXMMObjectVersionResultSet getObjectVersionsForObjectOrdered(int objId) {
-		SLEXMMObjectVersionResultSet erset = null;
-		Statement statement = null;
-		try {
-			statement = connection.createStatement();
-			ResultSet rset = statement.executeQuery("SELECT OBJV.* FROM "
-					+METAMODEL_ALIAS+".object_version AS OBJV "
-					+" WHERE OBJV.object_id = "+objId+" "
-					+" ORDER BY OBJV.start_timestamp ");
-			erset = new SLEXMMObjectVersionResultSet(this, rset);
-		} catch (Exception e) {
-			e.printStackTrace();
-			closeStatement(statement);
-		}
-		
-		return erset; 
-	}
+
 	
 	@Override
 	public SLEXMMObjectVersionResultSet getObjectVersions() {
@@ -1556,24 +1534,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		return erset; 
 	}
 	
-	@Override
-	public SLEXMMObjectResultSet getObjectsPerClass(int classId) {
-		SLEXMMObjectResultSet erset = null;
-		Statement statement = null;
-		try {
-			statement = connection.createStatement();
-			ResultSet rset = statement.executeQuery("SELECT OBJ.id, OBJ.class_id FROM "
-					+METAMODEL_ALIAS+".object AS OBJ "
-					+" WHERE OBJ.class_id = "+classId
-					+" ORDER BY OBJ.id");
-			erset = new SLEXMMObjectResultSet(this, rset);
-		} catch (Exception e) {
-			e.printStackTrace();
-			closeStatement(statement);
-		}
-		
-		return erset; 
-	}
+
 
 	@Override
 	public SLEXMMEventResultSet getEvents() {
@@ -1717,58 +1678,6 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 
 	@Override
-	public SLEXMMEventResultSet getEventsForActivityInstanceOrdered(
-			SLEXMMActivityInstance slexmmActivityInstance) {
-		return getEventsForActivityInstanceOrdered(slexmmActivityInstance.getId());
-	}
-	
-	@Override
-	public SLEXMMEventResultSet getEventsForActivityInstanceOrdered(int aiId) {
-		SLEXMMEventResultSet erset = null;
-		Statement statement = null;
-		try {
-			statement = connection.createStatement();
-			ResultSet rset = statement.executeQuery("SELECT EV.* FROM "
-					+METAMODEL_ALIAS+".event as EV "
-					+" WHERE EV.activity_instance_id = '"+aiId+"' "
-					+" ORDER BY EV.ordering ASC ");
-			erset = new SLEXMMEventResultSet(this, rset);
-		} catch (Exception e) {
-			e.printStackTrace();
-			closeStatement(statement);
-		}
-		
-		return erset;
-	}
-
-	@Override
-	public SLEXMMEventResultSet getEventsForCaseOrdered(SLEXMMCase c) {
-		return getEventsForCaseOrdered(c.getId());
-	}
-	
-	@Override
-	public SLEXMMEventResultSet getEventsForCaseOrdered(int caseId) {
-		SLEXMMEventResultSet erset = null;
-		Statement statement = null;
-		try {
-			statement = connection.createStatement();
-			String query = "SELECT EV.* FROM "
-					+METAMODEL_ALIAS+".event as EV, "
-					+METAMODEL_ALIAS+".activity_instance_to_case as AITC "
-					+" WHERE EV.activity_instance_id = AITC.activity_instance_id "
-					+" AND AITC.case_id = '"+caseId+"' "
-					+" ORDER BY EV.ordering ASC ";
-			ResultSet rset = statement.executeQuery(query);
-			erset = new SLEXMMEventResultSet(this, rset);
-		} catch (Exception e) {
-			e.printStackTrace();
-			closeStatement(statement);
-		}
-		
-		return erset; 
-	}
-
-	@Override
 	public SLEXMMProcess createProcess(String name) {
 		SLEXMMProcess p = new SLEXMMProcess(this);
 		p.setName(name);
@@ -1848,34 +1757,6 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 
 	@Override
-	public SLEXMMObjectVersionResultSet getObjectVersionsForActivity( // TODO CHECK
-			SLEXMMActivity act) {
-		SLEXMMObjectVersionResultSet erset = null;
-		Statement statement = null;
-		String query = "";
-		try {
-			statement = connection.createStatement();
-			query = "SELECT DISTINCT OBJV.* FROM "
-					+METAMODEL_ALIAS+".object_version AS OBJV, "
-					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
-					+METAMODEL_ALIAS+".event AS EV, "
-					+METAMODEL_ALIAS+".activity_instance AS AI "
-					+" WHERE OBJV.id = ETOV.object_version_id "
-					+" AND ETOV.event_id = EV.id "
-					+" AND EV.activity_instance_id = AI.id "
-					+" AND AI.activity_id = "+ act.getId()+" ";
-			ResultSet rset = statement.executeQuery(query);
-			erset = new SLEXMMObjectVersionResultSet(this, rset);
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.err.println(query);
-			closeStatement(statement);
-		}
-		
-		return erset;
-	}
-
-	@Override
 	public SLEXMMObjectVersionResultSet getVersionsRelatedToObjectVersion(
 			SLEXMMObjectVersion ob) {
 		
@@ -1902,16 +1783,54 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 
 	@Override
-	public SLEXMMEventResultSet getEventsForActivity(SLEXMMActivity act) {
+	public SLEXMMEventResultSet getEventsForCase(int caseId) {
+		return getEventsForCases(new int[] {caseId});
+	}
+	
+	@Override
+	public SLEXMMEventResultSet getEventsForCases(int[] caseIds) {
 		SLEXMMEventResultSet erset = null;
 		Statement statement = null;
+		
+		String caseList = buildStringFromArray(caseIds, true);
+		
+		try {
+			statement = connection.createStatement();
+			String query = "SELECT EV.* FROM "
+					+METAMODEL_ALIAS+".event as EV, "
+					+METAMODEL_ALIAS+".activity_instance_to_case as AITC "
+					+" WHERE EV.activity_instance_id = AITC.activity_instance_id "
+					+" AND AITC.case_id IN ("+caseList+") "
+					+" ORDER BY EV.ordering ASC ";
+			ResultSet rset = statement.executeQuery(query);
+			erset = new SLEXMMEventResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return erset; 
+	}
+	
+	@Override
+	public SLEXMMEventResultSet getEventsForActivity(int activityId) {
+		return getEventsForActivities(new int[] {activityId});
+	}
+	
+	@Override
+	public SLEXMMEventResultSet getEventsForActivities(int[] activityIds) {
+		SLEXMMEventResultSet erset = null;
+		Statement statement = null;
+		
+		String activityList = buildStringFromArray(activityIds, false);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT EV.* FROM "
 					+METAMODEL_ALIAS+".event as EV, "
 					+METAMODEL_ALIAS+".activity_instance as AI "
 					+" WHERE EV.activity_instance_id = AI.id "
-					+" AND AI.activity_id = "+act.getId()+" "
+					+" AND AI.activity_id IN ("+activityList+") "
 					+" ORDER BY EV.ordering ASC ");
 			erset = new SLEXMMEventResultSet(this, rset);
 		} catch (Exception e) {
@@ -1922,28 +1841,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		return erset;
 	}
 
-	@Override
-	public SLEXMMObjectResultSet getObjectsForEvent(SLEXMMEvent ev) { // TODO Check
-		SLEXMMObjectResultSet erset = null;
-		Statement statement = null;
-		try {
-			statement = connection.createStatement();
-			ResultSet rset = statement.executeQuery("SELECT OBJ.id, OBJ.class_id FROM "
-					+METAMODEL_ALIAS+".object AS OBJ, "
-					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
-					+METAMODEL_ALIAS+".object_version AS OBJV "
-					+" WHERE OBJ.id = OBJV.object_id "
-					+" AND OBJV.id = ETOV.object_version_id "
-					+" AND ETOV.event_id = '"+ev.getId()+"' "
-					+" ORDER BY OBJ.id");
-			erset = new SLEXMMObjectResultSet(this, rset);
-		} catch (Exception e) {
-			e.printStackTrace();
-			closeStatement(statement);
-		}
-		
-		return erset; 
-	}
+
 
 	@Override
 	public SLEXMMObject getObjectPerId(int objectId) {
@@ -1970,15 +1868,23 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMEventResultSet getEventsForObjectVersion(int objvId) { // TODO Check
+		return getEventsForObjectVersions(new int[] {objvId});
+	}
+	
+	@Override
+	public SLEXMMEventResultSet getEventsForObjectVersions(int[] objvIds) { // TODO Check
 		SLEXMMEventResultSet erset = null;
 		Statement statement = null;
+		
+		String objectVersionList = buildStringFromArray(objvIds, true);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT EV.* FROM "
 					+METAMODEL_ALIAS+".event as EV, "
 					+METAMODEL_ALIAS+".event_to_object_version as ETOV "
 					+" WHERE EV.id = ETOV.event_id "
-					+" AND ETOV.object_version_id = '"+objvId+"' ");
+					+" AND ETOV.object_version_id IN ("+objectVersionList+") ");
 			erset = new SLEXMMEventResultSet(this, rset);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -2115,27 +2021,6 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 
 	@Override
-	public SLEXMMActivityInstanceResultSet getActivityInstancesForCase(
-			int caseId) {
-		SLEXMMActivityInstanceResultSet airset = null;
-		Statement statement = null;
-		try {
-			statement = connection.createStatement();
-			ResultSet rset = statement.executeQuery("SELECT AI.* FROM "
-					+METAMODEL_ALIAS+".activity_instance AI, "
-					+METAMODEL_ALIAS+".activity_instance_to_case AIC "
-							+ " WHERE AI.id == AIC.activity_instance_id "
-							+ " AND AIC.case_id == '"+caseId+"' ");
-			airset = new SLEXMMActivityInstanceResultSet(this, rset);
-		} catch (Exception e) {
-			e.printStackTrace();
-			closeStatement(statement);
-		}
-		
-		return airset;
-	}
-
-	@Override
 	public SLEXMMEventAttributeResultSet getEventAttributes() {
 		SLEXMMEventAttributeResultSet arset = null;
 		Statement statement = null;
@@ -2154,8 +2039,16 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMObjectResultSet getObjectsForCase(int caseId) {
+		return getObjectsForCases(new int[] {caseId});
+	}
+	
+	@Override
+	public SLEXMMObjectResultSet getObjectsForCases(int[] caseIds) {
 		SLEXMMObjectResultSet erset = null;
 		Statement statement = null;
+		
+		String caseList = buildStringFromArray(caseIds, true);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJ.* FROM "
@@ -2168,7 +2061,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+" AND OBJV.id = ETOV.object_version_id "
 					+" AND ETOV.event_id = EV.id "
 					+" AND EV.activity_instance_id = AITC.activity_instance_id "
-					+" AND AITC.case_id = '"+caseId+"' "
+					+" AND AITC.case_id IN ("+caseList+") "
 					+" ORDER BY OBJ.id");
 			erset = new SLEXMMObjectResultSet(this, rset);
 		} catch (Exception e) {
@@ -2180,9 +2073,105 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 
 	@Override
-	public SLEXMMObjectResultSet getObjectsForActivity(int activityId) {
+	public SLEXMMObjectResultSet getObjectsForObjectVersion(int objectVersionId) {
+		return getObjectsForObjectVersions(new int[] {objectVersionId});
+	}
+
+	@Override
+	public SLEXMMObjectResultSet getObjectsForObjectVersions(
+			int[] objectVersionIds) { // TODO Check
 		SLEXMMObjectResultSet erset = null;
 		Statement statement = null;
+		
+		String objectVersionList = buildStringFromArray(objectVersionIds, false);
+				
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJ.* FROM "
+					+METAMODEL_ALIAS+".object AS OBJ, "
+					+METAMODEL_ALIAS+".object_version AS OBJV "
+					+" WHERE OBJ.id = OBJV.object_id "
+					+" AND OBJV.id IN ("+objectVersionList+") "
+					+" ORDER BY OBJ.id");
+			erset = new SLEXMMObjectResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return erset;
+	}
+	
+	@Override
+	public SLEXMMObjectResultSet getObjectsForEvent(int eventId) { // TODO Check
+		return getObjectsForEvents(new int[] {eventId});
+	}
+	
+	@Override
+	public SLEXMMObjectResultSet getObjectsForEvents(int[] eventIds) { // TODO Check
+		SLEXMMObjectResultSet erset = null;
+		Statement statement = null;
+		
+		String eventList = buildStringFromArray(eventIds, true);
+		
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT OBJ.id, OBJ.class_id FROM "
+					+METAMODEL_ALIAS+".object AS OBJ, "
+					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
+					+METAMODEL_ALIAS+".object_version AS OBJV "
+					+" WHERE OBJ.id = OBJV.object_id "
+					+" AND OBJV.id = ETOV.object_version_id "
+					+" AND ETOV.event_id IN ("+eventList+") "
+					+" ORDER BY OBJ.id");
+			erset = new SLEXMMObjectResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return erset; 
+	}
+	
+	@Override
+	public SLEXMMObjectResultSet getObjectsForClass(int classId) {
+		return getObjectsForClasses(new int[] {classId});
+	}
+	
+	@Override
+	public SLEXMMObjectResultSet getObjectsForClasses(int[] classIds) {
+		SLEXMMObjectResultSet erset = null;
+		Statement statement = null;
+		
+		String classList = buildStringFromArray(classIds, false);
+		
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT OBJ.id, OBJ.class_id FROM "
+					+METAMODEL_ALIAS+".object AS OBJ "
+					+" WHERE OBJ.class_id IN ("+classList+") "
+					+" ORDER BY OBJ.id");
+			erset = new SLEXMMObjectResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return erset; 
+	}
+	
+	@Override
+	public SLEXMMObjectResultSet getObjectsForActivity(int activityId) {
+		return getObjectsForActivities(new int[] {activityId});
+	}
+	
+	@Override
+	public SLEXMMObjectResultSet getObjectsForActivities(int[] activityIds) {
+		SLEXMMObjectResultSet erset = null;
+		Statement statement = null;
+		
+		String activityList = buildStringFromArray(activityIds, false);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJ.* FROM "
@@ -2195,7 +2184,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+" AND OBJV.id = ETOV.object_version_id "
 					+" AND ETOV.event_id = EV.id "
 					+" AND EV.activity_instance_id = AI.id "
-					+" AND AI.activity_id = "+activityId+" "
+					+" AND AI.activity_id IN ("+activityList+") "
 					+" ORDER BY OBJ.id");
 			erset = new SLEXMMObjectResultSet(this, rset);
 		} catch (Exception e) {
@@ -2209,8 +2198,17 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	@Override
 	public SLEXMMObjectResultSet getObjectsForActivityInstance(
 			int activityInstanceId) {
+		return getObjectsForActivityInstances(new int[] {activityInstanceId});
+	}
+	
+	@Override
+	public SLEXMMObjectResultSet getObjectsForActivityInstances(
+			int[] activityInstanceIds) {
 		SLEXMMObjectResultSet erset = null;
 		Statement statement = null;
+		
+		String activityInstanceList = buildStringFromArray(activityInstanceIds, true);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJ.* FROM "
@@ -2221,7 +2219,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+" WHERE OBJ.id = OBJV.object_id "
 					+" AND OBJV.id = ETOV.object_version_id "
 					+" AND ETOV.event_id = EV.id "
-					+" AND EV.activity_instance_id = '"+activityInstanceId+"' "
+					+" AND EV.activity_instance_id IN ("+activityInstanceList+") "
 					+" ORDER BY OBJ.id");
 			erset = new SLEXMMObjectResultSet(this, rset);
 		} catch (Exception e) {
@@ -2234,8 +2232,16 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMObjectResultSet getObjectsForRelation(int relationId) {
+		return getObjectsForRelations(new int[] {relationId});
+	}
+	
+	@Override
+	public SLEXMMObjectResultSet getObjectsForRelations(int[] relationIds) {
 		SLEXMMObjectResultSet erset = null;
 		Statement statement = null;
+		
+		String relationList = buildStringFromArray(relationIds, true);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJ.* FROM "
@@ -2244,7 +2250,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+METAMODEL_ALIAS+".object_version AS OBJV "
 					+" WHERE OBJ.id = OBJV.object_id "
 					+" AND (OBJV.id = REL.source_object_version_id OR OBJV.id = REL.target_object_version_id) "
-					+" AND REL.id = '"+relationId+"' "
+					+" AND REL.id IN ("+relationList+") "
 					+" ORDER BY OBJ.id");
 			erset = new SLEXMMObjectResultSet(this, rset);
 		} catch (Exception e) {
@@ -2257,8 +2263,16 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMObjectResultSet getObjectsForRelationship(int relationshipId) {
+		return getObjectsForRelationships(new int[] {relationshipId});
+	}
+	
+	@Override
+	public SLEXMMObjectResultSet getObjectsForRelationships(int[] relationshipIds) {
 		SLEXMMObjectResultSet erset = null;
 		Statement statement = null;
+		
+		String relationshipList = buildStringFromArray(relationshipIds, false);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJ.* FROM "
@@ -2267,7 +2281,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+METAMODEL_ALIAS+".object_version AS OBJV "
 					+" WHERE OBJ.id = OBJV.object_id "
 					+" AND (OBJV.id = REL.source_object_version_id OR OBJV.id = REL.target_object_version_id) "
-					+" AND REL.relationship_id = "+relationshipId+" "
+					+" AND REL.relationship_id IN ("+relationshipList+") "
 					+" ORDER BY OBJ.id");
 			erset = new SLEXMMObjectResultSet(this, rset);
 		} catch (Exception e) {
@@ -2280,8 +2294,16 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	
 	@Override
 	public SLEXMMObjectResultSet getObjectsForAttribute(int attributeId) {
+		return getObjectsForAttributes(new int[] {attributeId});
+	}
+	
+	@Override
+	public SLEXMMObjectResultSet getObjectsForAttributes(int[] attributeIds) {
 		SLEXMMObjectResultSet erset = null;
 		Statement statement = null;
+		
+		String attributeList = buildStringFromArray(attributeIds, false);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJ.* FROM "
@@ -2290,7 +2312,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+METAMODEL_ALIAS+".object_version AS OBJV "
 					+" WHERE OBJ.id = OBJV.object_id "
 					+" AND OBJV.id = ATV.object_version_id "
-					+" AND ATV.attribute_name_id = "+attributeId+" "
+					+" AND ATV.attribute_name_id IN ("+attributeList+") "
 					+" ORDER BY OBJ.id");
 			erset = new SLEXMMObjectResultSet(this, rset);
 		} catch (Exception e) {
@@ -2303,8 +2325,16 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMCaseResultSet getCasesForObject(int objectId) {
+		return getCasesForObjects(new int[] {objectId});
+	}
+	
+	@Override
+	public SLEXMMCaseResultSet getCasesForObjects(int[] objectIds) {
 		SLEXMMCaseResultSet crset = null;
 		Statement statement = null;
+		
+		String objectList = buildStringFromArray(objectIds, false);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
@@ -2317,7 +2347,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+" AND AITC.activity_instance_id = EV.activity_instance_id "
 					+" AND EV.id = ETOV.event_id "
 					+" AND ETOV.object_version_id = OBJV.id "
-					+" AND OBJV.object_id = "+objectId+" "
+					+" AND OBJV.object_id IN ("+objectList+") "
 					+" ORDER BY C.id");
 			crset = new SLEXMMCaseResultSet(this, rset);
 		} catch (Exception e) {
@@ -2330,8 +2360,16 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMCaseResultSet getCasesForEvent(int eventId) {
+		return getCasesForEvents(new int[] {eventId});
+	}
+	
+	@Override
+	public SLEXMMCaseResultSet getCasesForEvents(int[] eventIds) {
 		SLEXMMCaseResultSet crset = null;
 		Statement statement = null;
+		
+		String eventList = buildStringFromArray(eventIds, true);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
@@ -2340,7 +2378,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+METAMODEL_ALIAS+".activity_instance_to_case AS AITC "
 					+" WHERE C.id = AITC.case_id "
 					+" AND AITC.activity_instance_id = EV.activity_instance_id "
-					+" AND EV.id = '"+eventId+"' "
+					+" AND EV.id IN ("+eventList+") "
 					+" ORDER BY C.id");
 			crset = new SLEXMMCaseResultSet(this, rset);
 		} catch (Exception e) {
@@ -2353,8 +2391,16 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMCaseResultSet getCasesForActivity(int activityId) {
+		return getCasesForActivities(new int[] {activityId});
+	}
+	
+	@Override
+	public SLEXMMCaseResultSet getCasesForActivities(int[] activityIds) {
 		SLEXMMCaseResultSet crset = null;
 		Statement statement = null;
+		
+		String activityList = buildStringFromArray(activityIds, false);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
@@ -2363,7 +2409,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+METAMODEL_ALIAS+".activity_instance_to_case AS AITC "
 					+" WHERE C.id = AITC.case_id "
 					+" AND AITC.activity_instance_id = AI.id "
-					+" AND AI.activity_id = "+activityId+" "
+					+" AND AI.activity_id IN ("+activityList+") "
 					+" ORDER BY C.id");
 			crset = new SLEXMMCaseResultSet(this, rset);
 		} catch (Exception e) {
@@ -2376,8 +2422,16 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMCaseResultSet getCasesForClass(int classId) {
+		return getCasesForClasses(new int[] {classId});
+	}
+	
+	@Override
+	public SLEXMMCaseResultSet getCasesForClasses(int[] classIds) {
 		SLEXMMCaseResultSet crset = null;
 		Statement statement = null;
+		
+		String classList = buildStringFromArray(classIds, false);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
@@ -2392,7 +2446,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+" AND EV.id = ETOV.event_id "
 					+" AND ETOV.object_version_id = OBJV.id "
 					+" AND OBJV.object_id = OBJ.id "
-					+" AND OBJ.class_id = "+classId+" "
+					+" AND OBJ.class_id IN ("+classList+") "
 					+" ORDER BY C.id");
 			crset = new SLEXMMCaseResultSet(this, rset);
 		} catch (Exception e) {
@@ -2405,8 +2459,16 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMCaseResultSet getCasesForRelationship(int relationshipId) {
+		return getCasesForRelationships(new int[] {relationshipId});
+	}
+	
+	@Override
+	public SLEXMMCaseResultSet getCasesForRelationships(int[] relationshipIds) {
 		SLEXMMCaseResultSet crset = null;
 		Statement statement = null;
+		
+		String relationshipList = buildStringFromArray(relationshipIds, false);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
@@ -2421,7 +2483,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+" AND EV.id = ETOV.event_id "
 					+" AND OBJV.id = ETOV.object_version_id "
 					+" AND (OBJV.id = REL.source_object_version_id OR OBJV.id = REL.target_object_version_id) "
-					+" AND REL.relationship_id = "+relationshipId+" "
+					+" AND REL.relationship_id IN ("+relationshipList+") "
 					+" ORDER BY C.id");
 			crset = new SLEXMMCaseResultSet(this, rset);
 		} catch (Exception e) {
@@ -2434,8 +2496,16 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMCaseResultSet getCasesForObjectVersion(int objectVersionId) {
+		return getCasesForObjectVersions(new int[] {objectVersionId});
+	}
+	
+	@Override
+	public SLEXMMCaseResultSet getCasesForObjectVersions(int[] objectVersionIds) {
 		SLEXMMCaseResultSet crset = null;
 		Statement statement = null;
+		
+		String objectVersionList = buildStringFromArray(objectVersionIds, true);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
@@ -2446,7 +2516,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+" WHERE C.id = AITC.case_id "
 					+" AND AITC.activity_instance_id = EV.activity_instance_id "
 					+" AND EV.id = ETOV.event_id "
-					+" AND ETOV.object_version_id = '"+objectVersionId+"' "
+					+" AND ETOV.object_version_id IN ("+objectVersionList+") "
 					+" ORDER BY C.id");
 			crset = new SLEXMMCaseResultSet(this, rset);
 		} catch (Exception e) {
@@ -2459,8 +2529,16 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMCaseResultSet getCasesForRelation(int relationId) {
+		return getCasesForRelations(new int[] {relationId});
+	}
+	
+	@Override
+	public SLEXMMCaseResultSet getCasesForRelations(int[] relationIds) {
 		SLEXMMCaseResultSet crset = null;
 		Statement statement = null;
+		
+		String relationList = buildStringFromArray(relationIds, true);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
@@ -2475,7 +2553,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+" AND EV.id = ETOV.event_id "
 					+" AND OBJV.id = ETOV.object_version_id "
 					+" AND (OBJV.id = REL.source_object_version_id OR OBJV.id = REL.target_object_version_id) "
-					+" AND REL.id = '"+relationId+"' "
+					+" AND REL.id IN ("+relationList+") "
 					+" ORDER BY C.id");
 			crset = new SLEXMMCaseResultSet(this, rset);
 		} catch (Exception e) {
@@ -2489,15 +2567,24 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	@Override
 	public SLEXMMCaseResultSet getCasesForActivityInstance(
 			int activityInstanceId) {
+		return getCasesForActivityInstances(new int[] {activityInstanceId});
+	}
+	
+	@Override
+	public SLEXMMCaseResultSet getCasesForActivityInstances(
+			int[] activityInstanceIds) {
 		SLEXMMCaseResultSet crset = null;
 		Statement statement = null;
+		
+		String activityInstanceList = buildStringFromArray(activityInstanceIds, true);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
 					+METAMODEL_ALIAS+".pcase AS C, "
 					+METAMODEL_ALIAS+".activity_instance_to_case AS AITC "
 					+" WHERE C.id = AITC.case_id "
-					+" AND AITC.activity_instance_id = '"+activityInstanceId+"' "
+					+" AND AITC.activity_instance_id IN ("+activityInstanceList+") "
 					+" ORDER BY C.id");
 			crset = new SLEXMMCaseResultSet(this, rset);
 		} catch (Exception e) {
@@ -2510,8 +2597,16 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMCaseResultSet getCasesForAttribute(int attributeId) {
+		return getCasesForAttributes(new int[] {attributeId});
+	}
+	
+	@Override
+	public SLEXMMCaseResultSet getCasesForAttributes(int[] attributeIds) {
 		SLEXMMCaseResultSet crset = null;
 		Statement statement = null;
+		
+		String attributeList = buildStringFromArray(attributeIds, false);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
@@ -2526,7 +2621,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+" AND EV.id = ETOV.event_id "
 					+" AND ETOV.object_version_id = OBJV.id "
 					+" AND OBJV.id = ATV.object_version_id "
-					+" AND ATV.attribute_name_id = "+attributeId+" "
+					+" AND ATV.attribute_name_id IN ("+attributeList+") "
 					+" ORDER BY C.id");
 			crset = new SLEXMMCaseResultSet(this, rset);
 		} catch (Exception e) {
@@ -2539,8 +2634,16 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMEventResultSet getEventsForObject(int objectId) {
+		return getEventsForObjects(new int[] {objectId});
+	}
+	
+	@Override
+	public SLEXMMEventResultSet getEventsForObjects(int[] objectIds) {
 		SLEXMMEventResultSet erset = null;
 		Statement statement = null;
+		
+		String objectList = buildStringFromArray(objectIds, false);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT EV.* FROM "
@@ -2549,7 +2652,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+METAMODEL_ALIAS+".object_version AS OBJV "
 					+" WHERE EV.id = ETOV.event_id "
 					+" AND ETOV.object_version_id = OBJV.id "
-					+" AND OBJV.object_id = "+objectId+" "
+					+" AND OBJV.object_id IN ("+objectList+") "
 					+" ORDER BY EV.ordering");
 			erset = new SLEXMMEventResultSet(this, rset);
 		} catch (Exception e) {
@@ -2562,8 +2665,16 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMEventResultSet getEventsForClass(int classId) {
+		return getEventsForClasses(new int[] {classId});
+	}
+	
+	@Override
+	public SLEXMMEventResultSet getEventsForClasses(int[] classIds) {
 		SLEXMMEventResultSet erset = null;
 		Statement statement = null;
+		
+		String classList = buildStringFromArray(classIds, false);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT EV.* FROM "
@@ -2574,7 +2685,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+" WHERE EV.id = ETOV.event_id "
 					+" AND ETOV.object_version_id = OBJV.id "
 					+" AND OBJV.object_id = OBJ.id "
-					+" AND OBJ.class_id = "+classId+" "
+					+" AND OBJ.class_id IN ("+classList+") "
 					+" ORDER BY EV.ordering");
 			erset = new SLEXMMEventResultSet(this, rset);
 		} catch (Exception e) {
@@ -2587,8 +2698,16 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMEventResultSet getEventsForRelationship(int relationshipId) {
+		return getEventsForRelationships(new int[] {relationshipId});
+	}
+	
+	@Override
+	public SLEXMMEventResultSet getEventsForRelationships(int[] relationshipIds) {
 		SLEXMMEventResultSet erset = null;
 		Statement statement = null;
+		
+		String relationshipList = buildStringFromArray(relationshipIds, false);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT EV.* FROM "
@@ -2599,7 +2718,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+" WHERE EV.id = ETOV.event_id "
 					+" AND ETOV.object_version_id = OBJV.id "
 					+" AND ( OBJV.id = REL.source_object_version_id OR OBJV.id = REL.target_object_version_id ) "
-					+" AND REL.relationship_id = "+relationshipId+" "
+					+" AND REL.relationship_id IN ("+relationshipList+") "
 					+" ORDER BY EV.ordering");
 			erset = new SLEXMMEventResultSet(this, rset);
 		} catch (Exception e) {
@@ -2612,8 +2731,16 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMEventResultSet getEventsForRelation(int relationId) {
+		return getEventsForRelations(new int[] {relationId});
+	}
+	
+	@Override
+	public SLEXMMEventResultSet getEventsForRelations(int[] relationIds) {
 		SLEXMMEventResultSet erset = null;
 		Statement statement = null;
+		
+		String relationList = buildStringFromArray(relationIds, false);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT EV.* FROM "
@@ -2624,7 +2751,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+" WHERE EV.id = ETOV.event_id "
 					+" AND ETOV.object_version_id = OBJV.id "
 					+" AND ( OBJV.id = REL.source_object_version_id OR OBJV.id = REL.target_object_version_id ) "
-					+" AND REL.id = "+relationId+" "
+					+" AND REL.id IN ("+relationList+") "
 					+" ORDER BY EV.ordering");
 			erset = new SLEXMMEventResultSet(this, rset);
 		} catch (Exception e) {
@@ -2638,13 +2765,22 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	@Override
 	public SLEXMMEventResultSet getEventsForActivityInstance(
 			int activityInstanceId) {
+		return getEventsForActivityInstances(new int[] {activityInstanceId});
+	}
+	
+	@Override
+	public SLEXMMEventResultSet getEventsForActivityInstances(
+			int[] activityInstanceIds) {
 		SLEXMMEventResultSet erset = null;
 		Statement statement = null;
+		
+		String activityInstanceList = buildStringFromArray(activityInstanceIds, true);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT EV.* FROM "
 					+METAMODEL_ALIAS+".event AS EV "
-					+" WHERE EV.activity_instance_id = '"+activityInstanceId+"' "
+					+" WHERE EV.activity_instance_id IN ("+activityInstanceList+") "
 					+" ORDER BY EV.ordering");
 			erset = new SLEXMMEventResultSet(this, rset);
 		} catch (Exception e) {
@@ -2657,8 +2793,16 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMEventResultSet getEventsForAttribute(int attributeId) {
+		return getEventsForAttributes(new int[] {attributeId});
+	}
+	
+	@Override
+	public SLEXMMEventResultSet getEventsForAttributes(int[] attributeIds) {
 		SLEXMMEventResultSet erset = null;
 		Statement statement = null;
+		
+		String attributeList = buildStringFromArray(attributeIds, false);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT EV.* FROM "
@@ -2669,7 +2813,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+" WHERE EV.id = ETOV.event_id "
 					+" AND ETOV.object_version_id = OBJV.id "
 					+" AND OBJV.id = ATV.object_version_id "
-					+" AND ATV.attribute_name_id = "+attributeId+" "
+					+" AND ATV.attribute_name_id IN ("+attributeList+") "
 					+" ORDER BY EV.ordering");
 			erset = new SLEXMMEventResultSet(this, rset);
 		} catch (Exception e) {
@@ -2681,16 +2825,51 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 
 	@Override
+	public SLEXMMObjectVersionResultSet getObjectVersionsForObject(int objId) {
+		return getObjectVersionsForObjects(new int[] {objId});
+	}
+	
+	@Override
+	public SLEXMMObjectVersionResultSet getObjectVersionsForObjects(int[] objIds) {
+		SLEXMMObjectVersionResultSet erset = null;
+		Statement statement = null;
+		
+		String objectList = buildStringFromArray(objIds, false);
+		
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT OBJV.* FROM "
+					+METAMODEL_ALIAS+".object_version AS OBJV "
+					+" WHERE OBJV.object_id IN ("+objectList+") "
+					+" ORDER BY OBJV.start_timestamp ");
+			erset = new SLEXMMObjectVersionResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return erset; 
+	}
+	
+	@Override
 	public SLEXMMObjectVersionResultSet getObjectVersionsForEvent(int eventId) {
+		return getObjectVersionsForEvents(new int[] {eventId});
+	}
+	
+	@Override
+	public SLEXMMObjectVersionResultSet getObjectVersionsForEvents(int[] eventIds) {
 		SLEXMMObjectVersionResultSet ovrset = null;
 		Statement statement = null;
+		
+		String eventList = buildStringFromArray(eventIds, true);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJV.* FROM "
 					+METAMODEL_ALIAS+".object_version AS OBJV, "
 					+METAMODEL_ALIAS+".event_to_object_version AS ETOV "
 					+" WHERE OBJV.id = ETOV.object_version_id "
-					+" AND ETOV.event_id = '"+eventId+"' "
+					+" AND ETOV.event_id IN ("+eventList+") "
 					+" ORDER BY OBJV.id");
 			ovrset = new SLEXMMObjectVersionResultSet(this, rset);
 		} catch (Exception e) {
@@ -2703,8 +2882,16 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMObjectVersionResultSet getObjectVersionsForCase(int caseId) {
+		return getObjectVersionsForCases(new int[] {caseId});
+	}
+	
+	@Override
+	public SLEXMMObjectVersionResultSet getObjectVersionsForCases(int[] caseIds) {
 		SLEXMMObjectVersionResultSet ovrset = null;
 		Statement statement = null;
+		
+		String caseList = buildStringFromArray(caseIds, true);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJV.* FROM "
@@ -2715,7 +2902,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+" WHERE OBJV.id = ETOV.object_version_id "
 					+" AND ETOV.event_id = EV.id "
 					+" AND EV.activity_instance_id = AITC.activity_instance_id "
-					+" AND AITC.case_id = '"+caseId+"' "
+					+" AND AITC.case_id IN ("+caseList+") "
 					+" ORDER BY OBJV.id");
 			ovrset = new SLEXMMObjectVersionResultSet(this, rset);
 		} catch (Exception e) {
@@ -2728,15 +2915,23 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMObjectVersionResultSet getObjectVersionsForClass(int classId) {
+		return getObjectVersionsForClasses(new int[] {classId});
+	}
+	
+	@Override
+	public SLEXMMObjectVersionResultSet getObjectVersionsForClasses(int[] classIds) {
 		SLEXMMObjectVersionResultSet ovrset = null;
 		Statement statement = null;
+		
+		String classList = buildStringFromArray(classIds, false);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJV.* FROM "
 					+METAMODEL_ALIAS+".object_version AS OBJV, "
 					+METAMODEL_ALIAS+".object AS OBJ "
 					+" WHERE OBJV.object_id = OBJ.id "
-					+" AND OBJ.class_id = "+classId+" "
+					+" AND OBJ.class_id IN ("+classList+") "
 					+" ORDER BY OBJV.id");
 			ovrset = new SLEXMMObjectVersionResultSet(this, rset);
 		} catch (Exception e) {
@@ -2750,15 +2945,24 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	@Override
 	public SLEXMMObjectVersionResultSet getObjectVersionsForRelationship(
 			int relationshipId) {
+		return getObjectVersionsForRelationships(new int[] {relationshipId});
+	}
+	
+	@Override
+	public SLEXMMObjectVersionResultSet getObjectVersionsForRelationships(
+			int[] relationshipIds) {
 		SLEXMMObjectVersionResultSet ovrset = null;
 		Statement statement = null;
+		
+		String relationshipList = buildStringFromArray(relationshipIds, false);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJV.* FROM "
 					+METAMODEL_ALIAS+".object_version AS OBJV, "
 					+METAMODEL_ALIAS+".relation AS REL "
 					+" WHERE ( OBJV.id = REL.source_object_version_id OR REL.target_object_version_id ) "
-					+" AND REL.relationship_id = "+relationshipId+" "
+					+" AND REL.relationship_id IN ("+relationshipList+") "
 					+" ORDER BY OBJV.id");
 			ovrset = new SLEXMMObjectVersionResultSet(this, rset);
 		} catch (Exception e) {
@@ -2772,15 +2976,24 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	@Override
 	public SLEXMMObjectVersionResultSet getObjectVersionsForRelation(
 			int relationId) {
+		return getObjectVersionsForRelations(new int[] {relationId});
+	}
+	
+	@Override
+	public SLEXMMObjectVersionResultSet getObjectVersionsForRelations(
+			int[] relationIds) {
 		SLEXMMObjectVersionResultSet ovrset = null;
 		Statement statement = null;
+		
+		String relationList = buildStringFromArray(relationIds, false);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJV.* FROM "
 					+METAMODEL_ALIAS+".object_version AS OBJV, "
 					+METAMODEL_ALIAS+".relation AS REL "
 					+" WHERE ( OBJV.id = REL.source_object_version_id OR REL.target_object_version_id ) "
-					+" AND REL.id = "+relationId+" "
+					+" AND REL.id IN ("+relationList+") "
 					+" ORDER BY OBJV.id");
 			ovrset = new SLEXMMObjectVersionResultSet(this, rset);
 		} catch (Exception e) {
@@ -2794,8 +3007,17 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	@Override
 	public SLEXMMObjectVersionResultSet getObjectVersionsForActivityInstance(
 			int activityInstanceId) {
+		return getObjectVersionsForActivityInstances(new int[] {activityInstanceId});
+	}
+	
+	@Override
+	public SLEXMMObjectVersionResultSet getObjectVersionsForActivityInstances(
+			int[] activityInstanceIds) {
 		SLEXMMObjectVersionResultSet ovrset = null;
 		Statement statement = null;
+		
+		String activityInstanceList = buildStringFromArray(activityInstanceIds, true);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJV.* FROM "
@@ -2804,7 +3026,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+METAMODEL_ALIAS+".event AS EV "
 					+" WHERE OBJV.id = ETOV.object_version_id "
 					+" AND ETOV.event_id = EV.id "
-					+" AND EV.activity_instance_id = '"+activityInstanceId+"' "
+					+" AND EV.activity_instance_id IN ("+activityInstanceList+") "
 					+" ORDER BY OBJV.id");
 			ovrset = new SLEXMMObjectVersionResultSet(this, rset);
 		} catch (Exception e) {
@@ -2816,17 +3038,63 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 
 	@Override
+	public SLEXMMObjectVersionResultSet getObjectVersionsForActivity(
+			int activityId) {
+		return getObjectVersionsForActivities(new int[] {activityId});
+	}
+	
+	@Override
+	public SLEXMMObjectVersionResultSet getObjectVersionsForActivities( // TODO CHECK
+			int[] activityIds) {
+		SLEXMMObjectVersionResultSet erset = null;
+		Statement statement = null;
+		String query = "";
+		
+		String activityList = buildStringFromArray(activityIds, false);
+		
+		try {
+			statement = connection.createStatement();
+			query = "SELECT DISTINCT OBJV.* FROM "
+					+METAMODEL_ALIAS+".object_version AS OBJV, "
+					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
+					+METAMODEL_ALIAS+".event AS EV, "
+					+METAMODEL_ALIAS+".activity_instance AS AI "
+					+" WHERE OBJV.id = ETOV.object_version_id "
+					+" AND ETOV.event_id = EV.id "
+					+" AND EV.activity_instance_id = AI.id "
+					+" AND AI.activity_id IN ("+activityList+") ";
+			ResultSet rset = statement.executeQuery(query);
+			erset = new SLEXMMObjectVersionResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.err.println(query);
+			closeStatement(statement);
+		}
+		
+		return erset;
+	}
+	
+	@Override
 	public SLEXMMObjectVersionResultSet getObjectVersionsForAttribute(
 			int attributeId) {
+		return getObjectVersionsForAttributes(new int[] {attributeId});
+	}
+	
+	@Override
+	public SLEXMMObjectVersionResultSet getObjectVersionsForAttributes(
+			int[] attributeIds) {
 		SLEXMMObjectVersionResultSet ovrset = null;
 		Statement statement = null;
+		
+		String attributeList = buildStringFromArray(attributeIds, false);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJV.* FROM "
 					+METAMODEL_ALIAS+".object_version AS OBJV, "
 					+METAMODEL_ALIAS+".attribute_value AS ATV "
 					+" WHERE OBJV.id = ATV.object_version_id "
-					+" AND ATV.attribute_name_id = "+attributeId+" "
+					+" AND ATV.attribute_name_id IN ("+attributeList+") "
 					+" ORDER BY OBJV.id");
 			ovrset = new SLEXMMObjectVersionResultSet(this, rset);
 		} catch (Exception e) {
@@ -2839,8 +3107,16 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMActivityResultSet getActivitiesForObject(int objectId) {
+		return getActivitiesForObjects(new int[] {objectId});
+	}
+	
+	@Override
+	public SLEXMMActivityResultSet getActivitiesForObjects(int[] objectIds) {
 		SLEXMMActivityResultSet arset = null;
 		Statement statement = null;
+		
+		String objectList = buildStringFromArray(objectIds, false);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT AC.* FROM "
@@ -2853,7 +3129,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+" AND AI.id = EV.activity_instance_id "
 					+" AND EV.id = ETOV.event_id "
 					+" AND ETOV.object_version_id = OBJV.id "
-					+" AND OBJV.object_id = "+objectId+" "
+					+" AND OBJV.object_id IN ("+objectList+") "
 					+" ORDER BY AC.id");
 			arset = new SLEXMMActivityResultSet(this, rset);
 		} catch (Exception e) {
@@ -2866,8 +3142,16 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMActivityResultSet getActivitiesForEvent(int eventId) {
+		return getActivitiesForEvents(new int[] {eventId});
+	}
+	
+	@Override
+	public SLEXMMActivityResultSet getActivitiesForEvents(int[] eventIds) {
 		SLEXMMActivityResultSet arset = null;
 		Statement statement = null;
+		
+		String eventList = buildStringFromArray(eventIds, false);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT AC.* FROM "
@@ -2876,7 +3160,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+METAMODEL_ALIAS+".event AS EV "
 					+" WHERE AC.id = AI.activity_id "
 					+" AND AI.id = EV.activity_instance_id "
-					+" AND EV.id = "+eventId+" "
+					+" AND EV.id IN ("+eventList+") "
 					+" ORDER BY AC.id");
 			arset = new SLEXMMActivityResultSet(this, rset);
 		} catch (Exception e) {
@@ -2889,8 +3173,16 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMActivityResultSet getActivitiesForCase(int caseId) {
+		return getActivitiesForCases(new int[] {caseId});
+	}
+	
+	@Override
+	public SLEXMMActivityResultSet getActivitiesForCases(int[] caseIds) {
 		SLEXMMActivityResultSet arset = null;
 		Statement statement = null;
+		
+		String caseList = buildStringFromArray(caseIds, true);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT AC.* FROM "
@@ -2899,7 +3191,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+METAMODEL_ALIAS+".activity_instance_to_case AS AITC "
 					+" WHERE AC.id = AI.activity_id "
 					+" AND AI.id = AITC.activity_instance_id "
-					+" AND AITC.case_id = '"+caseId+"' "
+					+" AND AITC.case_id IN ("+caseList+") "
 					+" ORDER BY AC.id");
 			arset = new SLEXMMActivityResultSet(this, rset);
 		} catch (Exception e) {
@@ -2912,8 +3204,16 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMActivityResultSet getActivitiesForClass(int classId) {
+		return getActivitiesForClasses(new int[] {classId});
+	}
+	
+	@Override
+	public SLEXMMActivityResultSet getActivitiesForClasses(int[] classIds) {
 		SLEXMMActivityResultSet arset = null;
 		Statement statement = null;
+		
+		String classList = buildStringFromArray(classIds, false);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT AC.* FROM "
@@ -2928,7 +3228,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+" AND EV.id = ETOV.event_id "
 					+" AND ETOV.object_version_id = OBJV.id "
 					+" AND OBJV.object_id = OBJ.id "
-					+" AND OBJ.class_id = "+classId+" "
+					+" AND OBJ.class_id IN ("+classList+") "
 					+" ORDER BY AC.id");
 			arset = new SLEXMMActivityResultSet(this, rset);
 		} catch (Exception e) {
@@ -2942,8 +3242,17 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	@Override
 	public SLEXMMActivityResultSet getActivitiesForRelationship(
 			int relationshipId) {
+		return getActivitiesForRelationships(new int[] {relationshipId});
+	}
+	
+	@Override
+	public SLEXMMActivityResultSet getActivitiesForRelationships(
+			int[] relationshipIds) {
 		SLEXMMActivityResultSet arset = null;
 		Statement statement = null;
+		
+		String relationshipList = buildStringFromArray(relationshipIds, false);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT AC.* FROM "
@@ -2958,7 +3267,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+" AND EV.id = ETOV.event_id "
 					+" AND ETOV.object_version_id = OBJV.id "
 					+" AND ( OBJV.id = REL.source_object_version_id OR OBJV.id = REL.target_object_version_id ) "
-					+" AND REL.relationship_id = "+relationshipId+" "
+					+" AND REL.relationship_id IN ("+relationshipList+") "
 					+" ORDER BY AC.id");
 			arset = new SLEXMMActivityResultSet(this, rset);
 		} catch (Exception e) {
@@ -2972,8 +3281,17 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	@Override
 	public SLEXMMActivityResultSet getActivitiesForObjectVersion(
 			int objectVersionId) {
+		return getActivitiesForObjectVersions(new int[] {objectVersionId});
+	}
+	
+	@Override
+	public SLEXMMActivityResultSet getActivitiesForObjectVersions(
+			int[] objectVersionIds) {
 		SLEXMMActivityResultSet arset = null;
 		Statement statement = null;
+		
+		String objectVersionList = buildStringFromArray(objectVersionIds, true);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT AC.* FROM "
@@ -2984,7 +3302,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+" WHERE AC.id = AI.activity_id "
 					+" AND AI.id = EV.activity_instance_id "
 					+" AND EV.id = ETOV.event_id "
-					+" AND ETOV.object_version_id = '"+objectVersionId+"' "
+					+" AND ETOV.object_version_id IN ("+objectVersionList+") "
 					+" ORDER BY AC.id");
 			arset = new SLEXMMActivityResultSet(this, rset);
 		} catch (Exception e) {
@@ -2997,8 +3315,16 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMActivityResultSet getActivitiesForRelation(int relationId) {
+		return getActivitiesForRelations(new int[] {relationId});
+	}
+	
+	@Override
+	public SLEXMMActivityResultSet getActivitiesForRelations(int[] relationIds) {
 		SLEXMMActivityResultSet arset = null;
 		Statement statement = null;
+		
+		String relationList = buildStringFromArray(relationIds, false);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT AC.* FROM "
@@ -3013,7 +3339,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+" AND EV.id = ETOV.event_id "
 					+" AND ETOV.object_version_id = OBJV.id "
 					+" AND ( OBJV.id = REL.source_object_version_id OR OBJV.id = REL.target_object_version_id ) "
-					+" AND REL.id = "+relationId+" "
+					+" AND REL.id IN ("+relationList+") "
 					+" ORDER BY AC.id");
 			arset = new SLEXMMActivityResultSet(this, rset);
 		} catch (Exception e) {
@@ -3027,15 +3353,24 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	@Override
 	public SLEXMMActivityResultSet getActivitiesForActivityInstance(
 			int activityInstanceId) {
+		return getActivitiesForActivityInstances(new int[] {activityInstanceId});
+	}
+	
+	@Override
+	public SLEXMMActivityResultSet getActivitiesForActivityInstances(
+			int[] activityInstanceIds) {
 		SLEXMMActivityResultSet arset = null;
 		Statement statement = null;
+		
+		String activityInstanceList = buildStringFromArray(activityInstanceIds, false);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT AC.* FROM "
 					+METAMODEL_ALIAS+".activity AS AC, "
 					+METAMODEL_ALIAS+".activity_instance AS AI "
 					+" WHERE AC.id = AI.activity_id "
-					+" AND AI.id = "+activityInstanceId+" "
+					+" AND AI.id IN ("+activityInstanceList+") "
 					+" ORDER BY AC.id");
 			arset = new SLEXMMActivityResultSet(this, rset);
 		} catch (Exception e) {
@@ -3048,8 +3383,16 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMActivityResultSet getActivitiesForAttribute(int attributeId) {
+		return getActivitiesForAttributes(new int[] {attributeId});
+	}
+	
+	@Override
+	public SLEXMMActivityResultSet getActivitiesForAttributes(int[] attributeIds) {
 		SLEXMMActivityResultSet arset = null;
 		Statement statement = null;
+		
+		String attributeList = buildStringFromArray(attributeIds, false);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT AC.* FROM "
@@ -3068,7 +3411,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+" AND OBJV.object_id = OBJ.id "
 					+" AND OBJ.class_id = C.id "
 					+" AND C.id = AN.class_id "
-					+" AND AN.id = "+attributeId+" "
+					+" AND AN.id IN ("+attributeList+") "
 					+" ORDER BY AC.id");
 			arset = new SLEXMMActivityResultSet(this, rset);
 		} catch (Exception e) {
@@ -3081,15 +3424,23 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMClassResultSet getClassesForObject(int objectId) {
+		return getClassesForObjects(new int[] {objectId});
+	}
+	
+	@Override
+	public SLEXMMClassResultSet getClassesForObjects(int[] objectIds) {
 		SLEXMMClassResultSet crset = null;
 		Statement statement = null;
+		
+		String objectList = buildStringFromArray(objectIds, false);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
 					+METAMODEL_ALIAS+".class AS C, "
 					+METAMODEL_ALIAS+".object AS OBJ "
 					+" WHERE C.id = OBJ.class_id "
-					+" AND OBJ.id = "+objectId+" "
+					+" AND OBJ.id IN ("+objectList+") "
 					+" ORDER BY C.id");
 			crset = new SLEXMMClassResultSet(this, rset);
 		} catch (Exception e) {
@@ -3102,8 +3453,16 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMClassResultSet getClassesForEvent(int eventId) {
+		return getClassesForEvents(new int[] {eventId});
+	}
+	
+	@Override
+	public SLEXMMClassResultSet getClassesForEvents(int[] eventIds) {
 		SLEXMMClassResultSet crset = null;
 		Statement statement = null;
+		
+		String eventList = buildStringFromArray(eventIds, true);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
@@ -3114,7 +3473,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+" WHERE C.id = OBJ.class_id "
 					+" AND OBJ.id = OBJV.object_id "
 					+" AND OBJV.id = ETOV.object_version_id "
-					+" AND ETOV.event_id = '"+eventId+"' "
+					+" AND ETOV.event_id IN ("+eventList+") "
 					+" ORDER BY C.id");
 			crset = new SLEXMMClassResultSet(this, rset);
 		} catch (Exception e) {
@@ -3127,8 +3486,16 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMClassResultSet getClassesForCase(int caseId) {
+		return getClassesForCases(new int[] {caseId});
+	}
+	
+	@Override
+	public SLEXMMClassResultSet getClassesForCases(int[] caseIds) {
 		SLEXMMClassResultSet crset = null;
 		Statement statement = null;
+		
+		String caseList = buildStringFromArray(caseIds, true);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
@@ -3143,7 +3510,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+" AND OBJV.id = ETOV.object_version_id "
 					+" AND ETOV.event_id = EV.id "
 					+" AND EV.activity_instance_id = AITC.activity_instance_id "
-					+" AND AITC.case_id = '"+caseId+"' "
+					+" AND AITC.case_id IN ("+caseList+") "
 					+" ORDER BY C.id");
 			crset = new SLEXMMClassResultSet(this, rset);
 		} catch (Exception e) {
@@ -3156,8 +3523,16 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMClassResultSet getClassesForActivity(int activityId) {
+		return getClassesForActivities(new int[] {activityId});
+	}
+	
+	@Override
+	public SLEXMMClassResultSet getClassesForActivities(int[] activityIds) {
 		SLEXMMClassResultSet crset = null;
 		Statement statement = null;
+		
+		String activityList = buildStringFromArray(activityIds, false);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
@@ -3172,7 +3547,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+" AND OBJV.id = ETOV.object_version_id "
 					+" AND ETOV.event_id = EV.id "
 					+" AND EV.activity_instance_id = AI.id "
-					+" AND AI.activity_id = "+activityId+" "
+					+" AND AI.activity_id IN ("+activityList+") "
 					+" ORDER BY C.id");
 			crset = new SLEXMMClassResultSet(this, rset);
 		} catch (Exception e) {
@@ -3185,15 +3560,23 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMClassResultSet getClassesForRelationship(int relationshipId) {
+		return getClassesForRelationships(new int[] {relationshipId});
+	}
+	
+	@Override
+	public SLEXMMClassResultSet getClassesForRelationships(int[] relationshipIds) {
 		SLEXMMClassResultSet crset = null;
 		Statement statement = null;
+		
+		String relationshipList = buildStringFromArray(relationshipIds, true);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
 					+METAMODEL_ALIAS+".class AS C, "
 					+METAMODEL_ALIAS+".relationship AS RS "
 					+" WHERE ( C.id = RS.source OR C.id = RS.target ) "
-					+" AND RS.id = '"+relationshipId+"' "
+					+" AND RS.id IN ("+relationshipList+") "
 					+" ORDER BY C.id");
 			crset = new SLEXMMClassResultSet(this, rset);
 		} catch (Exception e) {
@@ -3207,8 +3590,17 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	@Override
 	public SLEXMMClassResultSet getClassesForObjectVersion(
 			int objectVersionId) {
+		return getClassesForObjectVersions(new int[] {objectVersionId});
+	}
+	
+	@Override
+	public SLEXMMClassResultSet getClassesForObjectVersions(
+			int[] objectVersionIds) {
 		SLEXMMClassResultSet crset = null;
 		Statement statement = null;
+		
+		String objectVersionList = buildStringFromArray(objectVersionIds, true);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
@@ -3217,7 +3609,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+METAMODEL_ALIAS+".object_version AS OBJV "
 					+" WHERE C.id = OBJ.class_id "
 					+" AND OBJ.id = OBJV.object_id "
-					+" AND OBJV.id = '"+objectVersionId+"' "
+					+" AND OBJV.id IN ("+objectVersionList+") "
 					+" ORDER BY C.id");
 			crset = new SLEXMMClassResultSet(this, rset);
 		} catch (Exception e) {
@@ -3230,8 +3622,16 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMClassResultSet getClassesForRelation(int relationId) {
+		return getClassesForRelations(new int[] {relationId});
+	}
+	
+	@Override
+	public SLEXMMClassResultSet getClassesForRelations(int[] relationIds) {
 		SLEXMMClassResultSet crset = null;
 		Statement statement = null;
+		
+		String relationList = buildStringFromArray(relationIds, true);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
@@ -3242,7 +3642,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+" WHERE C.id = OBJ.class_id "
 					+" AND OBJ.id = OBJV.object_id "
 					+" AND ( OBJV.id = REL.source_object_version_id OR OBJV.id = REL.target_object_version_id ) "
-					+" AND REL.id = '"+relationId+"' "
+					+" AND REL.id IN ("+relationList+") "
 					+" ORDER BY C.id");
 			crset = new SLEXMMClassResultSet(this, rset);
 		} catch (Exception e) {
@@ -3256,8 +3656,17 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	@Override
 	public SLEXMMClassResultSet getClassesForActivityInstance(
 			int activityInstanceId) {
+		return getClassesForActivityInstances(new int[] {activityInstanceId});
+	}
+	
+	@Override
+	public SLEXMMClassResultSet getClassesForActivityInstances(
+			int[] activityInstanceIds) {
 		SLEXMMClassResultSet crset = null;
 		Statement statement = null;
+		
+		String activityInstanceList = buildStringFromArray(activityInstanceIds, true);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
@@ -3270,7 +3679,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+" AND OBJ.id = OBJV.object_id "
 					+" AND OBJV.id = ETOV.object_version_id "
 					+" AND ETOV.event_id = EV.id "
-					+" AND EV.activity_instance_id = '"+activityInstanceId+"' "
+					+" AND EV.activity_instance_id IN ("+activityInstanceList+") "
 					+" ORDER BY C.id");
 			crset = new SLEXMMClassResultSet(this, rset);
 		} catch (Exception e) {
@@ -3283,15 +3692,23 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMClassResultSet getClassesForAttribute(int attributeId) {
+		return getClassesForAttributes(new int[] {attributeId});
+	}
+	
+	@Override
+	public SLEXMMClassResultSet getClassesForAttributes(int[] attributeIds) {
 		SLEXMMClassResultSet crset = null;
 		Statement statement = null;
+		
+		String attributeList = buildStringFromArray(attributeIds, true);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
 					+METAMODEL_ALIAS+".class AS C, "
 					+METAMODEL_ALIAS+".attribute_name AS AN "
 					+" WHERE C.id = AN.class_id "
-					+" AND AN.id = '"+attributeId+"' "
+					+" AND AN.id IN ("+attributeList+") "
 					+" ORDER BY C.id");
 			crset = new SLEXMMClassResultSet(this, rset);
 		} catch (Exception e) {
@@ -3304,15 +3721,23 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMRelationResultSet getRelationsForObject(int objectId) {
+		return getRelationsForObjects(new int[] {objectId});
+	}
+	
+	@Override
+	public SLEXMMRelationResultSet getRelationsForObjects(int[] objectIds) {
 		SLEXMMRelationResultSet rrset = null;
 		Statement statement = null;
+		
+		String objectList = buildStringFromArray(objectIds, false);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT REL.* FROM "
 					+METAMODEL_ALIAS+".relation AS REL, "
 					+METAMODEL_ALIAS+".object_version AS OBJV "
 					+" WHERE ( REL.source_object_version_id = OBJV.id OR REL.target_object_version_id = OBJV.id ) "
-					+" AND OBJV.object_id = "+objectId+" "
+					+" AND OBJV.object_id IN ("+objectList+") "
 					+" ORDER BY REL.id");
 			rrset = new SLEXMMRelationResultSet(this, rset);
 		} catch (Exception e) {
@@ -3325,8 +3750,16 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMRelationResultSet getRelationsForEvent(int eventId) {
+		return getRelationsForEvents(new int[] {eventId});
+	}
+	
+	@Override
+	public SLEXMMRelationResultSet getRelationsForEvents(int[] eventIds) {
 		SLEXMMRelationResultSet rrset = null;
 		Statement statement = null;
+		
+		String eventList = buildStringFromArray(eventIds, true);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT REL.* FROM "
@@ -3335,7 +3768,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+METAMODEL_ALIAS+".event_to_object_version AS ETOV "
 					+" WHERE ( REL.source_object_version_id = OBJV.id OR REL.target_object_version_id = OBJV.id ) "
 					+" AND OBJV.id = ETOV.object_version_id "
-					+" AND ETOV.event_id = '"+eventId+"' "
+					+" AND ETOV.event_id = ("+eventList+") "
 					+" ORDER BY REL.id");
 			rrset = new SLEXMMRelationResultSet(this, rset);
 		} catch (Exception e) {
@@ -3383,8 +3816,16 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMRelationResultSet getRelationsForActivity(int activityId) { // TODO Check
+		return getRelationsForActivities(new int[] {activityId});
+	}
+	
+	@Override
+	public SLEXMMRelationResultSet getRelationsForActivities(int[] activityIds) { // TODO Check
 		SLEXMMRelationResultSet rrset = null;
 		Statement statement = null;
+		
+		String activityList = buildStringFromArray(activityIds, false);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT REL.* FROM "
@@ -3397,7 +3838,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+" AND OBJV.id = ETOV.object_version_id "
 					+" AND ETOV.event_id = EV.id "
 					+" AND EV.activity_instance_id = AI.id "
-					+" AND AI.activity_id = "+activityId+" "
+					+" AND AI.activity_id IN ("+activityList+") "
 					+" ORDER BY REL.id");
 			rrset = new SLEXMMRelationResultSet(this, rset);
 		} catch (Exception e) {
@@ -3461,13 +3902,22 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	@Override
 	public SLEXMMRelationResultSet getRelationsForRelationship(
 			int relationshipId) {
+		return getRelationsForRelationships(new int[] {relationshipId});
+	}
+	
+	@Override
+	public SLEXMMRelationResultSet getRelationsForRelationships(
+			int[] relationshipIds) {
 		SLEXMMRelationResultSet rrset = null;
 		Statement statement = null;
+		
+		String relationshipList = buildStringFromArray(relationshipIds, false);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT REL.* FROM "
 					+METAMODEL_ALIAS+".relation AS REL "
-					+" WHERE REL.relationship_id = "+relationshipId+" "
+					+" WHERE REL.relationship_id IN ("+relationshipList+") "
 					+" ORDER BY REL.id");
 			rrset = new SLEXMMRelationResultSet(this, rset);
 		} catch (Exception e) {
@@ -3481,15 +3931,24 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	@Override
 	public SLEXMMRelationResultSet getRelationsForObjectVersion(
 			int objectVersionId) {
+		return getRelationsForObjectVersions(new int []{objectVersionId});
+	}
+	
+	@Override
+	public SLEXMMRelationResultSet getRelationsForObjectVersions(
+			int[] objectVersionIds) {
 		SLEXMMRelationResultSet rrset = null;
 		Statement statement = null;
+		
+		String objectVersionList = buildStringFromArray(objectVersionIds, false);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT REL.* FROM "
 					+METAMODEL_ALIAS+".relation AS REL, "
 					+METAMODEL_ALIAS+".object_version AS OBJV "
 					+" WHERE ( REL.source_object_version_id = OBJV.id OR REL.target_object_version_id = OBJV.id ) "
-					+" AND OBJV.id = "+objectVersionId+" "
+					+" AND OBJV.id IN ("+objectVersionList+") "
 					+" ORDER BY REL.id");
 			rrset = new SLEXMMRelationResultSet(this, rset);
 		} catch (Exception e) {
@@ -3503,8 +3962,16 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	@Override
 	public SLEXMMRelationResultSet getRelationsForActivityInstance(
 			int activityInstanceId) { // TODO Check
+		return getRelationsForActivityInstances(new int[] {activityInstanceId});
+	}
+	
+	@Override
+	public SLEXMMRelationResultSet getRelationsForActivityInstances(
+			int[] activityInstanceIds) { // TODO Check
 		SLEXMMRelationResultSet rrset = null;
 		Statement statement = null;
+		
+		String activityInstancesList = buildStringFromArray(activityInstanceIds, false);
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT REL.* FROM "
@@ -3515,7 +3982,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+" WHERE ( REL.source_object_version_id = OBJV.id OR REL.target_object_version_id = OBJV.id ) "
 					+" AND OBJV.id = ETOV.object_version_id "
 					+" AND ETOV.event_id = EV.id "
-					+" AND EV.activity_instance_id = "+activityInstanceId+" "
+					+" AND EV.activity_instance_id IN ("+activityInstancesList+") "
 					+" ORDER BY REL.id");
 			rrset = new SLEXMMRelationResultSet(this, rset);
 		} catch (Exception e) {
@@ -3528,8 +3995,16 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMRelationResultSet getRelationsForAttribute(int attributeId) {
+		return getRelationsForAttributes(new int[] {attributeId});
+	}
+	
+	@Override
+	public SLEXMMRelationResultSet getRelationsForAttributes(int[] attributeIds) {
 		SLEXMMRelationResultSet rrset = null;
 		Statement statement = null;
+		
+		String attributeIdList = buildStringFromArray(attributeIds,false);
+		
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT REL.* FROM "
@@ -3542,7 +4017,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+" AND OBJV.object_id = OBJ.id "
 					+" AND OBJ.class_id = C.id "
 					+" AND AN.class_id = C.id "
-					+" AND AN.id = "+attributeId+" "
+					+" AND AN.id IN ("+attributeIdList+") "
 					+" ORDER BY REL.id");
 			rrset = new SLEXMMRelationResultSet(this, rset);
 		} catch (Exception e) {
@@ -3555,38 +4030,184 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMRelationshipResultSet getRelationshipsForObject(int objectId) { // TODO Check
-		// TODO Auto-generated method stub
-		return null;
+		return getRelationshipsForObjects(new int[]{objectId});
+	}
+	
+	@Override
+	public SLEXMMRelationshipResultSet getRelationshipsForObjects(int[] objectIds) { // TODO Check
+		SLEXMMRelationshipResultSet rrset = null;
+		Statement statement = null;
+		
+		String objectList = buildStringFromArray(objectIds,false);
+		
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT DISTINCT RS.* FROM "
+					+METAMODEL_ALIAS+".relationship AS RS, "
+					+METAMODEL_ALIAS+".relation AS REL, "
+					+METAMODEL_ALIAS+".object_version AS OBJV, "
+					+METAMODEL_ALIAS+".object AS OBJ "
+					+" WHERE RS.id = REL.relationship_id "
+					+" AND ( REL.source_object_version_id = OBJV.id OR REL.target_object_version_id = OBJV.id ) "
+					+" AND OBJV.object_id = OBJ.id "
+					+" AND OBJ.id IN ("+objectList+") "
+					+" ORDER BY RS.id");
+			rrset = new SLEXMMRelationshipResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return rrset;
 	}
 
 	@Override
 	public SLEXMMRelationshipResultSet getRelationshipsForEvent(int eventId) { // TODO Check
-		// TODO Auto-generated method stub
-		return null;
+		return getRelationshipsForEvents(new int[] {eventId});
+	}
+	
+	@Override
+	public SLEXMMRelationshipResultSet getRelationshipsForEvents(int[] eventIds) { // TODO Check
+		SLEXMMRelationshipResultSet rrset = null;
+		Statement statement = null;
+		
+		String eventList = buildStringFromArray(eventIds,false);
+		
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT DISTINCT RS.* FROM "
+					+METAMODEL_ALIAS+".relationship AS RS, "
+					+METAMODEL_ALIAS+".relation AS REL, "
+					+METAMODEL_ALIAS+".object_version AS OBJV, "
+					+METAMODEL_ALIAS+".event_to_object_version AS ETOV "
+					+" WHERE RS.id = REL.relationship_id "
+					+" AND ( REL.source_object_version_id = OBJV.id OR REL.target_object_version_id = OBJV.id ) "
+					+" AND OBJV.id = ETOV.object_version_id "
+					+" AND ETOV.event_id IN ("+eventList+") "
+					+" ORDER BY RS.id");
+			rrset = new SLEXMMRelationshipResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return rrset;
 	}
 
 	@Override
 	public SLEXMMRelationshipResultSet getRelationshipsForCase(int caseId) { // TODO Check
-		// TODO Auto-generated method stub
-		return null;
+		return getRelationshipsForCases(new int[] {caseId});
+	}
+	
+	@Override
+	public SLEXMMRelationshipResultSet getRelationshipsForCases(int[] caseIds) { // TODO Check
+		SLEXMMRelationshipResultSet rrset = null;
+		Statement statement = null;
+		
+		String caseList = buildStringFromArray(caseIds,false);
+		
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT DISTINCT RS.* FROM "
+					+METAMODEL_ALIAS+".relationship AS RS, "
+					+METAMODEL_ALIAS+".relation AS REL, "
+					+METAMODEL_ALIAS+".object_version AS OBJV, "
+					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
+					+METAMODEL_ALIAS+".event AS EV, "
+					+METAMODEL_ALIAS+".activity_instance_to_case AS AITC "
+					+" WHERE RS.id = REL.relationship_id "
+					+" AND ( REL.source_object_version_id = OBJV.id OR REL.target_object_version_id = OBJV.id ) "
+					+" AND OBJV.id = ETOV.object_version_id "
+					+" AND ETOV.event_id = EV.id "
+					+" AND EV.activity_instance_id = AITC.activity_instance_id "
+					+" AND AITC.case_id IN ("+caseList+") "
+					+" ORDER BY RS.id");
+			rrset = new SLEXMMRelationshipResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return rrset;
 	}
 
 	@Override
 	public SLEXMMRelationshipResultSet getRelationshipsForActivity(
 			int activityId) { // TODO Check
-		// TODO Auto-generated method stub
-		return null;
+		return getRelationshipsForActivities(new int[] {activityId});
+	}
+	
+	@Override
+	public SLEXMMRelationshipResultSet getRelationshipsForActivities(
+			int[] activityIds) { // TODO Check
+		SLEXMMRelationshipResultSet rrset = null;
+		Statement statement = null;
+		
+		String activityList = buildStringFromArray(activityIds,false);
+		
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT DISTINCT RS.* FROM "
+					+METAMODEL_ALIAS+".relationship AS RS, "
+					+METAMODEL_ALIAS+".relation AS REL, "
+					+METAMODEL_ALIAS+".object_version AS OBJV, "
+					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
+					+METAMODEL_ALIAS+".event AS EV, "
+					+METAMODEL_ALIAS+".activity_instance AS AI "
+					+" WHERE RS.id = REL.relationship_id "
+					+" AND ( REL.source_object_version_id = OBJV.id OR REL.target_object_version_id = OBJV.id ) "
+					+" AND OBJV.id = ETOV.object_version_id "
+					+" AND ETOV.event_id = EV.id "
+					+" AND EV.activity_instance_id = AI.id "
+					+" AND AI.activity_id IN ("+activityList+") "
+					+" ORDER BY RS.id");
+			rrset = new SLEXMMRelationshipResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return rrset;
 	}
 
 	@Override
 	public SLEXMMRelationshipResultSet getRelationshipsForClass(int classId) { // TODO Check
-		// TODO Auto-generated method stub
-		return null;
+		return getRelationshipsForClasses(new int[] {classId});
+	}
+	
+	@Override
+	public SLEXMMRelationshipResultSet getRelationshipsForClasses(int[] classIds) { // TODO Check
+		SLEXMMRelationshipResultSet rrset = null;
+		Statement statement = null;
+		
+		String classList = buildStringFromArray(classIds,false);
+		
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT DISTINCT RS.* FROM "
+					+METAMODEL_ALIAS+".relationship AS RS, "
+					+METAMODEL_ALIAS+".class AS CL "
+					+" WHERE ( RS.source = CL.id OR RS.target = CL.id ) "
+					+" AND CL.id IN ("+classList+") "
+					+" ORDER BY RS.id");
+			rrset = new SLEXMMRelationshipResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return rrset;
 	}
 
 	@Override
 	public SLEXMMRelationshipResultSet getRelationshipsForObjectVersion(
 			int objectVersionId) { // TODO Check
+		return getRelationshipsForObjectVersions(new int[] {objectVersionId});
+	}
+	
+	@Override
+	public SLEXMMRelationshipResultSet getRelationshipsForObjectVersions(
+			int[] objectVersionIds) { // TODO Check
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -3594,6 +4215,11 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	@Override
 	public SLEXMMRelationshipResultSet getRelationshipsForRelation(
 			int relationId) { // TODO Check
+		return getRelationshipsForRelations(new int[] {relationId});
+	}
+	
+	@Override
+	public SLEXMMRelationshipResultSet getRelationshipsForRelations(int[] relationIds) { // TODO Check
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -3601,15 +4227,269 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	@Override
 	public SLEXMMRelationshipResultSet getRelationshipsForActivityInstance(
 			int activityInstanceId) { // TODO Check
+		return getRelationshipsForActivityInstances(new int[] {activityInstanceId});
+	}
+	
+	@Override
+	public SLEXMMRelationshipResultSet getRelationshipsForActivityInstances(
+			int[] activityInstanceIds) { // TODO Check
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public SLEXMMRelationshipResultSet getRelationshipsForAttribute(
-			int attributeId) { // TODO Check
+			int attributeId) {
+		return getRelationshipsForAttributes(new int[]{attributeId});
+	}
+	
+	@Override
+	public SLEXMMRelationshipResultSet getRelationshipsForAttributes(
+			int[] attributeIds) { // TODO Check
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	@Override
+	public SLEXMMActivityInstanceResultSet getActivityInstancesForCase(
+			int caseId) {
+		return getActivityInstancesForCases(new int[] {caseId});
+	}
+	
+	@Override
+	public SLEXMMActivityInstanceResultSet getActivityInstancesForCases(
+			int[] caseIds) {
+		SLEXMMActivityInstanceResultSet airset = null;
+		Statement statement = null;
+		
+		String caseList = buildStringFromArray(caseIds, true);
+		
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT AI.* FROM "
+					+METAMODEL_ALIAS+".activity_instance AI, "
+					+METAMODEL_ALIAS+".activity_instance_to_case AIC "
+							+ " WHERE AI.id = AIC.activity_instance_id "
+							+ " AND AIC.case_id IN ("+caseList+") ");
+			airset = new SLEXMMActivityInstanceResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return airset;
+	}
+
+	@Override
+	public SLEXMMActivityInstanceResultSet getActivityInstancesForObject(
+			int objectId) {
+		return getActivityInstancesForObjects(new int[] {objectId});
+	}
+
+	@Override
+	public SLEXMMActivityInstanceResultSet getActivityInstancesForObjects(
+			int[] objectIds) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMActivityInstanceResultSet getActivityInstancesForEvent(
+			int eventId) {
+		return getActivityInstancesForEvents(new int[] {eventId});
+	}
+
+	@Override
+	public SLEXMMActivityInstanceResultSet getActivityInstancesForEvents(
+			int[] eventIds) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMActivityInstanceResultSet getActivityInstancesForActivity(
+			int activityId) {
+		return getActivityInstancesForActivities(new int[] {activityId});
+	}
+
+	@Override
+	public SLEXMMActivityInstanceResultSet getActivityInstancesForActivities(
+			int[] activityIds) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMActivityInstanceResultSet getActivityInstancesForClass(
+			int classId) {
+		return getActivityInstancesForClasses(new int[] {classId});
+	}
+
+	@Override
+	public SLEXMMActivityInstanceResultSet getActivityInstancesForClasses(
+			int[] classIds) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMActivityInstanceResultSet getActivityInstancesForRelationship(
+			int relationshipId) {
+		return getActivityInstancesForRelationships(new int[] {relationshipId});
+	}
+
+	@Override
+	public SLEXMMActivityInstanceResultSet getActivityInstancesForRelationships(
+			int[] relationshipIds) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMActivityInstanceResultSet getActivityInstancesForObjectVersion(
+			int objectVersionId) {
+		return getActivityInstancesForObjectVersions(new int[] {objectVersionId});
+	}
+
+	@Override
+	public SLEXMMActivityInstanceResultSet getActivityInstancesForObjectVersions(
+			int[] objectVersionIds) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMActivityInstanceResultSet getActivityInstancesForRelation(
+			int relationId) {
+		return getActivityInstancesForRelations(new int[] {relationId});
+	}
+
+	@Override
+	public SLEXMMActivityInstanceResultSet getActivityInstancesForRelations(
+			int[] relationIds) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMActivityInstanceResultSet getActivityInstancesForAttribute(
+			int attributeId) {
+		return getActivityInstancesForAttributes(new int[] {attributeId});
+	}
+
+	@Override
+	public SLEXMMActivityInstanceResultSet getActivityInstancesForAttributes(
+			int[] attributeIds) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMAttributeResultSet getAttributesForObject(int objectId) {
+		return getAttributesForObjects(new int[] {objectId});
+	}
+
+	@Override
+	public SLEXMMAttributeResultSet getAttributesForObjects(int[] objectIds) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMAttributeResultSet getAttributesForEvent(int eventId) {
+		return getAttributesForEvents(new int[] {eventId});
+	}
+
+	@Override
+	public SLEXMMAttributeResultSet getAttributesForEvents(int[] eventIds) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMAttributeResultSet getAttributesForCase(int caseId) {
+		return getAttributesForCases(new int[] {caseId});
+	}
+
+	@Override
+	public SLEXMMAttributeResultSet getAttributesForCases(int[] caseIds) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMAttributeResultSet getAttributesForActivity(int activityId) {
+		return getAttributesForActivities(new int[] {activityId});
+	}
+
+	@Override
+	public SLEXMMAttributeResultSet getAttributesForActivities(int[] activityIds) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMAttributeResultSet getAttributesForClass(int classId) {
+		return getAttributesForClasses(new int[] {classId});
+	}
+
+	@Override
+	public SLEXMMAttributeResultSet getAttributesForClasses(int[] classIds) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMAttributeResultSet getAttributesForRelationship(
+			int relationshipId) {
+		return getAttributesForRelationships(new int[] {relationshipId});
+	}
+
+	@Override
+	public SLEXMMAttributeResultSet getAttributesForRelationships(
+			int[] relationshipIds) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMAttributeResultSet getAttributesForObjectVersion(
+			int objectVersionId) {
+		return getAttributesForObjectVersions(new int[] {objectVersionId});
+	}
+
+	@Override
+	public SLEXMMAttributeResultSet getAttributesForObjectVersions(
+			int[] objectVersionIds) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMAttributeResultSet getAttributesForRelation(int relationId) {
+		return getAttributesForRelations(new int[] {relationId});
+	}
+
+	@Override
+	public SLEXMMAttributeResultSet getAttributesForRelations(int[] relationIds) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMAttributeResultSet getAttributesForActivityInstance(
+			int activityInstanceId) {
+		return getAttributesForActivityInstances(new int[] {activityInstanceId});
+	}
+
+	@Override
+	public SLEXMMAttributeResultSet getAttributesForActivityInstances(
+			int[] activityInstanceIds) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
 	
 }

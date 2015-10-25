@@ -41,7 +41,7 @@ public class SLEXMMObject extends SLEXMMAbstractDatabaseObject {
 	}
 	
 	public SLEXMMObjectVersionResultSet getObjectVersions() {
-		return getStorage().getObjectVersionsForObjectOrdered(this);
+		return getStorage().getObjectVersionsForObject(this.getId());
 	}
 
 	@Override
