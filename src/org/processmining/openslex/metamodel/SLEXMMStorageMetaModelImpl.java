@@ -1470,7 +1470,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 	
 	@Override
-	public SLEXMMRelationResultSet getRelationsForSourceObjectOrdered(int objId) { // TODO Check
+	public SLEXMMRelationResultSet getRelationsForSourceObjectOrdered(int objId) { 
 		SLEXMMRelationResultSet erset = null;
 		Statement statement = null;
 		try {
@@ -1496,7 +1496,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 	
 	@Override
-	public SLEXMMRelationResultSet getRelationsForTargetObjectOrdered(int objId) { // TODO Check
+	public SLEXMMRelationResultSet getRelationsForTargetObjectOrdered(int objId) { 
 		SLEXMMRelationResultSet erset = null;
 		Statement statement = null;
 		try {
@@ -1867,12 +1867,12 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 
 	@Override
-	public SLEXMMEventResultSet getEventsForObjectVersion(int objvId) { // TODO Check
+	public SLEXMMEventResultSet getEventsForObjectVersion(int objvId) { 
 		return getEventsForObjectVersions(new int[] {objvId});
 	}
 	
 	@Override
-	public SLEXMMEventResultSet getEventsForObjectVersions(int[] objvIds) { // TODO Check
+	public SLEXMMEventResultSet getEventsForObjectVersions(int[] objvIds) { 
 		SLEXMMEventResultSet erset = null;
 		Statement statement = null;
 		
@@ -1895,13 +1895,13 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 
 	@Override
-	public boolean addEventToObjectVersion(SLEXMMObjectVersion ov, // TODO Check
+	public boolean addEventToObjectVersion(SLEXMMObjectVersion ov, 
 			SLEXMMEvent ev, String label) {
 		return addEventToObjectVersion(ov.getId(),ev.getId(),label);
 	}
 
 	@Override
-	public boolean addEventToObjectVersion(int ovId, int evId, String label) { // TODO Check
+	public boolean addEventToObjectVersion(int ovId, int evId, String label) { 
 		Statement statement = null;
 		boolean result = false;
 		try {
@@ -2079,7 +2079,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMObjectResultSet getObjectsForObjectVersions(
-			int[] objectVersionIds) { // TODO Check
+			int[] objectVersionIds) { 
 		SLEXMMObjectResultSet erset = null;
 		Statement statement = null;
 		
@@ -2103,12 +2103,12 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 	
 	@Override
-	public SLEXMMObjectResultSet getObjectsForEvent(int eventId) { // TODO Check
+	public SLEXMMObjectResultSet getObjectsForEvent(int eventId) { 
 		return getObjectsForEvents(new int[] {eventId});
 	}
 	
 	@Override
-	public SLEXMMObjectResultSet getObjectsForEvents(int[] eventIds) { // TODO Check
+	public SLEXMMObjectResultSet getObjectsForEvents(int[] eventIds) { 
 		SLEXMMObjectResultSet erset = null;
 		Statement statement = null;
 		
@@ -2612,12 +2612,14 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
 					+METAMODEL_ALIAS+".pcase AS C, "
 					+METAMODEL_ALIAS+".attribute_value AS ATV, "
+					+METAMODEL_ALIAS+".activity_instance AS AI, "
 					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
 					+METAMODEL_ALIAS+".event AS EV, "
 					+METAMODEL_ALIAS+".object_version AS OBJV, "
 					+METAMODEL_ALIAS+".activity_instance_to_case AS AITC "
 					+" WHERE C.id = AITC.case_id "
-					+" AND AITC.activity_instance_id = EV.activity_instance_id "
+					+" AND AITC.activity_instance_id = AI.id " 
+					+" AND AI.id = EV.activity_instance_id "
 					+" AND EV.id = ETOV.event_id "
 					+" AND ETOV.object_version_id = OBJV.id "
 					+" AND OBJV.id = ATV.object_version_id "
@@ -2961,7 +2963,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJV.* FROM "
 					+METAMODEL_ALIAS+".object_version AS OBJV, "
 					+METAMODEL_ALIAS+".relation AS REL "
-					+" WHERE ( OBJV.id = REL.source_object_version_id OR REL.target_object_version_id ) "
+					+" WHERE ( OBJV.id = REL.source_object_version_id OR OBJV.id = REL.target_object_version_id ) "
 					+" AND REL.relationship_id IN ("+relationshipList+") "
 					+" ORDER BY OBJV.id");
 			ovrset = new SLEXMMObjectVersionResultSet(this, rset);
@@ -2992,7 +2994,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJV.* FROM "
 					+METAMODEL_ALIAS+".object_version AS OBJV, "
 					+METAMODEL_ALIAS+".relation AS REL "
-					+" WHERE ( OBJV.id = REL.source_object_version_id OR REL.target_object_version_id ) "
+					+" WHERE ( OBJV.id = REL.source_object_version_id OR OBJV.id = REL.target_object_version_id ) "
 					+" AND REL.id IN ("+relationList+") "
 					+" ORDER BY OBJV.id");
 			ovrset = new SLEXMMObjectVersionResultSet(this, rset);
@@ -3044,7 +3046,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 	
 	@Override
-	public SLEXMMObjectVersionResultSet getObjectVersionsForActivities( // TODO CHECK
+	public SLEXMMObjectVersionResultSet getObjectVersionsForActivities( 
 			int[] activityIds) {
 		SLEXMMObjectVersionResultSet erset = null;
 		Statement statement = null;
@@ -3785,7 +3787,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 	
 	@Override
-	public SLEXMMRelationResultSet getRelationsForCases(int[] caseIds) { // TODO Check
+	public SLEXMMRelationResultSet getRelationsForCases(int[] caseIds) { 
 		SLEXMMRelationResultSet rrset = null;
 		Statement statement = null;
 		
@@ -3815,12 +3817,12 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 
 	@Override
-	public SLEXMMRelationResultSet getRelationsForActivity(int activityId) { // TODO Check
+	public SLEXMMRelationResultSet getRelationsForActivity(int activityId) { 
 		return getRelationsForActivities(new int[] {activityId});
 	}
 	
 	@Override
-	public SLEXMMRelationResultSet getRelationsForActivities(int[] activityIds) { // TODO Check
+	public SLEXMMRelationResultSet getRelationsForActivities(int[] activityIds) { 
 		SLEXMMRelationResultSet rrset = null;
 		Statement statement = null;
 		
@@ -3961,17 +3963,17 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMRelationResultSet getRelationsForActivityInstance(
-			int activityInstanceId) { // TODO Check
+			int activityInstanceId) { 
 		return getRelationsForActivityInstances(new int[] {activityInstanceId});
 	}
 	
 	@Override
 	public SLEXMMRelationResultSet getRelationsForActivityInstances(
-			int[] activityInstanceIds) { // TODO Check
+			int[] activityInstanceIds) { 
 		SLEXMMRelationResultSet rrset = null;
 		Statement statement = null;
 		
-		String activityInstancesList = buildStringFromArray(activityInstanceIds, false);
+		String activityInstancesList = buildStringFromArray(activityInstanceIds, true);
 		try {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT REL.* FROM "
@@ -4029,12 +4031,12 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 
 	@Override
-	public SLEXMMRelationshipResultSet getRelationshipsForObject(int objectId) { // TODO Check
+	public SLEXMMRelationshipResultSet getRelationshipsForObject(int objectId) { 
 		return getRelationshipsForObjects(new int[]{objectId});
 	}
 	
 	@Override
-	public SLEXMMRelationshipResultSet getRelationshipsForObjects(int[] objectIds) { // TODO Check
+	public SLEXMMRelationshipResultSet getRelationshipsForObjects(int[] objectIds) { 
 		SLEXMMRelationshipResultSet rrset = null;
 		Statement statement = null;
 		
@@ -4062,16 +4064,16 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 
 	@Override
-	public SLEXMMRelationshipResultSet getRelationshipsForEvent(int eventId) { // TODO Check
+	public SLEXMMRelationshipResultSet getRelationshipsForEvent(int eventId) { 
 		return getRelationshipsForEvents(new int[] {eventId});
 	}
 	
 	@Override
-	public SLEXMMRelationshipResultSet getRelationshipsForEvents(int[] eventIds) { // TODO Check
+	public SLEXMMRelationshipResultSet getRelationshipsForEvents(int[] eventIds) { 
 		SLEXMMRelationshipResultSet rrset = null;
 		Statement statement = null;
 		
-		String eventList = buildStringFromArray(eventIds,false);
+		String eventList = buildStringFromArray(eventIds,true);
 		
 		try {
 			statement = connection.createStatement();
@@ -4095,16 +4097,16 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 
 	@Override
-	public SLEXMMRelationshipResultSet getRelationshipsForCase(int caseId) { // TODO Check
+	public SLEXMMRelationshipResultSet getRelationshipsForCase(int caseId) { 
 		return getRelationshipsForCases(new int[] {caseId});
 	}
 	
 	@Override
-	public SLEXMMRelationshipResultSet getRelationshipsForCases(int[] caseIds) { // TODO Check
+	public SLEXMMRelationshipResultSet getRelationshipsForCases(int[] caseIds) { 
 		SLEXMMRelationshipResultSet rrset = null;
 		Statement statement = null;
 		
-		String caseList = buildStringFromArray(caseIds,false);
+		String caseList = buildStringFromArray(caseIds,true);
 		
 		try {
 			statement = connection.createStatement();
@@ -4133,13 +4135,13 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMRelationshipResultSet getRelationshipsForActivity(
-			int activityId) { // TODO Check
+			int activityId) { 
 		return getRelationshipsForActivities(new int[] {activityId});
 	}
 	
 	@Override
 	public SLEXMMRelationshipResultSet getRelationshipsForActivities(
-			int[] activityIds) { // TODO Check
+			int[] activityIds) { 
 		SLEXMMRelationshipResultSet rrset = null;
 		Statement statement = null;
 		
@@ -4171,12 +4173,12 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 
 	@Override
-	public SLEXMMRelationshipResultSet getRelationshipsForClass(int classId) { // TODO Check
+	public SLEXMMRelationshipResultSet getRelationshipsForClass(int classId) { 
 		return getRelationshipsForClasses(new int[] {classId});
 	}
 	
 	@Override
-	public SLEXMMRelationshipResultSet getRelationshipsForClasses(int[] classIds) { // TODO Check
+	public SLEXMMRelationshipResultSet getRelationshipsForClasses(int[] classIds) { 
 		SLEXMMRelationshipResultSet rrset = null;
 		Statement statement = null;
 		
@@ -4201,13 +4203,13 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMRelationshipResultSet getRelationshipsForObjectVersion(
-			int objectVersionId) { // TODO Check
+			int objectVersionId) { 
 		return getRelationshipsForObjectVersions(new int[] {objectVersionId});
 	}
 	
 	@Override
 	public SLEXMMRelationshipResultSet getRelationshipsForObjectVersions(
-			int[] objectVersionIds) { // TODO Check
+			int[] objectVersionIds) { 
 		SLEXMMRelationshipResultSet rrset = null;
 		Statement statement = null;
 		
@@ -4234,12 +4236,12 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMRelationshipResultSet getRelationshipsForRelation(
-			int relationId) { // TODO Check
+			int relationId) { 
 		return getRelationshipsForRelations(new int[] {relationId});
 	}
 	
 	@Override
-	public SLEXMMRelationshipResultSet getRelationshipsForRelations(int[] relationIds) { // TODO Check
+	public SLEXMMRelationshipResultSet getRelationshipsForRelations(int[] relationIds) { 
 		SLEXMMRelationshipResultSet rrset = null;
 		Statement statement = null;
 		
@@ -4249,11 +4251,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 			statement = connection.createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT RS.* FROM "
 					+METAMODEL_ALIAS+".relationship AS RS, "
-					+METAMODEL_ALIAS+".relation AS REL, "
-					+METAMODEL_ALIAS+".object_version AS OBJV, "
-					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
-					+METAMODEL_ALIAS+".event AS EV, "
-					+METAMODEL_ALIAS+".activity_instance AS AI "
+					+METAMODEL_ALIAS+".relation AS REL "
 					+" WHERE RS.id = REL.relationship_id "
 					+" AND REL.id IN ("+relationList+") "
 					+" ORDER BY RS.id");
@@ -4313,7 +4311,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	
 	@Override
 	public SLEXMMRelationshipResultSet getRelationshipsForAttributes(
-			int[] attributeIds) { // TODO Check
+			int[] attributeIds) { 
 		SLEXMMRelationshipResultSet rrset = null;
 		Statement statement = null;
 		
@@ -4380,7 +4378,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMActivityInstanceResultSet airset = null;
 		Statement statement = null;
 		
-		String objectList = buildStringFromArray(objectIds, true);
+		String objectList = buildStringFromArray(objectIds, false);
 		
 		try {
 			statement = connection.createStatement();
@@ -4508,7 +4506,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMActivityInstanceResultSet airset = null;
 		Statement statement = null;
 		
-		String relationshipList = buildStringFromArray(relationshipIds, true);
+		String relationshipList = buildStringFromArray(relationshipIds, false);
 		
 		try {
 			statement = connection.createStatement();
@@ -4614,7 +4612,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMActivityInstanceResultSet airset = null;
 		Statement statement = null;
 		
-		String attributeList = buildStringFromArray(attributeIds, true);
+		String attributeList = buildStringFromArray(attributeIds, false);
 		
 		try {
 			statement = connection.createStatement();
@@ -4754,7 +4752,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMAttributeResultSet atrset = null;
 		Statement statement = null;
 		
-		String activityList = buildStringFromArray(activityIds, true);
+		String activityList = buildStringFromArray(activityIds, false);
 		
 		try {
 			statement = connection.createStatement();
@@ -4831,7 +4829,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+METAMODEL_ALIAS+".class CL, "
 					+METAMODEL_ALIAS+".relationship RS "
 							+ " WHERE AN.class_id = CL.id "
-							+ " AND CL.id = RS.class_id "
+							+ " AND ( CL.id = RS.source OR CL.id = RS.target ) "
 							+ " AND RS.id IN ("+relationshipList+") ");
 			atrset = new SLEXMMAttributeResultSet(this, rset);
 		} catch (Exception e) {
