@@ -52,7 +52,7 @@ public class SLEXMMSQLResultSet extends SLEXMMAbstractResultSetObject {
 					values[i-1] = this.rset.getString(i);
 				}
 				
-				r = new SLEXMMSQLResult((SLEXMMStorageMetaModel) storage, values, columnNames);
+				r = new SLEXMMSQLResult(values, columnNames);
 				
 			}
 		} catch (Exception e) {

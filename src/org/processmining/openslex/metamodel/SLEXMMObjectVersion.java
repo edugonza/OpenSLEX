@@ -1,6 +1,5 @@
 package org.processmining.openslex.metamodel;
 
-import java.util.Date;
 import java.util.HashMap;
 
 public class SLEXMMObjectVersion extends SLEXMMAbstractDatabaseObject {

@@ -18,7 +18,7 @@ import org.processmining.openslex.utils.ScriptRunner;
 
 public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	
-	private static final String STORAGE_METAMODEL = PATH+File.separator+"metamodels.db";
+	//private static final String STORAGE_METAMODEL = PATH+File.separator+"metamodels.db";
 	
 	private static final String METAMODEL_ALIAS = "metamodeldb";
 	
@@ -232,7 +232,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		return false;
 	}
 	
-	private String queryPragma(String pragma) {
+	public String queryPragma(String pragma) {
 		String result = "";
 		if (pragma != null) {
 			Statement statement = null;
@@ -3768,7 +3768,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+METAMODEL_ALIAS+".event_to_object_version AS ETOV "
 					+" WHERE ( REL.source_object_version_id = OBJV.id OR REL.target_object_version_id = OBJV.id ) "
 					+" AND OBJV.id = ETOV.object_version_id "
-					+" AND ETOV.event_id = ("+eventList+") "
+					+" AND ETOV.event_id IN ("+eventList+") "
 					+" ORDER BY REL.id");
 			rrset = new SLEXMMRelationResultSet(this, rset);
 		} catch (Exception e) {
@@ -4208,8 +4208,28 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	@Override
 	public SLEXMMRelationshipResultSet getRelationshipsForObjectVersions(
 			int[] objectVersionIds) { // TODO Check
-		// TODO Auto-generated method stub
-		return null;
+		SLEXMMRelationshipResultSet rrset = null;
+		Statement statement = null;
+		
+		String objectVersionList = buildStringFromArray(objectVersionIds,false);
+		
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT DISTINCT RS.* FROM "
+					+METAMODEL_ALIAS+".relationship AS RS, "
+					+METAMODEL_ALIAS+".relation AS REL, "
+					+METAMODEL_ALIAS+".object_version AS OBJV "
+					+" WHERE RS.id = REL.relationship_id "
+					+" AND ( REL.source_object_version_id = OBJV.id OR REL.target_object_version_id = OBJV.id ) "
+					+" AND OBJV.id IN ("+objectVersionList+") "
+					+" ORDER BY RS.id");
+			rrset = new SLEXMMRelationshipResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return rrset;
 	}
 
 	@Override
@@ -4220,21 +4240,69 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	
 	@Override
 	public SLEXMMRelationshipResultSet getRelationshipsForRelations(int[] relationIds) { // TODO Check
-		// TODO Auto-generated method stub
-		return null;
+		SLEXMMRelationshipResultSet rrset = null;
+		Statement statement = null;
+		
+		String relationList = buildStringFromArray(relationIds,false);
+		
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT DISTINCT RS.* FROM "
+					+METAMODEL_ALIAS+".relationship AS RS, "
+					+METAMODEL_ALIAS+".relation AS REL, "
+					+METAMODEL_ALIAS+".object_version AS OBJV, "
+					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
+					+METAMODEL_ALIAS+".event AS EV, "
+					+METAMODEL_ALIAS+".activity_instance AS AI "
+					+" WHERE RS.id = REL.relationship_id "
+					+" AND REL.id IN ("+relationList+") "
+					+" ORDER BY RS.id");
+			rrset = new SLEXMMRelationshipResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return rrset;
 	}
 
 	@Override
 	public SLEXMMRelationshipResultSet getRelationshipsForActivityInstance(
-			int activityInstanceId) { // TODO Check
+			int activityInstanceId) {
 		return getRelationshipsForActivityInstances(new int[] {activityInstanceId});
 	}
 	
 	@Override
 	public SLEXMMRelationshipResultSet getRelationshipsForActivityInstances(
-			int[] activityInstanceIds) { // TODO Check
-		// TODO Auto-generated method stub
-		return null;
+			int[] activityInstanceIds) {
+		SLEXMMRelationshipResultSet rrset = null;
+		Statement statement = null;
+		
+		String activityInstanceList = buildStringFromArray(activityInstanceIds,true);
+		
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT DISTINCT RS.* FROM "
+					+METAMODEL_ALIAS+".relationship AS RS, "
+					+METAMODEL_ALIAS+".relation AS REL, "
+					+METAMODEL_ALIAS+".object_version AS OBJV, "
+					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
+					+METAMODEL_ALIAS+".event AS EV, "
+					+METAMODEL_ALIAS+".activity_instance AS AI "
+					+" WHERE RS.id = REL.relationship_id "
+					+" AND ( REL.source_object_version_id = OBJV.id OR REL.target_object_version_id = OBJV.id ) "
+					+" AND OBJV.id = ETOV.object_version_id "
+					+" AND ETOV.event_id = EV.id "
+					+" AND EV.activity_instance_id = AI.id "
+					+" AND AI.id IN ("+activityInstanceList+") "
+					+" ORDER BY RS.id");
+			rrset = new SLEXMMRelationshipResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return rrset;
 	}
 
 	@Override
@@ -4246,8 +4314,28 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	@Override
 	public SLEXMMRelationshipResultSet getRelationshipsForAttributes(
 			int[] attributeIds) { // TODO Check
-		// TODO Auto-generated method stub
-		return null;
+		SLEXMMRelationshipResultSet rrset = null;
+		Statement statement = null;
+		
+		String attributeList = buildStringFromArray(attributeIds,true);
+		
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT DISTINCT RS.* FROM "
+					+METAMODEL_ALIAS+".relationship AS RS, "
+					+METAMODEL_ALIAS+".class AS CL, "
+					+METAMODEL_ALIAS+".attribute_name AS AN "
+					+" WHERE ( RS.source = CL.id OR RS.target = CL.id ) "
+					+" AND CL.id = AN.class_id"
+					+" AND AN.class_id IN ("+attributeList+") "
+					+" ORDER BY RS.id");
+			rrset = new SLEXMMRelationshipResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return rrset;
 	}
 	
 	@Override
@@ -4289,8 +4377,29 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	@Override
 	public SLEXMMActivityInstanceResultSet getActivityInstancesForObjects(
 			int[] objectIds) {
-		// TODO Auto-generated method stub
-		return null;
+		SLEXMMActivityInstanceResultSet airset = null;
+		Statement statement = null;
+		
+		String objectList = buildStringFromArray(objectIds, true);
+		
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT AI.* FROM "
+					+METAMODEL_ALIAS+".activity_instance AI, "
+					+METAMODEL_ALIAS+".event EV, "
+					+METAMODEL_ALIAS+".event_to_object_version ETOV, "
+					+METAMODEL_ALIAS+".object_version OBJV "
+							+ " WHERE AI.id = EV.activity_instance_id "
+							+ " AND EV.id = ETOV.event_id "
+							+ " AND ETOV.object_version_id = OBJV.id "
+							+ " AND OBJV.object_id IN ("+objectList+") ");
+			airset = new SLEXMMActivityInstanceResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return airset;
 	}
 
 	@Override
@@ -4302,8 +4411,25 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	@Override
 	public SLEXMMActivityInstanceResultSet getActivityInstancesForEvents(
 			int[] eventIds) {
-		// TODO Auto-generated method stub
-		return null;
+		SLEXMMActivityInstanceResultSet airset = null;
+		Statement statement = null;
+		
+		String eventList = buildStringFromArray(eventIds, true);
+		
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT AI.* FROM "
+					+METAMODEL_ALIAS+".activity_instance AI, "
+					+METAMODEL_ALIAS+".event EV "
+							+ " WHERE AI.id = EV.activity_instance_id "
+							+ " AND EV.id IN ("+eventList+") ");
+			airset = new SLEXMMActivityInstanceResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return airset;
 	}
 
 	@Override
@@ -4315,8 +4441,23 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	@Override
 	public SLEXMMActivityInstanceResultSet getActivityInstancesForActivities(
 			int[] activityIds) {
-		// TODO Auto-generated method stub
-		return null;
+		SLEXMMActivityInstanceResultSet airset = null;
+		Statement statement = null;
+		
+		String activityList = buildStringFromArray(activityIds, false);
+		
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT AI.* FROM "
+					+METAMODEL_ALIAS+".activity_instance AI "
+							+ " WHERE AI.activity_id IN ("+activityList+") ");
+			airset = new SLEXMMActivityInstanceResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return airset;
 	}
 
 	@Override
@@ -4328,8 +4469,31 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	@Override
 	public SLEXMMActivityInstanceResultSet getActivityInstancesForClasses(
 			int[] classIds) {
-		// TODO Auto-generated method stub
-		return null;
+		SLEXMMActivityInstanceResultSet airset = null;
+		Statement statement = null;
+		
+		String classList = buildStringFromArray(classIds, false);
+		
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT AI.* FROM "
+					+METAMODEL_ALIAS+".activity_instance AI, "
+					+METAMODEL_ALIAS+".event EV, "
+					+METAMODEL_ALIAS+".event_to_object_version ETOV, "
+					+METAMODEL_ALIAS+".object_version OBJV, "
+					+METAMODEL_ALIAS+".object OBJ "
+							+ " WHERE AI.id = EV.activity_instance_id "
+							+ " AND EV.id = ETOV.event_id "
+							+ " AND ETOV.object_version_id = OBJV.id "
+							+ " AND OBJV.object_id = OBJ.id "
+							+ " AND OBJ.class_id IN ("+classList+") ");
+			airset = new SLEXMMActivityInstanceResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return airset;
 	}
 
 	@Override
@@ -4341,8 +4505,31 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	@Override
 	public SLEXMMActivityInstanceResultSet getActivityInstancesForRelationships(
 			int[] relationshipIds) {
-		// TODO Auto-generated method stub
-		return null;
+		SLEXMMActivityInstanceResultSet airset = null;
+		Statement statement = null;
+		
+		String relationshipList = buildStringFromArray(relationshipIds, true);
+		
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT AI.* FROM "
+					+METAMODEL_ALIAS+".activity_instance AI, "
+					+METAMODEL_ALIAS+".event EV, "
+					+METAMODEL_ALIAS+".event_to_object_version ETOV, "
+					+METAMODEL_ALIAS+".object_version OBJV, "
+					+METAMODEL_ALIAS+".relation REL "
+							+ " WHERE AI.id = EV.activity_instance_id "
+							+ " AND EV.id = ETOV.event_id "
+							+ " AND ETOV.object_version_id = OBJV.id "
+							+ " AND ( REL.source_object_version_id = OBJV.id OR REL.target_object_version_id = OBJV.id ) "
+							+ " AND REL.relationship_id IN ("+relationshipList+") ");
+			airset = new SLEXMMActivityInstanceResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return airset;
 	}
 
 	@Override
@@ -4354,8 +4541,29 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	@Override
 	public SLEXMMActivityInstanceResultSet getActivityInstancesForObjectVersions(
 			int[] objectVersionIds) {
-		// TODO Auto-generated method stub
-		return null;
+		SLEXMMActivityInstanceResultSet airset = null;
+		Statement statement = null;
+		
+		String objectVersionList = buildStringFromArray(objectVersionIds, true);
+		
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT AI.* FROM "
+					+METAMODEL_ALIAS+".activity_instance AI, "
+					+METAMODEL_ALIAS+".event EV, "
+					+METAMODEL_ALIAS+".event_to_object_version ETOV, "
+					+METAMODEL_ALIAS+".object_version OBJV "
+							+ " WHERE AI.id = EV.activity_instance_id "
+							+ " AND EV.id = ETOV.event_id "
+							+ " AND ETOV.object_version_id = OBJV.id "
+							+ " AND OBJV.id IN ("+objectVersionList+") ");
+			airset = new SLEXMMActivityInstanceResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return airset;
 	}
 
 	@Override
@@ -4367,8 +4575,31 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	@Override
 	public SLEXMMActivityInstanceResultSet getActivityInstancesForRelations(
 			int[] relationIds) {
-		// TODO Auto-generated method stub
-		return null;
+		SLEXMMActivityInstanceResultSet airset = null;
+		Statement statement = null;
+		
+		String relationList = buildStringFromArray(relationIds, true);
+		
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT AI.* FROM "
+					+METAMODEL_ALIAS+".activity_instance AI, "
+					+METAMODEL_ALIAS+".event EV, "
+					+METAMODEL_ALIAS+".event_to_object_version ETOV, "
+					+METAMODEL_ALIAS+".object_version OBJV, "
+					+METAMODEL_ALIAS+".relation REL "
+							+ " WHERE AI.id = EV.activity_instance_id "
+							+ " AND EV.id = ETOV.event_id "
+							+ " AND ETOV.object_version_id = OBJV.id "
+							+ " AND ( REL.source_object_version_id = OBJV.id OR REL.target_object_version_id = OBJV.id ) "
+							+ " AND REL.id IN ("+relationList+") ");
+			airset = new SLEXMMActivityInstanceResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return airset;
 	}
 
 	@Override
@@ -4380,8 +4611,33 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	@Override
 	public SLEXMMActivityInstanceResultSet getActivityInstancesForAttributes(
 			int[] attributeIds) {
-		// TODO Auto-generated method stub
-		return null;
+		SLEXMMActivityInstanceResultSet airset = null;
+		Statement statement = null;
+		
+		String attributeList = buildStringFromArray(attributeIds, true);
+		
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT AI.* FROM "
+					+METAMODEL_ALIAS+".activity_instance AI, "
+					+METAMODEL_ALIAS+".event EV, "
+					+METAMODEL_ALIAS+".event_to_object_version ETOV, "
+					+METAMODEL_ALIAS+".object_version OBJV, "
+					+METAMODEL_ALIAS+".attribute_value ATV, "
+					+METAMODEL_ALIAS+".attribute_name AN "
+							+ " WHERE AI.id = EV.activity_instance_id "
+							+ " AND EV.id = ETOV.event_id "
+							+ " AND ETOV.object_version_id = OBJV.id "
+							+ " AND OBJV.id = ATV.object_version_id "
+							+ " AND ATV.attribute_name_id = AN.id "
+							+ " AND AN.id IN ("+attributeList+") ");
+			airset = new SLEXMMActivityInstanceResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return airset;
 	}
 
 	@Override
@@ -4391,8 +4647,27 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMAttributeResultSet getAttributesForObjects(int[] objectIds) {
-		// TODO Auto-generated method stub
-		return null;
+		SLEXMMAttributeResultSet atrset = null;
+		Statement statement = null;
+		
+		String objectList = buildStringFromArray(objectIds, true);
+		
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT AN.* FROM "
+					+METAMODEL_ALIAS+".attribute_name AN, "
+					+METAMODEL_ALIAS+".class CL, "
+					+METAMODEL_ALIAS+".object OBJ "
+							+ " WHERE AN.class_id = CL.id "
+							+ " AND CL.id = OBJ.class_id "
+							+ " AND OBJ.id IN ("+objectList+") ");
+			atrset = new SLEXMMAttributeResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return atrset;
 	}
 
 	@Override
@@ -4402,8 +4677,33 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMAttributeResultSet getAttributesForEvents(int[] eventIds) {
-		// TODO Auto-generated method stub
-		return null;
+		SLEXMMAttributeResultSet atrset = null;
+		Statement statement = null;
+		
+		String eventList = buildStringFromArray(eventIds, true);
+		
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT AN.* FROM "
+					+METAMODEL_ALIAS+".attribute_name AN, "
+					+METAMODEL_ALIAS+".class CL, "
+					+METAMODEL_ALIAS+".object OBJ, "
+					+METAMODEL_ALIAS+".object_version OBJV, "
+					+METAMODEL_ALIAS+".event_to_object_version ETOV, "
+					+METAMODEL_ALIAS+".event EV "
+							+ " WHERE AN.class_id = CL.id "
+							+ " AND CL.id = OBJ.class_id "
+							+ " AND OBJ.id = OBJV.object_id "
+							+ " AND OBJV.id = ETOV.object_version_id "
+							+ " AND ETOV.event_id = EV.id "
+							+ " AND EV.id IN ("+eventList+") ");
+			atrset = new SLEXMMAttributeResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return atrset;
 	}
 
 	@Override
@@ -4413,8 +4713,35 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMAttributeResultSet getAttributesForCases(int[] caseIds) {
-		// TODO Auto-generated method stub
-		return null;
+		SLEXMMAttributeResultSet atrset = null;
+		Statement statement = null;
+		
+		String caseList = buildStringFromArray(caseIds, true);
+		
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT AN.* FROM "
+					+METAMODEL_ALIAS+".attribute_name AN, "
+					+METAMODEL_ALIAS+".class CL, "
+					+METAMODEL_ALIAS+".object OBJ, "
+					+METAMODEL_ALIAS+".object_version OBJV, "
+					+METAMODEL_ALIAS+".event_to_object_version ETOV, "
+					+METAMODEL_ALIAS+".event EV, "
+					+METAMODEL_ALIAS+".activity_instance_to_case AITC "
+							+ " WHERE AN.class_id = CL.id "
+							+ " AND CL.id = OBJ.class_id "
+							+ " AND OBJ.id = OBJV.object_id "
+							+ " AND OBJV.id = ETOV.object_version_id "
+							+ " AND ETOV.event_id = EV.id "
+							+ " AND EV.activity_instance_id = AITC.activity_instance_id "
+							+ " AND AITC.case_id IN ("+caseList+") ");
+			atrset = new SLEXMMAttributeResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return atrset;
 	}
 
 	@Override
@@ -4424,8 +4751,35 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMAttributeResultSet getAttributesForActivities(int[] activityIds) {
-		// TODO Auto-generated method stub
-		return null;
+		SLEXMMAttributeResultSet atrset = null;
+		Statement statement = null;
+		
+		String activityList = buildStringFromArray(activityIds, true);
+		
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT AN.* FROM "
+					+METAMODEL_ALIAS+".attribute_name AN, "
+					+METAMODEL_ALIAS+".class CL, "
+					+METAMODEL_ALIAS+".object OBJ, "
+					+METAMODEL_ALIAS+".object_version OBJV, "
+					+METAMODEL_ALIAS+".event_to_object_version ETOV, "
+					+METAMODEL_ALIAS+".event EV, "
+					+METAMODEL_ALIAS+".activity_instance AI "
+							+ " WHERE AN.class_id = CL.id "
+							+ " AND CL.id = OBJ.class_id "
+							+ " AND OBJ.id = OBJV.object_id "
+							+ " AND OBJV.id = ETOV.object_version_id "
+							+ " AND ETOV.event_id = EV.id "
+							+ " AND EV.activity_instance_id = AI.id "
+							+ " AND AI.activity_id IN ("+activityList+") ");
+			atrset = new SLEXMMAttributeResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return atrset;
 	}
 
 	@Override
@@ -4435,8 +4789,25 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMAttributeResultSet getAttributesForClasses(int[] classIds) {
-		// TODO Auto-generated method stub
-		return null;
+		SLEXMMAttributeResultSet atrset = null;
+		Statement statement = null;
+		
+		String classList = buildStringFromArray(classIds, true);
+		
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT AN.* FROM "
+					+METAMODEL_ALIAS+".attribute_name AN, "
+					+METAMODEL_ALIAS+".class CL "
+							+ " WHERE AN.class_id = CL.id "
+							+ " AND CL.id IN ("+classList+") ");
+			atrset = new SLEXMMAttributeResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return atrset;
 	}
 
 	@Override
@@ -4448,8 +4819,27 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	@Override
 	public SLEXMMAttributeResultSet getAttributesForRelationships(
 			int[] relationshipIds) {
-		// TODO Auto-generated method stub
-		return null;
+		SLEXMMAttributeResultSet atrset = null;
+		Statement statement = null;
+		
+		String relationshipList = buildStringFromArray(relationshipIds, true);
+		
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT AN.* FROM "
+					+METAMODEL_ALIAS+".attribute_name AN, "
+					+METAMODEL_ALIAS+".class CL, "
+					+METAMODEL_ALIAS+".relationship RS "
+							+ " WHERE AN.class_id = CL.id "
+							+ " AND CL.id = RS.class_id "
+							+ " AND RS.id IN ("+relationshipList+") ");
+			atrset = new SLEXMMAttributeResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return atrset;
 	}
 
 	@Override
@@ -4461,8 +4851,29 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	@Override
 	public SLEXMMAttributeResultSet getAttributesForObjectVersions(
 			int[] objectVersionIds) {
-		// TODO Auto-generated method stub
-		return null;
+		SLEXMMAttributeResultSet atrset = null;
+		Statement statement = null;
+		
+		String objectVersionList = buildStringFromArray(objectVersionIds, true);
+		
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT AN.* FROM "
+					+METAMODEL_ALIAS+".attribute_name AN, "
+					+METAMODEL_ALIAS+".class CL, "
+					+METAMODEL_ALIAS+".object OBJ, "
+					+METAMODEL_ALIAS+".object_version OBJV "
+							+ " WHERE AN.class_id = CL.id "
+							+ " AND CL.id = OBJ.class_id "
+							+ " AND OBJV.object_id = OBJ.id "
+							+ " AND OBJV.id IN ("+objectVersionList+") ");
+			atrset = new SLEXMMAttributeResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return atrset;
 	}
 
 	@Override
@@ -4472,8 +4883,31 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMAttributeResultSet getAttributesForRelations(int[] relationIds) {
-		// TODO Auto-generated method stub
-		return null;
+		SLEXMMAttributeResultSet atrset = null;
+		Statement statement = null;
+		
+		String relationList = buildStringFromArray(relationIds, true);
+		
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT AN.* FROM "
+					+METAMODEL_ALIAS+".attribute_name AN, "
+					+METAMODEL_ALIAS+".class CL, "
+					+METAMODEL_ALIAS+".object OBJ, "
+					+METAMODEL_ALIAS+".object_version OBJV, "
+					+METAMODEL_ALIAS+".relation REL "
+							+ " WHERE AN.class_id = CL.id "
+							+ " AND CL.id = OBJ.class_id "
+							+ " AND OBJV.object_id = OBJ.id "
+							+ " AND ( REL.source_object_version_id = OBJV.id OR REL.target_object_version_id = OBJV.id ) "
+							+ " AND REL.id IN ("+relationList+") ");
+			atrset = new SLEXMMAttributeResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return atrset;
 	}
 
 	@Override
@@ -4485,8 +4919,35 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	@Override
 	public SLEXMMAttributeResultSet getAttributesForActivityInstances(
 			int[] activityInstanceIds) {
-		// TODO Auto-generated method stub
-		return null;
+		SLEXMMAttributeResultSet atrset = null;
+		Statement statement = null;
+		
+		String activityInstanceList = buildStringFromArray(activityInstanceIds, true);
+		
+		try {
+			statement = connection.createStatement();
+			ResultSet rset = statement.executeQuery("SELECT AN.* FROM "
+					+METAMODEL_ALIAS+".attribute_name AN, "
+					+METAMODEL_ALIAS+".class CL, "
+					+METAMODEL_ALIAS+".object OBJ, "
+					+METAMODEL_ALIAS+".object_version OBJV, "
+					+METAMODEL_ALIAS+".event_to_object_version ETOV, "
+					+METAMODEL_ALIAS+".event EV, "
+					+METAMODEL_ALIAS+".activity_instance AI "
+							+ " WHERE AN.class_id = CL.id "
+							+ " AND CL.id = OBJ.class_id "
+							+ " AND OBJ.id = OBJV.object_id "
+							+ " AND OBJV.id = ETOV.object_version_id "
+							+ " AND ETOV.event_id = EV.id "
+							+ " AND EV.activity_instance_id = AI.id "
+							+ " AND AI.id IN ("+activityInstanceList+") ");
+			atrset = new SLEXMMAttributeResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return atrset;
 	}
 
 

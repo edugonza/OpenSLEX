@@ -1,7 +1,6 @@
 package org.processmining.openslex.metamodel;
 
 import java.sql.ResultSet;
-import java.util.Date;
 
 public class SLEXMMObjectVersionResultSet extends SLEXMMAbstractResultSetObject {
 	
