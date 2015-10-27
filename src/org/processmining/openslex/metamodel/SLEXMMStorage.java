@@ -1,5 +1,8 @@
 package org.processmining.openslex.metamodel;
 
+import java.sql.ResultSet;
+import java.sql.Statement;
+
 public interface SLEXMMStorage {
 
 	public static final int TYPE_METAMODEL = 4;
@@ -24,4 +27,10 @@ public interface SLEXMMStorage {
 
 	public abstract boolean isAutoCommitOnCreationEnabled();
 
+	public abstract void abort();
+
+	public abstract void closeStatement(Statement statement);
+
+	public abstract void closeResultSet(ResultSet rset);
+	
 }

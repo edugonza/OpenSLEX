@@ -11,8 +11,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.Executor;
 
 import org.processmining.openslex.utils.ScriptRunner;
 
@@ -33,6 +36,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	private String filename = null;
 	private String path = null;	
 	private Connection connection = null;
+	private HashSet<Statement> statements = new HashSet<>();
 	
 	public SLEXMMStorageMetaModelImpl(String path, String filename) throws Exception {
 		init();
@@ -126,17 +130,31 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		return result;
 	}
 	
-	private void closeStatement(Statement statement) {
+	private Statement createStatement() {
+		Statement stm = null;
+		try {
+			stm = connection.createStatement();
+			statements.add(stm);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return stm;
+	}
+	
+	@Override
+	public void closeStatement(Statement statement) {
 		try {
 			if (statement != null) {
 				statement.close();
+				statements.remove(statement);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-	private void closeResultSet(ResultSet rset) {
+	@Override
+	public void closeResultSet(ResultSet rset) {
 		try {
 			if (rset != null) {
 				rset.close();
@@ -157,7 +175,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 			}
 			
 			if (checkSchema(filename,alias,schemaIn)) {
-				statement = connection.createStatement();
+				statement = createStatement();
 				statement.setQueryTimeout(30);
 				statement.execute("ATTACH DATABASE 'file:"+filename+"' AS "+alias);
 				result = true;
@@ -179,7 +197,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		boolean result = false;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			statement.setQueryTimeout(30);
 			statement.execute("DETACH DATABASE "+alias);
 			result = true;
@@ -197,7 +215,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 			Statement statement = null;
 			boolean result = false;
 			try {
-				statement = connection.createStatement();
+				statement = createStatement();
 				statement.setQueryTimeout(30);
 				statement.execute("pragma journal_mode = "+mode+";");
 				result = true;
@@ -217,7 +235,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 			Statement statement = null;
 			boolean result = false;
 			try {
-				statement = connection.createStatement();
+				statement = createStatement();
 				statement.setQueryTimeout(30);
 				statement.execute("pragma synchronous = "+mode+";");
 				result = true;
@@ -237,7 +255,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		if (pragma != null) {
 			Statement statement = null;
 			try {
-				statement = connection.createStatement();
+				statement = createStatement();
 				statement.setQueryTimeout(30);
 				ResultSet r = statement.executeQuery("pragma "+pragma);
 				if (r.next()) {
@@ -272,6 +290,23 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+		}
+	}
+	
+	@Override
+	public void abort() {
+		if (connection != null) {
+			Iterator<Statement> it = statements.iterator();
+			while (it.hasNext()) {
+				Statement stm = it.next();
+				try {
+					stm.cancel();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				it.remove();
+			}
+			disconnect();
 		}
 	}
 	
@@ -452,7 +487,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		boolean result = false;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			statement.setQueryTimeout(30);
 			statement.execute("INSERT INTO "+METAMODEL_ALIAS+".event (activity_instance_id,ordering,lifecycle,timestamp,resource) VALUES ('"+
 					ev.getActivityInstanceId()+"','"+ev.getOrder()+"','"+ev.getLifecycle()+"','"+ev.getTimestamp()+"','"+ev.getResource()+"')");
@@ -474,7 +509,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		boolean result = false;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			statement.setQueryTimeout(30);
 			statement.execute("UPDATE "+METAMODEL_ALIAS+".event"+
 					" SET activity_instance_id = '"+ev.getActivityInstanceId()+"' "+
@@ -499,7 +534,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		boolean result = false;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			statement.setQueryTimeout(30);
 			statement.execute("INSERT INTO "+METAMODEL_ALIAS+".attribute_name (name,class_id) VALUES ('"+
 					at.getName()+"','"+at.getClassId()+"')");
@@ -520,7 +555,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		boolean result = false;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			statement.setQueryTimeout(30);
 			statement.execute("UPDATE "+METAMODEL_ALIAS+".attribute_name SET class_id = '"+
 					at.getClassId()+"',name = '"+at.getName()+"' WHERE id = '"+at.getId()+"'");
@@ -540,7 +575,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		boolean result = false;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			statement.setQueryTimeout(30);
 			statement.execute("INSERT INTO " + METAMODEL_ALIAS
 					+ ".event_attribute_name (name) VALUES ('"
@@ -562,7 +597,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		boolean result = false;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			statement.setQueryTimeout(30);
 			statement.execute("UPDATE "+METAMODEL_ALIAS
 					+".event_attribute_name SET name = '"+at.getName()
@@ -583,7 +618,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		boolean result = false;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			statement.setQueryTimeout(30);
 			statement.execute("INSERT INTO "+METAMODEL_ALIAS
 					+".relationship (name,source,target) VALUES ('"
@@ -605,7 +640,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		boolean result = false;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			statement.setQueryTimeout(30);
 			statement.execute("UPDATE "+METAMODEL_ALIAS
 					+".relationship SET name = '"+k.getName()+"',source = '"+k.getSourceClassId()
@@ -726,7 +761,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		boolean result = false;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			statement.setQueryTimeout(30);
 			statement.execute("INSERT INTO "+METAMODEL_ALIAS+".class (name,datamodel_id) VALUES ('"+cl.getName()+"','"+cl.getDataModelId()+"')");
 			cl.setId(getLastInsertedRowId(statement));
@@ -746,7 +781,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		boolean result = false;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			statement.setQueryTimeout(30);
 			statement.execute("UPDATE "+METAMODEL_ALIAS+".class SET name = '"+cl.getName()+"', datamodel_id = '"+cl.getDataModelId()+"' WHERE id = '"+cl.getId()+"'");
 			result = true;
@@ -765,7 +800,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		boolean result = false;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			statement.setQueryTimeout(30);
 			statement.execute("INSERT INTO "+METAMODEL_ALIAS+".process (name) VALUES ('"+p.getName()+"')");
 			p.setId(getLastInsertedRowId(statement));
@@ -785,7 +820,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		boolean result = false;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			statement.setQueryTimeout(30);
 			statement.execute("UPDATE "+METAMODEL_ALIAS+".process SET name = '"+p.getName()+"' WHERE id = '"+p.getId()+"'");
 			result = true;
@@ -804,7 +839,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		boolean result = false;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			statement.setQueryTimeout(30);
 			statement.execute("INSERT INTO "+METAMODEL_ALIAS+".datamodel (name) VALUES ('"+dm.getName()+"')");
 			dm.setId(getLastInsertedRowId(statement));
@@ -824,7 +859,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		boolean result = false;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			statement.setQueryTimeout(30);
 			statement.execute("UPDATE "+METAMODEL_ALIAS+".datamodel SET name = '"+dm.getName()+"' WHERE id = '"+dm.getId()+"'");
 			result = true;
@@ -843,7 +878,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		boolean result = false;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			statement.setQueryTimeout(30);
 			statement.execute("INSERT INTO "+METAMODEL_ALIAS+".pcase (name) VALUES ('"+t.getName()+"')");
 			t.setId(getLastInsertedRowId(statement));
@@ -863,7 +898,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		boolean result = false;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			statement.setQueryTimeout(30);
 			statement.execute("UPDATE "+METAMODEL_ALIAS+".pcase SET name = '"+t.getName()+"' WHERE id = '"+t.getId()+"'");
 			result = true;
@@ -887,7 +922,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMEventResultSet erset = null;
 		Statement statement = null;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT EV.* FROM "
 					+METAMODEL_ALIAS+".event as EV, "
 					+METAMODEL_ALIAS+".activity_instance_to_case as AITC "
@@ -914,7 +949,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		HashMap<SLEXMMEventAttribute, SLEXMMEventAttributeValue> attributeValues = null;
 		Statement statement = null;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			statement.setQueryTimeout(30);
 			ResultSet rset = statement.executeQuery("SELECT AT.id, AT.name, ATV.value, ATV.type FROM "+
 														METAMODEL_ALIAS+".event_attribute_name AS AT, "+
@@ -952,7 +987,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMClassResultSet crset = null;
 		Statement statement = null;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT * FROM "+METAMODEL_ALIAS+".class WHERE datamodel_id = '"+dm.getId()+"'");
 			crset = new SLEXMMClassResultSet(this, rset);
 		} catch (Exception e) {
@@ -968,7 +1003,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMDataModelResultSet dmrset = null;
 		Statement statement = null;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT * FROM "+METAMODEL_ALIAS+".datamodel");
 			dmrset = new SLEXMMDataModelResultSet(this, rset);
 		} catch (Exception e) {
@@ -991,7 +1026,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT * FROM "+METAMODEL_ALIAS+".attribute_name WHERE class_id = '"+clId+"'");
 			while (rset.next()) {
 				int id = rset.getInt("id");
@@ -1020,7 +1055,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT * FROM "+METAMODEL_ALIAS+".relationship WHERE source = '"+cl.getId()+"'");
 			while (rset.next()) {
 				int id = rset.getInt("id");
@@ -1050,7 +1085,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		int events = 0;
 		Statement statement = null;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT count(TE.event_id) FROM "+METAMODEL_ALIAS+".event_to_case AS TE WHERE TE.case_id='"+t.getId()+"'");
 			if (rset.next()) {
 				events = rset.getInt(1);
@@ -1078,7 +1113,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		ct.commit();
 		Statement statement = null;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			//statement.setQueryTimeout(30);
 			statement.execute("INSERT INTO "+METAMODEL_ALIAS+".activity_instance_to_case (case_id,activity_instance_id) "+
 							" SELECT '"+ct.getId()+"', activity_instance_id FROM "+METAMODEL_ALIAS+".activity_instance_to_case "+
@@ -1096,7 +1131,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		boolean result = false;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			statement.setQueryTimeout(30);
 			statement.execute("INSERT INTO "+METAMODEL_ALIAS+".activity_instance_to_case (case_id,activity_instance_id) VALUES ('"+traceId+"','"+activityInstanceId+"')");
 			result = true;
@@ -1120,7 +1155,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		
 		Statement statement = null;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT IFNULL(MAX(id),0) + 1 FROM "+METAMODEL_ALIAS+".pcase");
 			rset.next();
 			maxId = rset.getInt(1);
@@ -1358,7 +1393,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		HashMap<SLEXMMAttribute, SLEXMMAttributeValue> attributeValues = null;
 		Statement statement = null;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			statement.setQueryTimeout(30);
 			ResultSet rset = statement.executeQuery("SELECT AT.id, AT.name, AT.class_id, ATV.id, ATV.value, ATV.type FROM "+
 														METAMODEL_ALIAS+".attribute_name AS AT, "+
@@ -1401,7 +1436,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMObjectVersionResultSet erset = null;
 		Statement statement = null;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT OBJV.* FROM "
 					+METAMODEL_ALIAS+".object_version AS OBJV "
 					+" ORDER BY OBJV.start_timestamp ");
@@ -1424,7 +1459,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMRelationResultSet erset = null;
 		Statement statement = null;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT RL.* FROM "
 					+METAMODEL_ALIAS+".relation RL, "
 					+METAMODEL_ALIAS+".object_version OBJV "
@@ -1449,7 +1484,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMRelationResultSet erset = null;
 		Statement statement = null;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT RL.* FROM "
 					+METAMODEL_ALIAS+".relation RL, "
 					+METAMODEL_ALIAS+".object_version OBJV "
@@ -1474,7 +1509,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMRelationResultSet erset = null;
 		Statement statement = null;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT REL.* FROM "
 					+METAMODEL_ALIAS+".relation as REL, "
 					+METAMODEL_ALIAS+".object_version OBJV "
@@ -1500,7 +1535,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMRelationResultSet erset = null;
 		Statement statement = null;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT REL.* FROM "
 					+METAMODEL_ALIAS+".relation as REL, "
 					+METAMODEL_ALIAS+".object_version OBJV "
@@ -1521,7 +1556,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMObjectResultSet erset = null;
 		Statement statement = null;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT OBJ.id, OBJ.class_id FROM "
 					+METAMODEL_ALIAS+".object AS OBJ "
 					+" ORDER BY OBJ.id");
@@ -1541,7 +1576,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMEventResultSet erset = null;
 		Statement statement = null;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT * FROM "
 					+METAMODEL_ALIAS+".event ");
 			erset = new SLEXMMEventResultSet(this, rset);
@@ -1558,7 +1593,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMEventResultSet erset = null;
 		Statement statement = null;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT * FROM "
 					+METAMODEL_ALIAS+".event ORDER BY ordering ASC ");
 			erset = new SLEXMMEventResultSet(this, rset);
@@ -1575,7 +1610,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMCaseResultSet erset = null;
 		Statement statement = null;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT * FROM "
 					+METAMODEL_ALIAS+".pcase ");
 			erset = new SLEXMMCaseResultSet(this, rset);
@@ -1713,7 +1748,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMEventResultSet erset = null;
 		Statement statement = null;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			String query = "SELECT EV.* FROM "
 					+METAMODEL_ALIAS+".event as EV "
 					+" WHERE EV.id = '"+evId+"' ";
@@ -1735,7 +1770,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT * FROM "+METAMODEL_ALIAS+".activity");
 			while (rset.next()) {
 				int id = rset.getInt("id");
@@ -1764,7 +1799,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		String query = "";
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			query = "SELECT DISTINCT OBJV.* FROM "
 					+METAMODEL_ALIAS+".object_version AS OBJV, "
 					+METAMODEL_ALIAS+".relation AS RL "
@@ -1795,7 +1830,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String caseList = buildStringFromArray(caseIds, true);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			String query = "SELECT EV.* FROM "
 					+METAMODEL_ALIAS+".event as EV, "
 					+METAMODEL_ALIAS+".activity_instance_to_case as AITC "
@@ -1825,7 +1860,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String activityList = buildStringFromArray(activityIds, false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT EV.* FROM "
 					+METAMODEL_ALIAS+".event as EV, "
 					+METAMODEL_ALIAS+".activity_instance as AI "
@@ -1850,7 +1885,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMObjectResultSet orset = null;
 		Statement statement = null;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			String query = "SELECT OBJ.* FROM "
 					+METAMODEL_ALIAS+".object as OBJ "
 					+" WHERE OBJ.id = '"+objectId+"' ";
@@ -1879,7 +1914,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String objectVersionList = buildStringFromArray(objvIds, true);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT EV.* FROM "
 					+METAMODEL_ALIAS+".event as EV, "
 					+METAMODEL_ALIAS+".event_to_object_version as ETOV "
@@ -1905,7 +1940,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		boolean result = false;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			statement.setQueryTimeout(30);
 			statement.execute("INSERT INTO "+METAMODEL_ALIAS+".event_to_object_version "
 					+" (event_id,object_version_id,label) VALUES ('"
@@ -1927,7 +1962,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMRelationResultSet erset = null;
 		Statement statement = null;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT RL.* FROM "
 					+METAMODEL_ALIAS+".relation RL ");
 			erset = new SLEXMMRelationResultSet(this, rset);
@@ -1945,7 +1980,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT * FROM "+METAMODEL_ALIAS+".relationship ");
 			while (rset.next()) {
 				int id = rset.getInt("id");
@@ -1975,7 +2010,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMActivityInstanceResultSet airset = null;
 		Statement statement = null;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT AI.* FROM "
 					+METAMODEL_ALIAS+".activity_instance AI ");
 			airset = new SLEXMMActivityInstanceResultSet(this, rset);
@@ -1992,7 +2027,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMAttributeResultSet arset = null;
 		Statement statement = null;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT A.* FROM "
 					+METAMODEL_ALIAS+".attribute_name A ");
 			arset = new SLEXMMAttributeResultSet(this, rset);
@@ -2009,7 +2044,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMSQLResultSet sqlrset = null;
 		Statement statement = null;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery(query);
 			sqlrset = new SLEXMMSQLResultSet(this, rset);
 		} catch (Exception e) {
@@ -2025,7 +2060,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMEventAttributeResultSet arset = null;
 		Statement statement = null;
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT EA.* FROM "
 					+METAMODEL_ALIAS+".event_attribute_name EA ");
 			arset = new SLEXMMEventAttributeResultSet(this, rset);
@@ -2050,7 +2085,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String caseList = buildStringFromArray(caseIds, true);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJ.* FROM "
 					+METAMODEL_ALIAS+".object AS OBJ, "
 					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
@@ -2086,7 +2121,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String objectVersionList = buildStringFromArray(objectVersionIds, false);
 				
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJ.* FROM "
 					+METAMODEL_ALIAS+".object AS OBJ, "
 					+METAMODEL_ALIAS+".object_version AS OBJV "
@@ -2115,7 +2150,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String eventList = buildStringFromArray(eventIds, true);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT OBJ.id, OBJ.class_id FROM "
 					+METAMODEL_ALIAS+".object AS OBJ, "
 					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
@@ -2146,7 +2181,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String classList = buildStringFromArray(classIds, false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT OBJ.id, OBJ.class_id FROM "
 					+METAMODEL_ALIAS+".object AS OBJ "
 					+" WHERE OBJ.class_id IN ("+classList+") "
@@ -2173,7 +2208,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String activityList = buildStringFromArray(activityIds, false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJ.* FROM "
 					+METAMODEL_ALIAS+".object AS OBJ, "
 					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
@@ -2210,7 +2245,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String activityInstanceList = buildStringFromArray(activityInstanceIds, true);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJ.* FROM "
 					+METAMODEL_ALIAS+".object AS OBJ, "
 					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
@@ -2243,7 +2278,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String relationList = buildStringFromArray(relationIds, true);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJ.* FROM "
 					+METAMODEL_ALIAS+".object AS OBJ, "
 					+METAMODEL_ALIAS+".relation AS REL, "
@@ -2274,7 +2309,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String relationshipList = buildStringFromArray(relationshipIds, false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJ.* FROM "
 					+METAMODEL_ALIAS+".object AS OBJ, "
 					+METAMODEL_ALIAS+".relation AS REL, "
@@ -2305,7 +2340,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String attributeList = buildStringFromArray(attributeIds, false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJ.* FROM "
 					+METAMODEL_ALIAS+".object AS OBJ, "
 					+METAMODEL_ALIAS+".attribute_value AS ATV, "
@@ -2336,7 +2371,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String objectList = buildStringFromArray(objectIds, false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
 					+METAMODEL_ALIAS+".pcase AS C, "
 					+METAMODEL_ALIAS+".object_version AS OBJV, "
@@ -2371,7 +2406,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String eventList = buildStringFromArray(eventIds, true);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
 					+METAMODEL_ALIAS+".pcase AS C, "
 					+METAMODEL_ALIAS+".event AS EV, "
@@ -2402,7 +2437,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String activityList = buildStringFromArray(activityIds, false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
 					+METAMODEL_ALIAS+".pcase AS C, "
 					+METAMODEL_ALIAS+".activity_instance AS AI, "
@@ -2433,7 +2468,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String classList = buildStringFromArray(classIds, false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
 					+METAMODEL_ALIAS+".pcase AS C, "
 					+METAMODEL_ALIAS+".object AS OBJ, "
@@ -2470,7 +2505,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String relationshipList = buildStringFromArray(relationshipIds, false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
 					+METAMODEL_ALIAS+".pcase AS C, "
 					+METAMODEL_ALIAS+".relation AS REL, "
@@ -2507,7 +2542,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String objectVersionList = buildStringFromArray(objectVersionIds, true);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
 					+METAMODEL_ALIAS+".pcase AS C, "
 					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
@@ -2540,7 +2575,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String relationList = buildStringFromArray(relationIds, true);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
 					+METAMODEL_ALIAS+".pcase AS C, "
 					+METAMODEL_ALIAS+".relation AS REL, "
@@ -2579,7 +2614,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String activityInstanceList = buildStringFromArray(activityInstanceIds, true);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
 					+METAMODEL_ALIAS+".pcase AS C, "
 					+METAMODEL_ALIAS+".activity_instance_to_case AS AITC "
@@ -2608,7 +2643,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String attributeList = buildStringFromArray(attributeIds, false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
 					+METAMODEL_ALIAS+".pcase AS C, "
 					+METAMODEL_ALIAS+".attribute_value AS ATV, "
@@ -2647,7 +2682,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String objectList = buildStringFromArray(objectIds, false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT EV.* FROM "
 					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
 					+METAMODEL_ALIAS+".event AS EV, "
@@ -2678,7 +2713,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String classList = buildStringFromArray(classIds, false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT EV.* FROM "
 					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
 					+METAMODEL_ALIAS+".event AS EV, "
@@ -2711,7 +2746,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String relationshipList = buildStringFromArray(relationshipIds, false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT EV.* FROM "
 					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
 					+METAMODEL_ALIAS+".event AS EV, "
@@ -2744,7 +2779,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String relationList = buildStringFromArray(relationIds, false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT EV.* FROM "
 					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
 					+METAMODEL_ALIAS+".event AS EV, "
@@ -2779,7 +2814,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String activityInstanceList = buildStringFromArray(activityInstanceIds, true);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT EV.* FROM "
 					+METAMODEL_ALIAS+".event AS EV "
 					+" WHERE EV.activity_instance_id IN ("+activityInstanceList+") "
@@ -2806,7 +2841,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String attributeList = buildStringFromArray(attributeIds, false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT EV.* FROM "
 					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
 					+METAMODEL_ALIAS+".event AS EV, "
@@ -2839,7 +2874,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String objectList = buildStringFromArray(objIds, false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT OBJV.* FROM "
 					+METAMODEL_ALIAS+".object_version AS OBJV "
 					+" WHERE OBJV.object_id IN ("+objectList+") "
@@ -2866,7 +2901,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String eventList = buildStringFromArray(eventIds, true);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJV.* FROM "
 					+METAMODEL_ALIAS+".object_version AS OBJV, "
 					+METAMODEL_ALIAS+".event_to_object_version AS ETOV "
@@ -2895,7 +2930,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String caseList = buildStringFromArray(caseIds, true);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJV.* FROM "
 					+METAMODEL_ALIAS+".object_version AS OBJV, "
 					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
@@ -2928,7 +2963,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String classList = buildStringFromArray(classIds, false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJV.* FROM "
 					+METAMODEL_ALIAS+".object_version AS OBJV, "
 					+METAMODEL_ALIAS+".object AS OBJ "
@@ -2959,7 +2994,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String relationshipList = buildStringFromArray(relationshipIds, false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJV.* FROM "
 					+METAMODEL_ALIAS+".object_version AS OBJV, "
 					+METAMODEL_ALIAS+".relation AS REL "
@@ -2990,7 +3025,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String relationList = buildStringFromArray(relationIds, false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJV.* FROM "
 					+METAMODEL_ALIAS+".object_version AS OBJV, "
 					+METAMODEL_ALIAS+".relation AS REL "
@@ -3021,7 +3056,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String activityInstanceList = buildStringFromArray(activityInstanceIds, true);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJV.* FROM "
 					+METAMODEL_ALIAS+".object_version AS OBJV, "
 					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
@@ -3055,7 +3090,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String activityList = buildStringFromArray(activityIds, false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			query = "SELECT DISTINCT OBJV.* FROM "
 					+METAMODEL_ALIAS+".object_version AS OBJV, "
 					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
@@ -3091,7 +3126,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String attributeList = buildStringFromArray(attributeIds, false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJV.* FROM "
 					+METAMODEL_ALIAS+".object_version AS OBJV, "
 					+METAMODEL_ALIAS+".attribute_value AS ATV "
@@ -3120,7 +3155,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String objectList = buildStringFromArray(objectIds, false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT AC.* FROM "
 					+METAMODEL_ALIAS+".activity AS AC, "
 					+METAMODEL_ALIAS+".activity_instance AS AI, "
@@ -3155,7 +3190,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String eventList = buildStringFromArray(eventIds, false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT AC.* FROM "
 					+METAMODEL_ALIAS+".activity AS AC, "
 					+METAMODEL_ALIAS+".activity_instance AS AI, "
@@ -3186,7 +3221,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String caseList = buildStringFromArray(caseIds, true);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT AC.* FROM "
 					+METAMODEL_ALIAS+".activity AS AC, "
 					+METAMODEL_ALIAS+".activity_instance AS AI, "
@@ -3217,7 +3252,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String classList = buildStringFromArray(classIds, false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT AC.* FROM "
 					+METAMODEL_ALIAS+".activity AS AC, "
 					+METAMODEL_ALIAS+".activity_instance AS AI, "
@@ -3256,7 +3291,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String relationshipList = buildStringFromArray(relationshipIds, false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT AC.* FROM "
 					+METAMODEL_ALIAS+".activity AS AC, "
 					+METAMODEL_ALIAS+".activity_instance AS AI, "
@@ -3295,7 +3330,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String objectVersionList = buildStringFromArray(objectVersionIds, true);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT AC.* FROM "
 					+METAMODEL_ALIAS+".activity AS AC, "
 					+METAMODEL_ALIAS+".activity_instance AS AI, "
@@ -3328,7 +3363,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String relationList = buildStringFromArray(relationIds, false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT AC.* FROM "
 					+METAMODEL_ALIAS+".activity AS AC, "
 					+METAMODEL_ALIAS+".activity_instance AS AI, "
@@ -3367,7 +3402,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String activityInstanceList = buildStringFromArray(activityInstanceIds, false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT AC.* FROM "
 					+METAMODEL_ALIAS+".activity AS AC, "
 					+METAMODEL_ALIAS+".activity_instance AS AI "
@@ -3396,7 +3431,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String attributeList = buildStringFromArray(attributeIds, false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT AC.* FROM "
 					+METAMODEL_ALIAS+".activity AS AC, "
 					+METAMODEL_ALIAS+".activity_instance AS AI, "
@@ -3437,7 +3472,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String objectList = buildStringFromArray(objectIds, false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
 					+METAMODEL_ALIAS+".class AS C, "
 					+METAMODEL_ALIAS+".object AS OBJ "
@@ -3466,7 +3501,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String eventList = buildStringFromArray(eventIds, true);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
 					+METAMODEL_ALIAS+".class AS C, "
 					+METAMODEL_ALIAS+".object AS OBJ, "
@@ -3499,7 +3534,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String caseList = buildStringFromArray(caseIds, true);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
 					+METAMODEL_ALIAS+".class AS C, "
 					+METAMODEL_ALIAS+".object AS OBJ, "
@@ -3536,7 +3571,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String activityList = buildStringFromArray(activityIds, false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
 					+METAMODEL_ALIAS+".class AS C, "
 					+METAMODEL_ALIAS+".object AS OBJ, "
@@ -3573,7 +3608,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String relationshipList = buildStringFromArray(relationshipIds, true);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
 					+METAMODEL_ALIAS+".class AS C, "
 					+METAMODEL_ALIAS+".relationship AS RS "
@@ -3604,7 +3639,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String objectVersionList = buildStringFromArray(objectVersionIds, true);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
 					+METAMODEL_ALIAS+".class AS C, "
 					+METAMODEL_ALIAS+".object AS OBJ, "
@@ -3635,7 +3670,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String relationList = buildStringFromArray(relationIds, true);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
 					+METAMODEL_ALIAS+".class AS C, "
 					+METAMODEL_ALIAS+".object AS OBJ, "
@@ -3670,7 +3705,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String activityInstanceList = buildStringFromArray(activityInstanceIds, true);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
 					+METAMODEL_ALIAS+".class AS C, "
 					+METAMODEL_ALIAS+".object AS OBJ, "
@@ -3705,7 +3740,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String attributeList = buildStringFromArray(attributeIds, true);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
 					+METAMODEL_ALIAS+".class AS C, "
 					+METAMODEL_ALIAS+".attribute_name AS AN "
@@ -3734,7 +3769,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String objectList = buildStringFromArray(objectIds, false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT REL.* FROM "
 					+METAMODEL_ALIAS+".relation AS REL, "
 					+METAMODEL_ALIAS+".object_version AS OBJV "
@@ -3763,7 +3798,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String eventList = buildStringFromArray(eventIds, true);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT REL.* FROM "
 					+METAMODEL_ALIAS+".relation AS REL, "
 					+METAMODEL_ALIAS+".object_version AS OBJV, "
@@ -3794,7 +3829,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String caseIdList = buildStringFromArray(caseIds,true);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT REL.* FROM "
 					+METAMODEL_ALIAS+".relation AS REL, "
 					+METAMODEL_ALIAS+".object_version AS OBJV, "
@@ -3829,7 +3864,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String activityList = buildStringFromArray(activityIds, false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT REL.* FROM "
 					+METAMODEL_ALIAS+".relation AS REL, "
 					+METAMODEL_ALIAS+".object_version AS OBJV, "
@@ -3883,7 +3918,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String classIdList = buildStringFromArray(classIds,false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT REL.* FROM "
 					+METAMODEL_ALIAS+".relation AS REL, "
 					+METAMODEL_ALIAS+".object_version AS OBJV, "
@@ -3916,7 +3951,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String relationshipList = buildStringFromArray(relationshipIds, false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT REL.* FROM "
 					+METAMODEL_ALIAS+".relation AS REL "
 					+" WHERE REL.relationship_id IN ("+relationshipList+") "
@@ -3945,7 +3980,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String objectVersionList = buildStringFromArray(objectVersionIds, false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT REL.* FROM "
 					+METAMODEL_ALIAS+".relation AS REL, "
 					+METAMODEL_ALIAS+".object_version AS OBJV "
@@ -3975,7 +4010,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		
 		String activityInstancesList = buildStringFromArray(activityInstanceIds, true);
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT REL.* FROM "
 					+METAMODEL_ALIAS+".relation AS REL, "
 					+METAMODEL_ALIAS+".object_version AS OBJV, "
@@ -4008,7 +4043,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String attributeIdList = buildStringFromArray(attributeIds,false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT REL.* FROM "
 					+METAMODEL_ALIAS+".relation AS REL, "
 					+METAMODEL_ALIAS+".object_version AS OBJV, "
@@ -4043,7 +4078,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String objectList = buildStringFromArray(objectIds,false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT RS.* FROM "
 					+METAMODEL_ALIAS+".relationship AS RS, "
 					+METAMODEL_ALIAS+".relation AS REL, "
@@ -4076,7 +4111,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String eventList = buildStringFromArray(eventIds,true);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT RS.* FROM "
 					+METAMODEL_ALIAS+".relationship AS RS, "
 					+METAMODEL_ALIAS+".relation AS REL, "
@@ -4109,7 +4144,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String caseList = buildStringFromArray(caseIds,true);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT RS.* FROM "
 					+METAMODEL_ALIAS+".relationship AS RS, "
 					+METAMODEL_ALIAS+".relation AS REL, "
@@ -4148,7 +4183,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String activityList = buildStringFromArray(activityIds,false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT RS.* FROM "
 					+METAMODEL_ALIAS+".relationship AS RS, "
 					+METAMODEL_ALIAS+".relation AS REL, "
@@ -4185,7 +4220,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String classList = buildStringFromArray(classIds,false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT RS.* FROM "
 					+METAMODEL_ALIAS+".relationship AS RS, "
 					+METAMODEL_ALIAS+".class AS CL "
@@ -4216,7 +4251,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String objectVersionList = buildStringFromArray(objectVersionIds,false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT RS.* FROM "
 					+METAMODEL_ALIAS+".relationship AS RS, "
 					+METAMODEL_ALIAS+".relation AS REL, "
@@ -4248,7 +4283,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String relationList = buildStringFromArray(relationIds,false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT RS.* FROM "
 					+METAMODEL_ALIAS+".relationship AS RS, "
 					+METAMODEL_ALIAS+".relation AS REL "
@@ -4279,7 +4314,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String activityInstanceList = buildStringFromArray(activityInstanceIds,true);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT RS.* FROM "
 					+METAMODEL_ALIAS+".relationship AS RS, "
 					+METAMODEL_ALIAS+".relation AS REL, "
@@ -4318,7 +4353,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String attributeList = buildStringFromArray(attributeIds,true);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT RS.* FROM "
 					+METAMODEL_ALIAS+".relationship AS RS, "
 					+METAMODEL_ALIAS+".class AS CL, "
@@ -4351,7 +4386,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String caseList = buildStringFromArray(caseIds, true);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT AI.* FROM "
 					+METAMODEL_ALIAS+".activity_instance AI, "
 					+METAMODEL_ALIAS+".activity_instance_to_case AIC "
@@ -4381,7 +4416,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String objectList = buildStringFromArray(objectIds, false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT AI.* FROM "
 					+METAMODEL_ALIAS+".activity_instance AI, "
 					+METAMODEL_ALIAS+".event EV, "
@@ -4415,7 +4450,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String eventList = buildStringFromArray(eventIds, true);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT AI.* FROM "
 					+METAMODEL_ALIAS+".activity_instance AI, "
 					+METAMODEL_ALIAS+".event EV "
@@ -4445,7 +4480,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String activityList = buildStringFromArray(activityIds, false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT AI.* FROM "
 					+METAMODEL_ALIAS+".activity_instance AI "
 							+ " WHERE AI.activity_id IN ("+activityList+") ");
@@ -4473,7 +4508,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String classList = buildStringFromArray(classIds, false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT AI.* FROM "
 					+METAMODEL_ALIAS+".activity_instance AI, "
 					+METAMODEL_ALIAS+".event EV, "
@@ -4509,7 +4544,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String relationshipList = buildStringFromArray(relationshipIds, false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT AI.* FROM "
 					+METAMODEL_ALIAS+".activity_instance AI, "
 					+METAMODEL_ALIAS+".event EV, "
@@ -4545,7 +4580,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String objectVersionList = buildStringFromArray(objectVersionIds, true);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT AI.* FROM "
 					+METAMODEL_ALIAS+".activity_instance AI, "
 					+METAMODEL_ALIAS+".event EV, "
@@ -4579,7 +4614,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String relationList = buildStringFromArray(relationIds, true);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT AI.* FROM "
 					+METAMODEL_ALIAS+".activity_instance AI, "
 					+METAMODEL_ALIAS+".event EV, "
@@ -4615,7 +4650,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String attributeList = buildStringFromArray(attributeIds, false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT AI.* FROM "
 					+METAMODEL_ALIAS+".activity_instance AI, "
 					+METAMODEL_ALIAS+".event EV, "
@@ -4651,7 +4686,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String objectList = buildStringFromArray(objectIds, true);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT AN.* FROM "
 					+METAMODEL_ALIAS+".attribute_name AN, "
 					+METAMODEL_ALIAS+".class CL, "
@@ -4681,7 +4716,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String eventList = buildStringFromArray(eventIds, true);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT AN.* FROM "
 					+METAMODEL_ALIAS+".attribute_name AN, "
 					+METAMODEL_ALIAS+".class CL, "
@@ -4717,7 +4752,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String caseList = buildStringFromArray(caseIds, true);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT AN.* FROM "
 					+METAMODEL_ALIAS+".attribute_name AN, "
 					+METAMODEL_ALIAS+".class CL, "
@@ -4755,7 +4790,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String activityList = buildStringFromArray(activityIds, false);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT AN.* FROM "
 					+METAMODEL_ALIAS+".attribute_name AN, "
 					+METAMODEL_ALIAS+".class CL, "
@@ -4793,7 +4828,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String classList = buildStringFromArray(classIds, true);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT AN.* FROM "
 					+METAMODEL_ALIAS+".attribute_name AN, "
 					+METAMODEL_ALIAS+".class CL "
@@ -4823,7 +4858,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String relationshipList = buildStringFromArray(relationshipIds, true);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT AN.* FROM "
 					+METAMODEL_ALIAS+".attribute_name AN, "
 					+METAMODEL_ALIAS+".class CL, "
@@ -4855,7 +4890,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String objectVersionList = buildStringFromArray(objectVersionIds, true);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT AN.* FROM "
 					+METAMODEL_ALIAS+".attribute_name AN, "
 					+METAMODEL_ALIAS+".class CL, "
@@ -4887,7 +4922,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String relationList = buildStringFromArray(relationIds, true);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT AN.* FROM "
 					+METAMODEL_ALIAS+".attribute_name AN, "
 					+METAMODEL_ALIAS+".class CL, "
@@ -4923,7 +4958,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String activityInstanceList = buildStringFromArray(activityInstanceIds, true);
 		
 		try {
-			statement = connection.createStatement();
+			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT AN.* FROM "
 					+METAMODEL_ALIAS+".attribute_name AN, "
 					+METAMODEL_ALIAS+".class CL, "

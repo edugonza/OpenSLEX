@@ -16,8 +16,9 @@ abstract class SLEXMMAbstractResultSetObject {
 	public void close() {
 		if (rset != null) {
 			try {
-				rset.close();
-			} catch (SQLException e) {
+				storage.closeStatement(rset.getStatement());
+				storage.closeResultSet(rset);
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
