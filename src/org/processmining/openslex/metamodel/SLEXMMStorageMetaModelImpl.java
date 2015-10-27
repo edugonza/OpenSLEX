@@ -1827,7 +1827,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMEventResultSet erset = null;
 		Statement statement = null;
 		
-		String caseList = buildStringFromArray(caseIds, true);
+		String caseList = buildStringFromArray(caseIds);
 		
 		try {
 			statement = createStatement();
@@ -1857,7 +1857,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMEventResultSet erset = null;
 		Statement statement = null;
 		
-		String activityList = buildStringFromArray(activityIds, false);
+		String activityList = buildStringFromArray(activityIds);
 		
 		try {
 			statement = createStatement();
@@ -1911,7 +1911,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMEventResultSet erset = null;
 		Statement statement = null;
 		
-		String objectVersionList = buildStringFromArray(objvIds, true);
+		String objectVersionList = buildStringFromArray(objvIds);
 		
 		try {
 			statement = createStatement();
@@ -2082,7 +2082,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMObjectResultSet erset = null;
 		Statement statement = null;
 		
-		String caseList = buildStringFromArray(caseIds, true);
+		String caseList = buildStringFromArray(caseIds);
 		
 		try {
 			statement = createStatement();
@@ -2118,7 +2118,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMObjectResultSet erset = null;
 		Statement statement = null;
 		
-		String objectVersionList = buildStringFromArray(objectVersionIds, false);
+		String objectVersionList = buildStringFromArray(objectVersionIds);
 				
 		try {
 			statement = createStatement();
@@ -2147,7 +2147,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMObjectResultSet erset = null;
 		Statement statement = null;
 		
-		String eventList = buildStringFromArray(eventIds, true);
+		String eventList = buildStringFromArray(eventIds);
 		
 		try {
 			statement = createStatement();
@@ -2178,7 +2178,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMObjectResultSet erset = null;
 		Statement statement = null;
 		
-		String classList = buildStringFromArray(classIds, false);
+		String classList = buildStringFromArray(classIds);
 		
 		try {
 			statement = createStatement();
@@ -2205,7 +2205,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMObjectResultSet erset = null;
 		Statement statement = null;
 		
-		String activityList = buildStringFromArray(activityIds, false);
+		String activityList = buildStringFromArray(activityIds);
 		
 		try {
 			statement = createStatement();
@@ -2242,7 +2242,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMObjectResultSet erset = null;
 		Statement statement = null;
 		
-		String activityInstanceList = buildStringFromArray(activityInstanceIds, true);
+		String activityInstanceList = buildStringFromArray(activityInstanceIds);
 		
 		try {
 			statement = createStatement();
@@ -2275,7 +2275,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMObjectResultSet erset = null;
 		Statement statement = null;
 		
-		String relationList = buildStringFromArray(relationIds, true);
+		String relationList = buildStringFromArray(relationIds);
 		
 		try {
 			statement = createStatement();
@@ -2306,7 +2306,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMObjectResultSet erset = null;
 		Statement statement = null;
 		
-		String relationshipList = buildStringFromArray(relationshipIds, false);
+		String relationshipList = buildStringFromArray(relationshipIds);
 		
 		try {
 			statement = createStatement();
@@ -2337,7 +2337,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMObjectResultSet erset = null;
 		Statement statement = null;
 		
-		String attributeList = buildStringFromArray(attributeIds, false);
+		String attributeList = buildStringFromArray(attributeIds);
 		
 		try {
 			statement = createStatement();
@@ -2368,7 +2368,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMCaseResultSet crset = null;
 		Statement statement = null;
 		
-		String objectList = buildStringFromArray(objectIds, false);
+		String objectList = buildStringFromArray(objectIds);
 		
 		try {
 			statement = createStatement();
@@ -2403,7 +2403,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMCaseResultSet crset = null;
 		Statement statement = null;
 		
-		String eventList = buildStringFromArray(eventIds, true);
+		String eventList = buildStringFromArray(eventIds);
 		
 		try {
 			statement = createStatement();
@@ -2434,7 +2434,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMCaseResultSet crset = null;
 		Statement statement = null;
 		
-		String activityList = buildStringFromArray(activityIds, false);
+		String activityList = buildStringFromArray(activityIds);
 		
 		try {
 			statement = createStatement();
@@ -2465,7 +2465,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMCaseResultSet crset = null;
 		Statement statement = null;
 		
-		String classList = buildStringFromArray(classIds, false);
+		String classList = buildStringFromArray(classIds);
 		
 		try {
 			statement = createStatement();
@@ -2502,7 +2502,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMCaseResultSet crset = null;
 		Statement statement = null;
 		
-		String relationshipList = buildStringFromArray(relationshipIds, false);
+		String relationshipList = buildStringFromArray(relationshipIds);
 		
 		try {
 			statement = createStatement();
@@ -2539,7 +2539,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMCaseResultSet crset = null;
 		Statement statement = null;
 		
-		String objectVersionList = buildStringFromArray(objectVersionIds, true);
+		String objectVersionList = buildStringFromArray(objectVersionIds);
 		
 		try {
 			statement = createStatement();
@@ -2572,7 +2572,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMCaseResultSet crset = null;
 		Statement statement = null;
 		
-		String relationList = buildStringFromArray(relationIds, true);
+		String relationList = buildStringFromArray(relationIds);
 		
 		try {
 			statement = createStatement();
@@ -2611,15 +2611,17 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMCaseResultSet crset = null;
 		Statement statement = null;
 		
-		String activityInstanceList = buildStringFromArray(activityInstanceIds, true);
+		String activityInstanceList = buildStringFromArray(activityInstanceIds);
 		
 		try {
 			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
 					+METAMODEL_ALIAS+".pcase AS C, "
+					+METAMODEL_ALIAS+".activity_instance AS AI, "
 					+METAMODEL_ALIAS+".activity_instance_to_case AS AITC "
 					+" WHERE C.id = AITC.case_id "
-					+" AND AITC.activity_instance_id IN ("+activityInstanceList+") "
+					+" AND AITC.activity_instance_id = AI.id "
+					+" AND AI.id IN ("+activityInstanceList+") "
 					+" ORDER BY C.id");
 			crset = new SLEXMMCaseResultSet(this, rset);
 		} catch (Exception e) {
@@ -2640,24 +2642,20 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMCaseResultSet crset = null;
 		Statement statement = null;
 		
-		String attributeList = buildStringFromArray(attributeIds, false);
+		String attributeList = buildStringFromArray(attributeIds);
 		
 		try {
 			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT C.* FROM "
 					+METAMODEL_ALIAS+".pcase AS C, "
-					+METAMODEL_ALIAS+".attribute_value AS ATV, "
-					+METAMODEL_ALIAS+".activity_instance AS AI, "
 					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
 					+METAMODEL_ALIAS+".event AS EV, "
-					+METAMODEL_ALIAS+".object_version AS OBJV, "
+					+METAMODEL_ALIAS+".attribute_value AS ATV, "
 					+METAMODEL_ALIAS+".activity_instance_to_case AS AITC "
 					+" WHERE C.id = AITC.case_id "
-					+" AND AITC.activity_instance_id = AI.id " 
-					+" AND AI.id = EV.activity_instance_id "
+					+" AND AITC.activity_instance_id = EV.activity_instance_id "
 					+" AND EV.id = ETOV.event_id "
-					+" AND ETOV.object_version_id = OBJV.id "
-					+" AND OBJV.id = ATV.object_version_id "
+					+" AND ETOV.object_version_id = ATV.object_version_id "
 					+" AND ATV.attribute_name_id IN ("+attributeList+") "
 					+" ORDER BY C.id");
 			crset = new SLEXMMCaseResultSet(this, rset);
@@ -2679,7 +2677,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMEventResultSet erset = null;
 		Statement statement = null;
 		
-		String objectList = buildStringFromArray(objectIds, false);
+		String objectList = buildStringFromArray(objectIds);
 		
 		try {
 			statement = createStatement();
@@ -2710,7 +2708,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMEventResultSet erset = null;
 		Statement statement = null;
 		
-		String classList = buildStringFromArray(classIds, false);
+		String classList = buildStringFromArray(classIds);
 		
 		try {
 			statement = createStatement();
@@ -2743,7 +2741,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMEventResultSet erset = null;
 		Statement statement = null;
 		
-		String relationshipList = buildStringFromArray(relationshipIds, false);
+		String relationshipList = buildStringFromArray(relationshipIds);
 		
 		try {
 			statement = createStatement();
@@ -2776,7 +2774,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMEventResultSet erset = null;
 		Statement statement = null;
 		
-		String relationList = buildStringFromArray(relationIds, false);
+		String relationList = buildStringFromArray(relationIds);
 		
 		try {
 			statement = createStatement();
@@ -2811,7 +2809,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMEventResultSet erset = null;
 		Statement statement = null;
 		
-		String activityInstanceList = buildStringFromArray(activityInstanceIds, true);
+		String activityInstanceList = buildStringFromArray(activityInstanceIds);
 		
 		try {
 			statement = createStatement();
@@ -2838,18 +2836,16 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMEventResultSet erset = null;
 		Statement statement = null;
 		
-		String attributeList = buildStringFromArray(attributeIds, false);
+		String attributeList = buildStringFromArray(attributeIds);
 		
 		try {
 			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT EV.* FROM "
 					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
 					+METAMODEL_ALIAS+".event AS EV, "
-					+METAMODEL_ALIAS+".attribute_value AS ATV, "
-					+METAMODEL_ALIAS+".object_version AS OBJV "
+					+METAMODEL_ALIAS+".attribute_value AS ATV "
 					+" WHERE EV.id = ETOV.event_id "
-					+" AND ETOV.object_version_id = OBJV.id "
-					+" AND OBJV.id = ATV.object_version_id "
+					+" AND ETOV.object_version_id = ATV.object_version_id "
 					+" AND ATV.attribute_name_id IN ("+attributeList+") "
 					+" ORDER BY EV.ordering");
 			erset = new SLEXMMEventResultSet(this, rset);
@@ -2871,7 +2867,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMObjectVersionResultSet erset = null;
 		Statement statement = null;
 		
-		String objectList = buildStringFromArray(objIds, false);
+		String objectList = buildStringFromArray(objIds);
 		
 		try {
 			statement = createStatement();
@@ -2898,7 +2894,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMObjectVersionResultSet ovrset = null;
 		Statement statement = null;
 		
-		String eventList = buildStringFromArray(eventIds, true);
+		String eventList = buildStringFromArray(eventIds);
 		
 		try {
 			statement = createStatement();
@@ -2927,7 +2923,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMObjectVersionResultSet ovrset = null;
 		Statement statement = null;
 		
-		String caseList = buildStringFromArray(caseIds, true);
+		String caseList = buildStringFromArray(caseIds);
 		
 		try {
 			statement = createStatement();
@@ -2960,7 +2956,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMObjectVersionResultSet ovrset = null;
 		Statement statement = null;
 		
-		String classList = buildStringFromArray(classIds, false);
+		String classList = buildStringFromArray(classIds);
 		
 		try {
 			statement = createStatement();
@@ -2991,7 +2987,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMObjectVersionResultSet ovrset = null;
 		Statement statement = null;
 		
-		String relationshipList = buildStringFromArray(relationshipIds, false);
+		String relationshipList = buildStringFromArray(relationshipIds);
 		
 		try {
 			statement = createStatement();
@@ -3022,7 +3018,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMObjectVersionResultSet ovrset = null;
 		Statement statement = null;
 		
-		String relationList = buildStringFromArray(relationIds, false);
+		String relationList = buildStringFromArray(relationIds);
 		
 		try {
 			statement = createStatement();
@@ -3053,7 +3049,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMObjectVersionResultSet ovrset = null;
 		Statement statement = null;
 		
-		String activityInstanceList = buildStringFromArray(activityInstanceIds, true);
+		String activityInstanceList = buildStringFromArray(activityInstanceIds);
 		
 		try {
 			statement = createStatement();
@@ -3087,7 +3083,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		String query = "";
 		
-		String activityList = buildStringFromArray(activityIds, false);
+		String activityList = buildStringFromArray(activityIds);
 		
 		try {
 			statement = createStatement();
@@ -3123,7 +3119,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMObjectVersionResultSet ovrset = null;
 		Statement statement = null;
 		
-		String attributeList = buildStringFromArray(attributeIds, false);
+		String attributeList = buildStringFromArray(attributeIds);
 		
 		try {
 			statement = createStatement();
@@ -3152,7 +3148,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMActivityResultSet arset = null;
 		Statement statement = null;
 		
-		String objectList = buildStringFromArray(objectIds, false);
+		String objectList = buildStringFromArray(objectIds);
 		
 		try {
 			statement = createStatement();
@@ -3187,7 +3183,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMActivityResultSet arset = null;
 		Statement statement = null;
 		
-		String eventList = buildStringFromArray(eventIds, false);
+		String eventList = buildStringFromArray(eventIds);
 		
 		try {
 			statement = createStatement();
@@ -3218,7 +3214,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMActivityResultSet arset = null;
 		Statement statement = null;
 		
-		String caseList = buildStringFromArray(caseIds, true);
+		String caseList = buildStringFromArray(caseIds);
 		
 		try {
 			statement = createStatement();
@@ -3249,7 +3245,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMActivityResultSet arset = null;
 		Statement statement = null;
 		
-		String classList = buildStringFromArray(classIds, false);
+		String classList = buildStringFromArray(classIds);
 		
 		try {
 			statement = createStatement();
@@ -3288,7 +3284,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMActivityResultSet arset = null;
 		Statement statement = null;
 		
-		String relationshipList = buildStringFromArray(relationshipIds, false);
+		String relationshipList = buildStringFromArray(relationshipIds);
 		
 		try {
 			statement = createStatement();
@@ -3327,7 +3323,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMActivityResultSet arset = null;
 		Statement statement = null;
 		
-		String objectVersionList = buildStringFromArray(objectVersionIds, true);
+		String objectVersionList = buildStringFromArray(objectVersionIds);
 		
 		try {
 			statement = createStatement();
@@ -3360,7 +3356,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMActivityResultSet arset = null;
 		Statement statement = null;
 		
-		String relationList = buildStringFromArray(relationIds, false);
+		String relationList = buildStringFromArray(relationIds);
 		
 		try {
 			statement = createStatement();
@@ -3399,7 +3395,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMActivityResultSet arset = null;
 		Statement statement = null;
 		
-		String activityInstanceList = buildStringFromArray(activityInstanceIds, false);
+		String activityInstanceList = buildStringFromArray(activityInstanceIds);
 		
 		try {
 			statement = createStatement();
@@ -3428,7 +3424,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMActivityResultSet arset = null;
 		Statement statement = null;
 		
-		String attributeList = buildStringFromArray(attributeIds, false);
+		String attributeList = buildStringFromArray(attributeIds);
 		
 		try {
 			statement = createStatement();
@@ -3469,7 +3465,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMClassResultSet crset = null;
 		Statement statement = null;
 		
-		String objectList = buildStringFromArray(objectIds, false);
+		String objectList = buildStringFromArray(objectIds);
 		
 		try {
 			statement = createStatement();
@@ -3498,7 +3494,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMClassResultSet crset = null;
 		Statement statement = null;
 		
-		String eventList = buildStringFromArray(eventIds, true);
+		String eventList = buildStringFromArray(eventIds);
 		
 		try {
 			statement = createStatement();
@@ -3531,7 +3527,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMClassResultSet crset = null;
 		Statement statement = null;
 		
-		String caseList = buildStringFromArray(caseIds, true);
+		String caseList = buildStringFromArray(caseIds);
 		
 		try {
 			statement = createStatement();
@@ -3568,7 +3564,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMClassResultSet crset = null;
 		Statement statement = null;
 		
-		String activityList = buildStringFromArray(activityIds, false);
+		String activityList = buildStringFromArray(activityIds);
 		
 		try {
 			statement = createStatement();
@@ -3605,7 +3601,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMClassResultSet crset = null;
 		Statement statement = null;
 		
-		String relationshipList = buildStringFromArray(relationshipIds, true);
+		String relationshipList = buildStringFromArray(relationshipIds);
 		
 		try {
 			statement = createStatement();
@@ -3636,7 +3632,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMClassResultSet crset = null;
 		Statement statement = null;
 		
-		String objectVersionList = buildStringFromArray(objectVersionIds, true);
+		String objectVersionList = buildStringFromArray(objectVersionIds);
 		
 		try {
 			statement = createStatement();
@@ -3667,7 +3663,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMClassResultSet crset = null;
 		Statement statement = null;
 		
-		String relationList = buildStringFromArray(relationIds, true);
+		String relationList = buildStringFromArray(relationIds);
 		
 		try {
 			statement = createStatement();
@@ -3702,7 +3698,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMClassResultSet crset = null;
 		Statement statement = null;
 		
-		String activityInstanceList = buildStringFromArray(activityInstanceIds, true);
+		String activityInstanceList = buildStringFromArray(activityInstanceIds);
 		
 		try {
 			statement = createStatement();
@@ -3737,7 +3733,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMClassResultSet crset = null;
 		Statement statement = null;
 		
-		String attributeList = buildStringFromArray(attributeIds, true);
+		String attributeList = buildStringFromArray(attributeIds);
 		
 		try {
 			statement = createStatement();
@@ -3766,7 +3762,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMRelationResultSet rrset = null;
 		Statement statement = null;
 		
-		String objectList = buildStringFromArray(objectIds, false);
+		String objectList = buildStringFromArray(objectIds);
 		
 		try {
 			statement = createStatement();
@@ -3795,7 +3791,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMRelationResultSet rrset = null;
 		Statement statement = null;
 		
-		String eventList = buildStringFromArray(eventIds, true);
+		String eventList = buildStringFromArray(eventIds);
 		
 		try {
 			statement = createStatement();
@@ -3826,7 +3822,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMRelationResultSet rrset = null;
 		Statement statement = null;
 		
-		String caseIdList = buildStringFromArray(caseIds,true);
+		String caseIdList = buildStringFromArray(caseIds);
 		
 		try {
 			statement = createStatement();
@@ -3861,7 +3857,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMRelationResultSet rrset = null;
 		Statement statement = null;
 		
-		String activityList = buildStringFromArray(activityIds, false);
+		String activityList = buildStringFromArray(activityIds);
 		
 		try {
 			statement = createStatement();
@@ -3886,17 +3882,11 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		return rrset;
 	}
 
-	private String buildStringFromArray(int[] ids, boolean quotes) {
+	private String buildStringFromArray(int[] ids) {
 		StringBuffer buf = new StringBuffer();
 		
 		for (int i = 0; i < ids.length; i++) {
-			if (quotes) {
-				buf.append("'");
-				buf.append(String.valueOf(ids[i]));
-				buf.append("'");
-			} else {
-				buf.append(String.valueOf(ids[i]));
-			}
+			buf.append(String.valueOf(ids[i]));
 			if (i < ids.length - 1) {
 				buf.append(",");
 			}
@@ -3915,7 +3905,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMRelationResultSet rrset = null;
 		Statement statement = null;
 		
-		String classIdList = buildStringFromArray(classIds,false);
+		String classIdList = buildStringFromArray(classIds);
 		
 		try {
 			statement = createStatement();
@@ -3948,7 +3938,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMRelationResultSet rrset = null;
 		Statement statement = null;
 		
-		String relationshipList = buildStringFromArray(relationshipIds, false);
+		String relationshipList = buildStringFromArray(relationshipIds);
 		
 		try {
 			statement = createStatement();
@@ -3977,7 +3967,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMRelationResultSet rrset = null;
 		Statement statement = null;
 		
-		String objectVersionList = buildStringFromArray(objectVersionIds, false);
+		String objectVersionList = buildStringFromArray(objectVersionIds);
 		
 		try {
 			statement = createStatement();
@@ -4008,7 +3998,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMRelationResultSet rrset = null;
 		Statement statement = null;
 		
-		String activityInstancesList = buildStringFromArray(activityInstanceIds, true);
+		String activityInstancesList = buildStringFromArray(activityInstanceIds);
 		try {
 			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT REL.* FROM "
@@ -4040,7 +4030,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMRelationResultSet rrset = null;
 		Statement statement = null;
 		
-		String attributeIdList = buildStringFromArray(attributeIds,false);
+		String attributeIdList = buildStringFromArray(attributeIds);
 		
 		try {
 			statement = createStatement();
@@ -4075,7 +4065,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMRelationshipResultSet rrset = null;
 		Statement statement = null;
 		
-		String objectList = buildStringFromArray(objectIds,false);
+		String objectList = buildStringFromArray(objectIds);
 		
 		try {
 			statement = createStatement();
@@ -4108,7 +4098,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMRelationshipResultSet rrset = null;
 		Statement statement = null;
 		
-		String eventList = buildStringFromArray(eventIds,true);
+		String eventList = buildStringFromArray(eventIds);
 		
 		try {
 			statement = createStatement();
@@ -4141,7 +4131,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMRelationshipResultSet rrset = null;
 		Statement statement = null;
 		
-		String caseList = buildStringFromArray(caseIds,true);
+		String caseList = buildStringFromArray(caseIds);
 		
 		try {
 			statement = createStatement();
@@ -4180,7 +4170,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMRelationshipResultSet rrset = null;
 		Statement statement = null;
 		
-		String activityList = buildStringFromArray(activityIds,false);
+		String activityList = buildStringFromArray(activityIds);
 		
 		try {
 			statement = createStatement();
@@ -4217,7 +4207,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMRelationshipResultSet rrset = null;
 		Statement statement = null;
 		
-		String classList = buildStringFromArray(classIds,false);
+		String classList = buildStringFromArray(classIds);
 		
 		try {
 			statement = createStatement();
@@ -4248,7 +4238,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMRelationshipResultSet rrset = null;
 		Statement statement = null;
 		
-		String objectVersionList = buildStringFromArray(objectVersionIds,false);
+		String objectVersionList = buildStringFromArray(objectVersionIds);
 		
 		try {
 			statement = createStatement();
@@ -4280,7 +4270,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMRelationshipResultSet rrset = null;
 		Statement statement = null;
 		
-		String relationList = buildStringFromArray(relationIds,false);
+		String relationList = buildStringFromArray(relationIds);
 		
 		try {
 			statement = createStatement();
@@ -4311,7 +4301,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMRelationshipResultSet rrset = null;
 		Statement statement = null;
 		
-		String activityInstanceList = buildStringFromArray(activityInstanceIds,true);
+		String activityInstanceList = buildStringFromArray(activityInstanceIds);
 		
 		try {
 			statement = createStatement();
@@ -4350,7 +4340,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMRelationshipResultSet rrset = null;
 		Statement statement = null;
 		
-		String attributeList = buildStringFromArray(attributeIds,true);
+		String attributeList = buildStringFromArray(attributeIds);
 		
 		try {
 			statement = createStatement();
@@ -4383,7 +4373,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMActivityInstanceResultSet airset = null;
 		Statement statement = null;
 		
-		String caseList = buildStringFromArray(caseIds, true);
+		String caseList = buildStringFromArray(caseIds);
 		
 		try {
 			statement = createStatement();
@@ -4413,7 +4403,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMActivityInstanceResultSet airset = null;
 		Statement statement = null;
 		
-		String objectList = buildStringFromArray(objectIds, false);
+		String objectList = buildStringFromArray(objectIds);
 		
 		try {
 			statement = createStatement();
@@ -4447,7 +4437,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMActivityInstanceResultSet airset = null;
 		Statement statement = null;
 		
-		String eventList = buildStringFromArray(eventIds, true);
+		String eventList = buildStringFromArray(eventIds);
 		
 		try {
 			statement = createStatement();
@@ -4477,7 +4467,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMActivityInstanceResultSet airset = null;
 		Statement statement = null;
 		
-		String activityList = buildStringFromArray(activityIds, false);
+		String activityList = buildStringFromArray(activityIds);
 		
 		try {
 			statement = createStatement();
@@ -4505,7 +4495,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMActivityInstanceResultSet airset = null;
 		Statement statement = null;
 		
-		String classList = buildStringFromArray(classIds, false);
+		String classList = buildStringFromArray(classIds);
 		
 		try {
 			statement = createStatement();
@@ -4541,7 +4531,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMActivityInstanceResultSet airset = null;
 		Statement statement = null;
 		
-		String relationshipList = buildStringFromArray(relationshipIds, false);
+		String relationshipList = buildStringFromArray(relationshipIds);
 		
 		try {
 			statement = createStatement();
@@ -4577,7 +4567,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMActivityInstanceResultSet airset = null;
 		Statement statement = null;
 		
-		String objectVersionList = buildStringFromArray(objectVersionIds, true);
+		String objectVersionList = buildStringFromArray(objectVersionIds);
 		
 		try {
 			statement = createStatement();
@@ -4611,7 +4601,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMActivityInstanceResultSet airset = null;
 		Statement statement = null;
 		
-		String relationList = buildStringFromArray(relationIds, true);
+		String relationList = buildStringFromArray(relationIds);
 		
 		try {
 			statement = createStatement();
@@ -4647,7 +4637,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMActivityInstanceResultSet airset = null;
 		Statement statement = null;
 		
-		String attributeList = buildStringFromArray(attributeIds, false);
+		String attributeList = buildStringFromArray(attributeIds);
 		
 		try {
 			statement = createStatement();
@@ -4656,13 +4646,15 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+METAMODEL_ALIAS+".event EV, "
 					+METAMODEL_ALIAS+".event_to_object_version ETOV, "
 					+METAMODEL_ALIAS+".object_version OBJV, "
-					+METAMODEL_ALIAS+".attribute_value ATV, "
+					+METAMODEL_ALIAS+".object OBJ, "
+					+METAMODEL_ALIAS+".class CL, "
 					+METAMODEL_ALIAS+".attribute_name AN "
 							+ " WHERE AI.id = EV.activity_instance_id "
 							+ " AND EV.id = ETOV.event_id "
 							+ " AND ETOV.object_version_id = OBJV.id "
-							+ " AND OBJV.id = ATV.object_version_id "
-							+ " AND ATV.attribute_name_id = AN.id "
+							+ " AND OBJV.object_id = OBJ.id "
+							+ " AND OBJ.class_id = CL.id "
+							+ " AND AN.class_id = CL.id "
 							+ " AND AN.id IN ("+attributeList+") ");
 			airset = new SLEXMMActivityInstanceResultSet(this, rset);
 		} catch (Exception e) {
@@ -4683,7 +4675,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMAttributeResultSet atrset = null;
 		Statement statement = null;
 		
-		String objectList = buildStringFromArray(objectIds, true);
+		String objectList = buildStringFromArray(objectIds);
 		
 		try {
 			statement = createStatement();
@@ -4713,23 +4705,17 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMAttributeResultSet atrset = null;
 		Statement statement = null;
 		
-		String eventList = buildStringFromArray(eventIds, true);
+		String eventList = buildStringFromArray(eventIds);
 		
 		try {
 			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT AN.* FROM "
 					+METAMODEL_ALIAS+".attribute_name AN, "
-					+METAMODEL_ALIAS+".class CL, "
-					+METAMODEL_ALIAS+".object OBJ, "
-					+METAMODEL_ALIAS+".object_version OBJV, "
-					+METAMODEL_ALIAS+".event_to_object_version ETOV, "
-					+METAMODEL_ALIAS+".event EV "
-							+ " WHERE AN.class_id = CL.id "
-							+ " AND CL.id = OBJ.class_id "
-							+ " AND OBJ.id = OBJV.object_id "
-							+ " AND OBJV.id = ETOV.object_version_id "
-							+ " AND ETOV.event_id = EV.id "
-							+ " AND EV.id IN ("+eventList+") ");
+					+METAMODEL_ALIAS+".attribute_value ATV, "
+					+METAMODEL_ALIAS+".event_to_object_version ETOV "
+							+ " WHERE AN.id = ATV.attribute_name_id "
+							+ " AND ATV.object_version_id = ETOV.object_version_id "
+							+ " AND ETOV.event_id IN ("+eventList+") ");
 			atrset = new SLEXMMAttributeResultSet(this, rset);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -4749,22 +4735,18 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMAttributeResultSet atrset = null;
 		Statement statement = null;
 		
-		String caseList = buildStringFromArray(caseIds, true);
+		String caseList = buildStringFromArray(caseIds);
 		
 		try {
 			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT AN.* FROM "
 					+METAMODEL_ALIAS+".attribute_name AN, "
-					+METAMODEL_ALIAS+".class CL, "
-					+METAMODEL_ALIAS+".object OBJ, "
-					+METAMODEL_ALIAS+".object_version OBJV, "
+					+METAMODEL_ALIAS+".attribute_value ATV, "
 					+METAMODEL_ALIAS+".event_to_object_version ETOV, "
 					+METAMODEL_ALIAS+".event EV, "
 					+METAMODEL_ALIAS+".activity_instance_to_case AITC "
-							+ " WHERE AN.class_id = CL.id "
-							+ " AND CL.id = OBJ.class_id "
-							+ " AND OBJ.id = OBJV.object_id "
-							+ " AND OBJV.id = ETOV.object_version_id "
+							+ " WHERE AN.id = ATV.attribute_name_id "
+							+ " AND ATV.object_version_id = ETOV.object_version_id "
 							+ " AND ETOV.event_id = EV.id "
 							+ " AND EV.activity_instance_id = AITC.activity_instance_id "
 							+ " AND AITC.case_id IN ("+caseList+") ");
@@ -4787,7 +4769,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMAttributeResultSet atrset = null;
 		Statement statement = null;
 		
-		String activityList = buildStringFromArray(activityIds, false);
+		String activityList = buildStringFromArray(activityIds);
 		
 		try {
 			statement = createStatement();
@@ -4825,7 +4807,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMAttributeResultSet atrset = null;
 		Statement statement = null;
 		
-		String classList = buildStringFromArray(classIds, true);
+		String classList = buildStringFromArray(classIds);
 		
 		try {
 			statement = createStatement();
@@ -4855,7 +4837,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMAttributeResultSet atrset = null;
 		Statement statement = null;
 		
-		String relationshipList = buildStringFromArray(relationshipIds, true);
+		String relationshipList = buildStringFromArray(relationshipIds);
 		
 		try {
 			statement = createStatement();
@@ -4887,7 +4869,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMAttributeResultSet atrset = null;
 		Statement statement = null;
 		
-		String objectVersionList = buildStringFromArray(objectVersionIds, true);
+		String objectVersionList = buildStringFromArray(objectVersionIds);
 		
 		try {
 			statement = createStatement();
@@ -4919,7 +4901,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMAttributeResultSet atrset = null;
 		Statement statement = null;
 		
-		String relationList = buildStringFromArray(relationIds, true);
+		String relationList = buildStringFromArray(relationIds);
 		
 		try {
 			statement = createStatement();
@@ -4955,7 +4937,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		SLEXMMAttributeResultSet atrset = null;
 		Statement statement = null;
 		
-		String activityInstanceList = buildStringFromArray(activityInstanceIds, true);
+		String activityInstanceList = buildStringFromArray(activityInstanceIds);
 		
 		try {
 			statement = createStatement();

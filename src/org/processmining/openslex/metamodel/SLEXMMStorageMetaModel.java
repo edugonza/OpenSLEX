@@ -1,7 +1,5 @@
 package org.processmining.openslex.metamodel;
 
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
