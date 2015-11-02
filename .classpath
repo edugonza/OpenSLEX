@@ -2,15 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/sqlite-jdbc-3.8.5-pre1.jar"/>
-	<classpathentry kind="lib" path="lib/openxes-2.0/guava-16.0.1.jar"/>
-	<classpathentry kind="lib" path="lib/openxes-2.0/OpenXES-XStream.jar"/>
-	<classpathentry kind="lib" path="lib/openxes-2.0/OpenXES.jar"/>
-	<classpathentry kind="lib" path="lib/openxes-2.0/Spex.jar"/>
-	<classpathentry kind="lib" path="lib/openxes-2.0/xpp3_min-1.1.4c.jar"/>
-	<classpathentry kind="lib" path="lib/openxes-2.0/xstream-1.3.1.jar"/>
-	<classpathentry kind="lib" path="lib/XESLite-6.5.1/lib/mapdb-1.0.5.jar"/>
-	<classpathentry kind="lib" path="lib/XESLite-6.5.1/lib/snappy-java-1.1.1.6.jar"/>
-	<classpathentry kind="lib" path="lib/XESLite-6.5.1/XESLite.jar"/>
+	<classpathentry kind="con" path="org.apache.ivyde.eclipse.cpcontainer.IVYDE_CONTAINER/?project=OpenSLEX&amp;ivyXmlPath=ivy.xml&amp;confs=*&amp;ivySettingsPath=ivysettings.xml&amp;loadSettingsOnDemand=false&amp;ivyUserDir=&amp;propertyFiles="/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
