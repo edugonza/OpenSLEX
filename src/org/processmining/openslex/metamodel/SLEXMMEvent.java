@@ -4,7 +4,6 @@ import java.util.HashMap;
 
 public class SLEXMMEvent extends SLEXMMAbstractDatabaseObject {
 
-	private int id = -1;
 	private int activityInstanceId = -1;
 	private int order = -1;
 	private HashMap<SLEXMMEventAttribute, SLEXMMEventAttributeValue> attributeValues = null;
@@ -20,16 +19,8 @@ public class SLEXMMEvent extends SLEXMMAbstractDatabaseObject {
 		return (SLEXMMStorageMetaModel) super.storage;
 	}
 	
-	public int getId() {
-		return this.id;
-	}
-	
 	public int getActivityInstanceId() {
 		return this.activityInstanceId;
-	}
-	
-	protected void setId(int id) {
-		this.id = id;
 	}
 	
 	public void setOrder(int order) {

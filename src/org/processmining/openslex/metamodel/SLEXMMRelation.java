@@ -2,7 +2,6 @@ package org.processmining.openslex.metamodel;
 
 public class SLEXMMRelation extends SLEXMMAbstractDatabaseObject {
 
-	private int id = -1;
 	private int sourceObjectVersionId = -1;
 	private int targetObjectVersionId = -1;
 	private int relationshipId = -1;
@@ -15,14 +14,6 @@ public class SLEXMMRelation extends SLEXMMAbstractDatabaseObject {
 	
 	public SLEXMMStorageMetaModel getStorage() {
 		return (SLEXMMStorageMetaModel) super.storage;
-	}
-	
-	public int getId() {
-		return this.id;
-	}
-	
-	protected void setId(int id) {
-		this.id = id;
 	}
 	
 	public int getSourceObjectVersionId() {

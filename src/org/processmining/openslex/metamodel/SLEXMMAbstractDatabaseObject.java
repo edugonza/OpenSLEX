@@ -1,10 +1,11 @@
 package org.processmining.openslex.metamodel;
 
 
-abstract class SLEXMMAbstractDatabaseObject {
+public abstract class SLEXMMAbstractDatabaseObject {
 	protected SLEXMMStorage storage = null;
 	private boolean dirty = true;
 	private boolean inserted = false;
+	private int id = -1;
 	
 	public SLEXMMAbstractDatabaseObject(SLEXMMStorage storage) {
 		this.storage = storage;
@@ -24,6 +25,14 @@ abstract class SLEXMMAbstractDatabaseObject {
 	
 	protected void setDirty(boolean dirty) {
 		this.dirty = dirty;
+	}
+	
+	public int getId() {
+		return this.id;
+	}
+	
+	protected void setId(int id) {
+		this.id = id;
 	}
 	
 	abstract boolean insert(SLEXMMAbstractDatabaseObject dbob);

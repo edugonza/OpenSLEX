@@ -4,7 +4,6 @@ import java.util.List;
 
 public class SLEXMMClass extends SLEXMMAbstractDatabaseObject {
 
-	private int id = -1;
 	private String name = null;
 	private int datamodelId = -1;
 	private List<SLEXMMAttribute> attributes = null;
@@ -24,10 +23,6 @@ public class SLEXMMClass extends SLEXMMAbstractDatabaseObject {
 		return this.name;
 	}
 	
-	public int getId() {
-		return this.id;
-	}
-	
 	public int getDataModelId() {
 		return this.datamodelId;
 	}
@@ -35,10 +30,6 @@ public class SLEXMMClass extends SLEXMMAbstractDatabaseObject {
 	protected void setName(String name) {
 		this.name = name;
 		setDirty(true);
-	}
-	
-	protected void setId(int id) {
-		this.id = id;
 	}
 	
 	protected void setDataModelId(int datamodelId) {

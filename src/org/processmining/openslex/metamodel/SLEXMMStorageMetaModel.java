@@ -178,7 +178,7 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 
 	public abstract SLEXMMRelationResultSet getRelations();
 
-	public abstract Collection<? extends Object> getRelationships();
+	public abstract List<SLEXMMRelationship> getRelationships();
 
 	public abstract SLEXMMActivityInstanceResultSet getActivityInstances();
 	
@@ -509,5 +509,7 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 			int activityInstanceId);
 	public abstract SLEXMMAttributeResultSet getAttributesForActivityInstances(
 			int[] activityInstanceIds);
+
+	public abstract SLEXMMPeriodResultSet getPeriodsForObjects(int[] objectIds);
 	
 }

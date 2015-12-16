@@ -2,7 +2,6 @@ package org.processmining.openslex.metamodel;
 
 public class SLEXMMObject extends SLEXMMAbstractDatabaseObject {
 
-	private int id = -1;
 	private int classId = -1;
 	
 	protected SLEXMMObject(SLEXMMStorageMetaModel storage) {
@@ -13,16 +12,8 @@ public class SLEXMMObject extends SLEXMMAbstractDatabaseObject {
 		return (SLEXMMStorageMetaModel) super.storage;
 	}
 	
-	public int getId() {
-		return this.id;
-	}
-	
 	public int getClassId() {
 		return this.classId;
-	}
-	
-	protected void setId(int id) {
-		this.id = id;
 	}
 	
 	protected void setClassId(int id) {

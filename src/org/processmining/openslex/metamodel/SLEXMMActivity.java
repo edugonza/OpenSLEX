@@ -2,7 +2,6 @@ package org.processmining.openslex.metamodel;
 
 public class SLEXMMActivity extends SLEXMMAbstractDatabaseObject {
 
-	private int id = -1;
 	private String name = null;
 	private int processId = -1;
 	
@@ -20,10 +19,6 @@ public class SLEXMMActivity extends SLEXMMAbstractDatabaseObject {
 		return this.name;
 	}
 	
-	public int getId() {
-		return this.id;
-	}
-	
 	public int getProcessId() {
 		return this.processId;
 	}
@@ -31,10 +26,6 @@ public class SLEXMMActivity extends SLEXMMAbstractDatabaseObject {
 	protected void setName(String name) {
 		this.name = name;
 		setDirty(true);
-	}
-	
-	protected void setId(int id) {
-		this.id = id;
 	}
 	
 	protected void setProcessId(int processId) {

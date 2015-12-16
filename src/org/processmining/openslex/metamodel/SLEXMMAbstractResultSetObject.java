@@ -1,6 +1,7 @@
 package org.processmining.openslex.metamodel;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 abstract class SLEXMMAbstractResultSetObject {
 	
@@ -21,6 +22,21 @@ abstract class SLEXMMAbstractResultSetObject {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public Integer getOriginId() {
+		
+		Integer originId = null;
+		
+		if (this.rset != null) {
+			try {
+				originId = this.rset.getInt("originIdQuery");
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return originId;
 	}
 	
 	@Override

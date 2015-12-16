@@ -3,7 +3,6 @@ package org.processmining.openslex.metamodel;
 
 public class SLEXMMProcess extends SLEXMMAbstractDatabaseObject {
 
-	private int id = -1;
 	private String name = null;
 	
 	public SLEXMMProcess(SLEXMMStorage storage) {
@@ -22,14 +21,6 @@ public class SLEXMMProcess extends SLEXMMAbstractDatabaseObject {
 	@Override
 	boolean update(SLEXMMAbstractDatabaseObject dm) {
 		return getStorage().update((SLEXMMProcess) dm);
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	protected void setId(int id) {
-		this.id = id;
 	}
 
 	public String getName() {

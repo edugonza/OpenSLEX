@@ -4,7 +4,6 @@ import java.util.HashMap;
 
 public class SLEXMMObjectVersion extends SLEXMMAbstractDatabaseObject {
 
-	private int id = -1;
 	private int objectId = -1;
 	private long startTimestamp = -1;
 	private long endTimestamp = -1;
@@ -18,10 +17,6 @@ public class SLEXMMObjectVersion extends SLEXMMAbstractDatabaseObject {
 		return (SLEXMMStorageMetaModel) super.storage;
 	}
 	
-	public int getId() {
-		return this.id;
-	}
-	
 	public int getObjectId() {
 		return this.objectId;
 	}
@@ -32,10 +27,6 @@ public class SLEXMMObjectVersion extends SLEXMMAbstractDatabaseObject {
 	
 	public long getEndTimestamp() {
 		return this.endTimestamp;
-	}
-	
-	protected void setId(int id) {
-		this.id = id;
 	}
 	
 	protected void setObjectId(int id) {
