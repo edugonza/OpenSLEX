@@ -3,18 +3,14 @@ package org.processmining.openslex;
 import java.util.Map.Entry;
 
 import org.deckfour.xes.classification.XEventAttributeClassifier;
-import org.deckfour.xes.extension.XExtension;
-import org.deckfour.xes.extension.XExtensionManager;
 import org.deckfour.xes.extension.std.XConceptExtension;
 import org.deckfour.xes.factory.XFactory;
-import org.deckfour.xes.factory.XFactoryRegistry;
 import org.deckfour.xes.model.XAttributeLiteral;
 import org.deckfour.xes.model.XAttributeMap;
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
-import org.deckfour.xes.model.impl.XAttributeLiteralImpl;
-import org.progressmining.xeslite.external.XFactoryExternalImpl;
+import org.processmining.xeslite.external.XFactoryExternalStore;
 
 public class SLEXExporter {
 	
@@ -24,14 +20,14 @@ public class SLEXExporter {
 		try {
 			SLEXStorageCollection storageEvCol = new SLEXStorageImpl(storage.getPath(),p.getCollectionFileName(),SLEXStorage.TYPE_COLLECTION);
 			//XFactory xfactory = XFactoryRegistry.instance().currentDefault();
-			XFactory xfactory = new XFactoryExternalImpl.MapDBDiskImpl();
+			XFactory xfactory = new XFactoryExternalStore.MapDBDiskImpl();
 			xlog = xfactory.createLog();
 		
 			SLEXAttribute table_nameAttr = storageEvCol.findAttribute("COMMON", "TABLE_NAME");
 			SLEXAttribute operationAttr = storageEvCol.findAttribute("COMMON", "OPERATION");
 			SLEXAttribute column_changesAttr = storageEvCol.findAttribute("COMMON", "COLUMN_CHANGES");
-			String[] classifier1Keys = new String[] {table_nameAttr.toString(),operationAttr.toString(),column_changesAttr.toString()};
-			String[] classifier2Keys = new String[] {table_nameAttr.toString(),operationAttr.toString()};
+			String[] classifier1Keys = new String[] {"_"+table_nameAttr.toString().replace(':','_'),"_"+operationAttr.toString().replace(':','_'),"_"+column_changesAttr.toString().replace(':','_')};
+			String[] classifier2Keys = new String[] {"_"+table_nameAttr.toString().replace(':','_'),"_"+operationAttr.toString().replace(':','_')};
 			xlog.getClassifiers().add(new XEventAttributeClassifier("Activity with changes vector", classifier1Keys));
 			xlog.getClassifiers().add(new XEventAttributeClassifier("Activity without changes vector", classifier2Keys));
 		
@@ -56,10 +52,16 @@ public class SLEXExporter {
 					XAttributeMap eAttrMap = xfactory.createAttributeMap();
 					XEvent xe = xfactory.createEvent();
 					XAttributeLiteral eidAttr = xfactory.createAttributeLiteral("Id", String.valueOf(e.getId()), null);
+//					if (timestampAttr != null) {
+//						XAttributeTimestamp etsAttr = xfactory.createAttributeTimestamp("time:timestamp", , null);
+//						eAttrMap.put("time:timestamp", etsAttr);
+//					}
 					eAttrMap.put("Id", eidAttr);
+					
 				
 					for (Entry<SLEXAttribute,SLEXAttributeValue> entry: e.getAttributeValues().entrySet()) {
-						String keyStr = entry.getKey().toString();
+						String keyStr = "_"+entry.getKey().toString().replace(':','_');
+						
 						String valStr = entry.getValue().getValue();
 						if (keyStr == null) {
 							keyStr = "";
@@ -67,7 +69,7 @@ public class SLEXExporter {
 						if (valStr == null) {
 							valStr = "";
 						}
-						eAttrMap.put(entry.getKey().toString(), xfactory.createAttributeLiteral(keyStr, valStr, null));
+						eAttrMap.put(keyStr, xfactory.createAttributeLiteral(keyStr, valStr, null));
 					}
 					xe.setAttributes(eAttrMap);
 					xt.add(xe);

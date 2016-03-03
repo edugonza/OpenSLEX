@@ -14,9 +14,9 @@ public class SLEXMMActivityResultSet extends SLEXMMAbstractResultSetObject {
 			if (this.rset != null && this.rset.next()) {
 				
 				int id = this.rset.getInt("id");
-				int processId = this.rset.getInt("process_id");
+				//int processId = this.rset.getInt("process_id");
 				String name = this.rset.getString("name");
-				ac = new SLEXMMActivity((SLEXMMStorageMetaModel) storage, name, processId);
+				ac = new SLEXMMActivity((SLEXMMStorageMetaModel) storage, name/*, processId*/);
 				ac.setId(id);
 				ac.setDirty(false);
 				ac.setInserted(true);

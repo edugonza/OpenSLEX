@@ -1,6 +1,5 @@
 package org.processmining.openslex.metamodel;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -215,6 +214,12 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	public abstract SLEXMMObjectResultSet getObjectsForAttribute(int attributeId);
 	public abstract SLEXMMObjectResultSet getObjectsForAttributes(int[] attributeIds);
 
+	public abstract SLEXMMCaseResultSet getCasesForLog(int logId);
+	public abstract SLEXMMCaseResultSet getCasesForLogs(int[] logIds);
+	
+	public abstract SLEXMMCaseResultSet getCasesForProcess(int processId);
+	public abstract SLEXMMCaseResultSet getCasesForProcess(int[] processIds);
+	
 	public abstract SLEXMMCaseResultSet getCasesForObject(int objectId);
 	public abstract SLEXMMCaseResultSet getCasesForObjects(int[] objectIds);
 
@@ -511,5 +516,13 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 			int[] activityInstanceIds);
 
 	public abstract SLEXMMPeriodResultSet getPeriodsForObjects(int[] objectIds);
+	
+	public abstract boolean insert(SLEXMMLog log);
+
+	public abstract boolean update(SLEXMMLog log);
+	
+	public abstract boolean addCaseToLog(int logId, int caseId);
+	
+	public abstract boolean addActivityToProcess(int processId, int actId);
 	
 }

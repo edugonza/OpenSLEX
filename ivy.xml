@@ -21,7 +21,7 @@
     <info
         organisation="db-process-mining"
         module="OpenSLEX"
-        revision="0.4">
+        revision="0.5">
     </info>
 	<dependencies>
 		<dependency org="org.xerial" name="sqlite-jdbc" rev="3.8.11.2"/>

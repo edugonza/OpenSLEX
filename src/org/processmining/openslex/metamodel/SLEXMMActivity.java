@@ -3,12 +3,12 @@ package org.processmining.openslex.metamodel;
 public class SLEXMMActivity extends SLEXMMAbstractDatabaseObject {
 
 	private String name = null;
-	private int processId = -1;
+	//private int processId = -1;
 	
-	protected SLEXMMActivity(SLEXMMStorageMetaModel storage, String name, int processId) {
+	protected SLEXMMActivity(SLEXMMStorageMetaModel storage, String name/*, int processId*/) {
 		super(storage);
 		this.name = name;
-		this.processId = processId;
+		//this.processId = processId;
 	}
 	
 	public SLEXMMStorageMetaModel getStorage() {
@@ -19,19 +19,19 @@ public class SLEXMMActivity extends SLEXMMAbstractDatabaseObject {
 		return this.name;
 	}
 	
-	public int getProcessId() {
-		return this.processId;
-	}
+//	public int getProcessId() {
+//		return this.processId;
+//	}
 	
 	protected void setName(String name) {
 		this.name = name;
 		setDirty(true);
 	}
 	
-	protected void setProcessId(int processId) {
-		this.processId = processId;
-		setDirty(true);
-	}
+//	protected void setProcessId(int processId) {
+//		this.processId = processId;
+//		setDirty(true);
+//	}
 	
 	@Override
 	boolean insert(SLEXMMAbstractDatabaseObject cl) {

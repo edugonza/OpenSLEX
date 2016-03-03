@@ -13,6 +13,14 @@ public class SLEXMMProcess extends SLEXMMAbstractDatabaseObject {
 		return (SLEXMMStorageMetaModel) super.storage;
 	}
 	
+	public boolean add(SLEXMMActivity ac) {
+		return getStorage().addActivityToProcess(this.getId(),ac.getId());
+	}
+	
+	public boolean add(int activityId) {
+		return getStorage().addActivityToProcess(this.getId(),activityId);
+	}
+	
 	@Override
 	boolean insert(SLEXMMAbstractDatabaseObject dm) {
 		return getStorage().insert((SLEXMMProcess) dm);
