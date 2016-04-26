@@ -5,25 +5,25 @@ package org.processmining.openslex.metamodel;
 
 // TODO: Auto-generated Javadoc
 /**
- * The Class SLEXMMAttribute.
+ * The Class SLEXMMClassifierAttribute.
  *
  * @author <a href="mailto:e.gonzalez@tue.nl">Eduardo Gonzalez Lopez de Murillas</a>
  * @see <a href="https://www.win.tue.nl/~egonzale/projects/openslex/" target="_blank">OpenSLEX</a>
  */
-public class SLEXMMAttribute extends SLEXMMAbstractDatabaseObject {
+public class SLEXMMClassifierAttribute extends SLEXMMAbstractDatabaseObject {
 
-	/** The name. */
-	private String name = null;
+	/** The classifier id. */
+	private int classifier_id = -1;
 	
-	/** The class id. */
-	private int classId = -1;
+	/** The event attribute name id. */
+	private int event_attribute_name_id = -1;
 	
 	/**
-	 * Instantiates a new SLEXMM attribute.
+	 * Instantiates a new SLEXMM classifier attribute.
 	 *
 	 * @param storage the storage
 	 */
-	protected SLEXMMAttribute(SLEXMMStorageMetaModel storage) {
+	protected SLEXMMClassifierAttribute(SLEXMMStorageMetaModel storage) {
 		super(storage);
 	}
 	
@@ -37,40 +37,40 @@ public class SLEXMMAttribute extends SLEXMMAbstractDatabaseObject {
 	}
 	
 	/**
-	 * Gets the class id.
+	 * Gets the classifier id.
 	 *
-	 * @return the class id
+	 * @return the classifier id
 	 */
-	public int getClassId() {
-		return this.classId;
+	public int getClassifierId() {
+		return this.classifier_id;
 	}
 	
 	/**
-	 * Gets the name.
+	 * Sets the classifier id.
 	 *
-	 * @return the name
+	 * @param id the new classifier id
 	 */
-	public String getName() {
-		return this.name;
-	}
-	
-	/**
-	 * Sets the class id.
-	 *
-	 * @param id the new class id
-	 */
-	protected void setClassId(int id) {
-		this.classId = id;
+	protected void setClassifierId(int id) {
+		this.classifier_id = id;
 		setDirty(true);
 	}
 	
 	/**
-	 * Sets the name.
+	 * Gets the event attribute name id.
 	 *
-	 * @param name the new name
+	 * @return the event attribute name id
 	 */
-	protected void setName(String name) {
-		this.name = name;
+	public int getEventAttributeNameId() {
+		return this.event_attribute_name_id;
+	}
+	
+	/**
+	 * Sets the event attribute name id.
+	 *
+	 * @param id the new event attribute name id
+	 */
+	protected void setEventAttributeNameId(int id) {
+		this.event_attribute_name_id = id;
 		setDirty(true);
 	}
 	
@@ -79,7 +79,7 @@ public class SLEXMMAttribute extends SLEXMMAbstractDatabaseObject {
 	 */
 	@Override
 	boolean insert(SLEXMMAbstractDatabaseObject at) {
-		return getStorage().insert((SLEXMMAttribute) at);
+		return getStorage().insert((SLEXMMClassifierAttribute) at);
 	}
 
 	/* (non-Javadoc)
@@ -87,7 +87,7 @@ public class SLEXMMAttribute extends SLEXMMAbstractDatabaseObject {
 	 */
 	@Override
 	boolean update(SLEXMMAbstractDatabaseObject at) {
-		return getStorage().update((SLEXMMAttribute) at);
+		return getStorage().update((SLEXMMClassifierAttribute) at);
 	}
 
 	/* (non-Javadoc)
@@ -95,7 +95,6 @@ public class SLEXMMAttribute extends SLEXMMAbstractDatabaseObject {
 	 */
 	@Override
 	public int hashCode() {
-		return ("attribute#"+getId()).hashCode();
+		return ("classifier_attribute#"+getId()).hashCode();
 	}
-	
 }

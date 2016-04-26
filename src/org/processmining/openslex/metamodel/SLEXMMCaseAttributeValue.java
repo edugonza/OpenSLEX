@@ -5,18 +5,18 @@ package org.processmining.openslex.metamodel;
 
 // TODO: Auto-generated Javadoc
 /**
- * The Class SLEXMMAttributeValue.
+ * The Class SLEXMMCaseAttributeValue.
  *
  * @author <a href="mailto:e.gonzalez@tue.nl">Eduardo Gonzalez Lopez de Murillas</a>
  * @see <a href="https://www.win.tue.nl/~egonzale/projects/openslex/" target="_blank">OpenSLEX</a>
  */
-public class SLEXMMAttributeValue extends SLEXMMAbstractDatabaseObject {
+public class SLEXMMCaseAttributeValue extends SLEXMMAbstractDatabaseObject {
 
 	/** The attribute id. */
 	private int attributeId = -1;
 	
-	/** The object version id. */
-	private int objectVersionId = -1;
+	/** The case id. */
+	private int caseId = -1;
 	
 	/** The value. */
 	private String value = null;
@@ -25,16 +25,16 @@ public class SLEXMMAttributeValue extends SLEXMMAbstractDatabaseObject {
 	private String type = null;
 	
 	/**
-	 * Instantiates a new SLEXMM attribute value.
+	 * Instantiates a new SLEXMM case attribute value.
 	 *
 	 * @param storage the storage
 	 * @param attributeId the attribute id
-	 * @param objectVersionId the object version id
+	 * @param caseId the case id
 	 */
-	protected SLEXMMAttributeValue(SLEXMMStorageMetaModel storage,int attributeId, int objectVersionId) {
+	protected SLEXMMCaseAttributeValue(SLEXMMStorageMetaModel storage,int attributeId, int caseId) {
 		super(storage);
 		this.attributeId = attributeId;
-		this.objectVersionId = objectVersionId;
+		this.caseId = caseId;
 	}
 	
 	/**
@@ -47,12 +47,12 @@ public class SLEXMMAttributeValue extends SLEXMMAbstractDatabaseObject {
 	}
 	
 	/**
-	 * Gets the object version id.
+	 * Gets the case id.
 	 *
-	 * @return the object version id
+	 * @return the case id
 	 */
-	public int getObjectVersionId() {
-		return this.objectVersionId;
+	public int getCaseId() {
+		return this.caseId;
 	}
 	
 	/**
@@ -102,12 +102,13 @@ public class SLEXMMAttributeValue extends SLEXMMAbstractDatabaseObject {
 		setDirty(true);
 	}
 	
+	
 	/* (non-Javadoc)
 	 * @see org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject#insert(org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject)
 	 */
 	@Override
 	boolean insert(SLEXMMAbstractDatabaseObject at) {
-		return getStorage().insert((SLEXMMAttributeValue) at);
+		return getStorage().insert((SLEXMMCaseAttributeValue) at);
 	}
 
 	/* (non-Javadoc)
@@ -115,15 +116,14 @@ public class SLEXMMAttributeValue extends SLEXMMAbstractDatabaseObject {
 	 */
 	@Override
 	boolean update(SLEXMMAbstractDatabaseObject at) {
-		return getStorage().update((SLEXMMAttributeValue) at);
+		return getStorage().update((SLEXMMCaseAttributeValue) at);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
 	public int hashCode() {
-		return ("attribute_value#"+getId()).hashCode();
+		return ("case_attribute_value#"+getId()).hashCode();
 	}
-
 }

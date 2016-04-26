@@ -1,16 +1,39 @@
+/*
+ * 
+ */
 package org.processmining.openslex.metamodel;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class SLEXMMSQLResultSet.
+ *
+ * @author <a href="mailto:e.gonzalez@tue.nl">Eduardo Gonzalez Lopez de Murillas</a>
+ * @see <a href="https://www.win.tue.nl/~egonzale/projects/openslex/" target="_blank">OpenSLEX</a>
+ */
 public class SLEXMMSQLResultSet extends SLEXMMAbstractResultSetObject {
 	
+	/** The metadata. */
 	private ResultSetMetaData metadata = null;
+	
+	/** The num columns. */
 	private int numColumns = 0;
+	
+	/** The column names. */
 	private String[] columnNames = null;
+	
+	/** The row count. */
 	private int rowCount = 0;
 	
+	/**
+	 * Instantiates a new SLEXMMSQL result set.
+	 *
+	 * @param storage the storage
+	 * @param rset the rset
+	 */
 	protected SLEXMMSQLResultSet(SLEXMMStorageMetaModel storage, ResultSet rset) {
 		super(storage, rset);
 		
@@ -33,14 +56,29 @@ public class SLEXMMSQLResultSet extends SLEXMMAbstractResultSetObject {
 		}
 	}
 	
+	/**
+	 * Gets the column names.
+	 *
+	 * @return the column names
+	 */
 	public String[] getColumnNames() {
 		return this.columnNames;
 	}
 	
+	/**
+	 * Gets the row count.
+	 *
+	 * @return the row count
+	 */
 	public int getRowCount() {
 		return this.rowCount;
 	}
 	
+	/**
+	 * Gets the next.
+	 *
+	 * @return the next
+	 */
 	public SLEXMMSQLResult getNext() {
 		SLEXMMSQLResult r = null;
 		try {

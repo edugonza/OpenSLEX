@@ -1,3 +1,6 @@
+/*
+ * 
+ */
 package org.processmining.openslex;
 
 import java.util.Map.Entry;
@@ -12,8 +15,21 @@ import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
 import org.processmining.xeslite.external.XFactoryExternalStore;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class SLEXExporter.
+ *
+ * @author <a href="mailto:e.gonzalez@tue.nl">Eduardo Gonzalez Lopez de Murillas</a>
+ * @see <a href="https://www.win.tue.nl/~egonzale/projects/openslex/" target="_blank">OpenSLEX</a>
+ */
 public class SLEXExporter {
 	
+	/**
+	 * Export perspective to x log.
+	 *
+	 * @param p the p
+	 * @return the x log
+	 */
 	public static XLog exportPerspectiveToXLog(SLEXPerspective p) {
 		XLog xlog = null;
 		SLEXStoragePerspective storage = p.getStorage();

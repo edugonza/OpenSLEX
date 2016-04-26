@@ -3,27 +3,37 @@
  */
 package org.processmining.openslex.metamodel;
 
+import java.util.List;
+
 // TODO: Auto-generated Javadoc
 /**
- * The Class SLEXMMActivity.
+ * The Class SLEXMMClassifier.
  *
  * @author <a href="mailto:e.gonzalez@tue.nl">Eduardo Gonzalez Lopez de Murillas</a>
  * @see <a href="https://www.win.tue.nl/~egonzale/projects/openslex/" target="_blank">OpenSLEX</a>
  */
-public class SLEXMMActivity extends SLEXMMAbstractDatabaseObject {
+public class SLEXMMClassifier extends SLEXMMAbstractDatabaseObject {
 
 	/** The name. */
 	private String name = null;
 	
+	/** The log id. */
+	private int logId = -1;
+	
+	/** The attributes. */
+	private List<SLEXMMClassifierAttribute> attributes = null;
+	
 	/**
-	 * Instantiates a new SLEXMM activity.
+	 * Instantiates a new SLEXMM classifier.
 	 *
 	 * @param storage the storage
 	 * @param name the name
+	 * @param logId the log id
 	 */
-	protected SLEXMMActivity(SLEXMMStorageMetaModel storage, String name) {
+	protected SLEXMMClassifier(SLEXMMStorageMetaModel storage, String name, int logId) {
 		super(storage);
 		this.name = name;
+		this.logId = logId;
 	}
 	
 	/**
@@ -45,6 +55,15 @@ public class SLEXMMActivity extends SLEXMMAbstractDatabaseObject {
 	}
 	
 	/**
+	 * Gets the log id.
+	 *
+	 * @return the log id
+	 */
+	public int getLogId() {
+		return this.logId;
+	}
+	
+	/**
 	 * Sets the name.
 	 *
 	 * @param name the new name
@@ -54,13 +73,42 @@ public class SLEXMMActivity extends SLEXMMAbstractDatabaseObject {
 		setDirty(true);
 	}
 	
-
+	/**
+	 * Sets the log id.
+	 *
+	 * @param logId the new log id
+	 */
+	protected void setLogId(int logId) {
+		this.logId = logId;
+		setDirty(true);
+	}
+	
+	/**
+	 * Retrieve attributes.
+	 */
+	protected void retrieveAttributes() {		
+		this.attributes = getStorage().getListAttributesForClassifier(this);
+	}
+	
+	/**
+	 * Gets the attributes.
+	 *
+	 * @return the attributes
+	 */
+	public List<SLEXMMClassifierAttribute> getAttributes() {
+		if (this.attributes == null) {
+			retrieveAttributes();
+		}
+		
+		return this.attributes;
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject#insert(org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject)
 	 */
 	@Override
 	boolean insert(SLEXMMAbstractDatabaseObject cl) {
-		return getStorage().insert((SLEXMMActivity) cl);
+		return getStorage().insert((SLEXMMClassifier) cl);
 	}
 
 	/* (non-Javadoc)
@@ -68,7 +116,7 @@ public class SLEXMMActivity extends SLEXMMAbstractDatabaseObject {
 	 */
 	@Override
 	boolean update(SLEXMMAbstractDatabaseObject cl) {
-		return getStorage().update((SLEXMMActivity) cl);
+		return getStorage().update((SLEXMMClassifier) cl);
 	}
 
 	/* (non-Javadoc)
@@ -76,7 +124,6 @@ public class SLEXMMActivity extends SLEXMMAbstractDatabaseObject {
 	 */
 	@Override
 	public int hashCode() {
-		return ("activity#"+getId()).hashCode();
+		return ("classifier#"+getId()).hashCode();
 	}
-	
 }
