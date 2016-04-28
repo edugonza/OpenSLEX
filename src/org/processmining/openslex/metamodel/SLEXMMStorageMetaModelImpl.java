@@ -6457,7 +6457,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		try {
 			statement = createStatement();
-			ResultSet rset = statement.executeQuery("SELECT DISTINCT * FROM "
+			ResultSet rset = statement.executeQuery("SELECT DISTINCT process_id as originIdQuery, * FROM "
 					+METAMODEL_ALIAS+".log "
 					+" WHERE process_id = '"+id+"'");
 			lrset = new SLEXMMLogResultSet(this, rset);
@@ -6475,7 +6475,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		try {
 			statement = createStatement();
-			ResultSet rset = statement.executeQuery("SELECT DISTINCT A.* FROM "
+			ResultSet rset = statement.executeQuery("SELECT DISTINCT ATP.process_id as originIdQuery, A.* FROM "
 					+METAMODEL_ALIAS+".activity as A, "
 					+METAMODEL_ALIAS+".activity_to_process as ATP "
 					+" WHERE A.id = ATP.activity_id "
@@ -6521,6 +6521,563 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		}
 		
 		return prset; 
+	}
+
+	@Override
+	public SLEXMMObjectResultSet getObjectsForDatamodels(int[] is) {
+		SLEXMMObjectResultSet prset = null;
+		Statement statement = null;
+		
+		String idsList = buildStringFromArray(is);
+		
+		try {
+			statement = createStatement();
+			ResultSet rset = statement.executeQuery("SELECT DISTINCT CL.datamodel_id as originIdQuery, OBJ.* FROM "
+					+METAMODEL_ALIAS+".object AS OBJ, "
+					+METAMODEL_ALIAS+".class AS CL "
+					+" WHERE CL.id = OBJ.class_id "
+					+" AND CL.datamodel_id IN ("+idsList+")");
+			prset = new SLEXMMObjectResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return prset;
+	}
+
+	@Override
+	public SLEXMMObjectResultSet getObjectsForLogs(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMObjectResultSet getObjectsForProcesses(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMCaseResultSet getCasesForDatamodels(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMCaseResultSet getCasesForProcesses(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMEventResultSet getEventsForDatamodels(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMEventResultSet getEventsForLogs(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMEventResultSet getEventsForProcesses(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMObjectVersionResultSet getVersionsForDatamodels(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMObjectVersionResultSet getVersionsForLogs(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMObjectVersionResultSet getVersionsForProcesses(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMActivityResultSet getActivitiesForDatamodels(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMActivityResultSet getActivitiesForLogs(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMActivityResultSet getActivitiesForProcesses(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMClassResultSet getClassesForDatamodels(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMClassResultSet getClassesForLogs(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMClassResultSet getClassesForProcesses(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMRelationResultSet getRelationsForDatamodels(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMRelationResultSet getRelationsForLogs(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMRelationResultSet getRelationsForProcesses(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMRelationshipResultSet getRelationshipsForDatamodels(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMRelationshipResultSet getRelationshipsForLogs(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMRelationshipResultSet getRelationshipsForProcesses(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMActivityInstanceResultSet getActivityInstancesForDatamodels(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMActivityInstanceResultSet getActivityInstancesForLogs(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMActivityInstanceResultSet getActivityInstancesForProcesses(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMAttributeResultSet getAttributesForDatamodels(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMAttributeResultSet getAttributesForLogs(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMAttributeResultSet getAttributesForProcesses(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMDataModelResultSet getDatamodelsForObjects(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMDataModelResultSet getDatamodelsForEvents(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMDataModelResultSet getDatamodelsForCases(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMDataModelResultSet getDatamodelsForActivities(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMDataModelResultSet getDatamodelsForClasses(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMDataModelResultSet getDatamodelsForRelationships(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMDataModelResultSet getDatamodelsForObjectVersions(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMDataModelResultSet getDatamodelsForRelations(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMDataModelResultSet getDatamodelsForActivityInstances(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMDataModelResultSet getDatamodelsForAttributes(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMDataModelResultSet getDatamodelsForLogs(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMDataModelResultSet getDatamodelsForProcesses(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMProcessResultSet getProcessesForObjects(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMProcessResultSet getProcessesForEvents(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMProcessResultSet getProcessesForCases(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMProcessResultSet getProcessesForActivities(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMProcessResultSet getProcessesForClasses(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMProcessResultSet getProcessesForRelationships(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMProcessResultSet getProcessesForObjectVersions(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMProcessResultSet getProcessesForRelations(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMProcessResultSet getProcessesForActivityInstances(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMProcessResultSet getProcessesForAttributes(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMProcessResultSet getProcessesForDatamodels(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMProcessResultSet getProcessesForLogs(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMLogResultSet getLogsForObjects(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMLogResultSet getLogsForEvents(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMLogResultSet getLogsForCases(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMLogResultSet getLogsForActivities(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMLogResultSet getLogsForClasses(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMLogResultSet getLogsForRelationships(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMLogResultSet getLogsForObjectVersions(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMLogResultSet getLogsForRelations(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMLogResultSet getLogsForActivityInstances(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMLogResultSet getLogsForAttributes(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMLogResultSet getLogsForDatamodels(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMLogResultSet getLogsForProcesses(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMObjectResultSet getObjectsForPeriods(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMCaseResultSet getCasesForPeriods(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMEventResultSet getEventsForPeriods(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMObjectVersionResultSet getVersionsForPeriods(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMActivityResultSet getActivitiesForPeriods(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMClassResultSet getClassesForPeriods(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMRelationResultSet getRelationsForPeriods(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMRelationshipResultSet getRelationshipsForPeriods(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMActivityInstanceResultSet getActivityInstancesForPeriods(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMAttributeResultSet getAttributesForPeriods(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMDataModelResultSet getDatamodelsForPeriods(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMProcessResultSet getProcessesForPeriods(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMLogResultSet getLogsForPeriods(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMPeriodResultSet getPeriodsForEvents(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMPeriodResultSet getPeriodsForCases(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMPeriodResultSet getPeriodsForActivities(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMPeriodResultSet getPeriodsForClasses(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMPeriodResultSet getPeriodsForRelationships(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMPeriodResultSet getPeriodsForVersions(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMPeriodResultSet getPeriodsForRelations(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMPeriodResultSet getPeriodsForActivityInstances(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMPeriodResultSet getPeriodsForAttributes(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMPeriodResultSet getPeriodsForDatamodels(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMPeriodResultSet getPeriodsForLogs(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SLEXMMPeriodResultSet getPeriodsForProcesses(int[] is) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }

@@ -2343,5 +2343,185 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	public abstract SLEXMMLogResultSet getLogs();
 	
 	public abstract SLEXMMProcessResultSet getProcesses();
+
+	public abstract SLEXMMObjectResultSet getObjectsForDatamodels(int[] is);
+
+	public abstract SLEXMMObjectResultSet getObjectsForLogs(int[] is);
+
+	public abstract SLEXMMObjectResultSet getObjectsForProcesses(int[] is);
+
+	public abstract SLEXMMCaseResultSet getCasesForDatamodels(int[] is);
+
+	public abstract SLEXMMCaseResultSet getCasesForProcesses(int[] is);
+
+	public abstract SLEXMMEventResultSet getEventsForDatamodels(int[] is);
+
+	public abstract SLEXMMEventResultSet getEventsForLogs(int[] is);
+
+	public abstract SLEXMMEventResultSet getEventsForProcesses(int[] is);
+
+	public abstract SLEXMMObjectVersionResultSet getVersionsForDatamodels(int[] is);
+
+	public abstract SLEXMMObjectVersionResultSet getVersionsForLogs(int[] is);
+
+	public abstract SLEXMMObjectVersionResultSet getVersionsForProcesses(int[] is);
+
+	public abstract SLEXMMActivityResultSet getActivitiesForDatamodels(int[] is);
+
+	public abstract SLEXMMActivityResultSet getActivitiesForLogs(int[] is);
+
+	public abstract SLEXMMActivityResultSet getActivitiesForProcesses(int[] is);
+
+	public abstract SLEXMMClassResultSet getClassesForDatamodels(int[] is);
+
+	public abstract SLEXMMClassResultSet getClassesForLogs(int[] is);
+
+	public abstract SLEXMMClassResultSet getClassesForProcesses(int[] is);
+
+	public abstract SLEXMMRelationResultSet getRelationsForDatamodels(int[] is);
+
+	public abstract SLEXMMRelationResultSet getRelationsForLogs(int[] is);
+
+	public abstract SLEXMMRelationResultSet getRelationsForProcesses(int[] is);
+
+	public abstract SLEXMMRelationshipResultSet getRelationshipsForDatamodels(int[] is);
+
+	public abstract SLEXMMRelationshipResultSet getRelationshipsForLogs(int[] is);
+
+	public abstract SLEXMMRelationshipResultSet getRelationshipsForProcesses(int[] is);
+
+	public abstract SLEXMMActivityInstanceResultSet getActivityInstancesForDatamodels(int[] is);
+
+	public abstract SLEXMMActivityInstanceResultSet getActivityInstancesForLogs(int[] is);
+
+	public abstract SLEXMMActivityInstanceResultSet getActivityInstancesForProcesses(int[] is);
+
+	public abstract SLEXMMAttributeResultSet getAttributesForDatamodels(int[] is);
+
+	public abstract SLEXMMAttributeResultSet getAttributesForLogs(int[] is);
+
+	public abstract SLEXMMAttributeResultSet getAttributesForProcesses(int[] is);
+
+	public abstract SLEXMMDataModelResultSet getDatamodelsForObjects(int[] is);
+
+	public abstract SLEXMMDataModelResultSet getDatamodelsForEvents(int[] is);
+
+	public abstract SLEXMMDataModelResultSet getDatamodelsForCases(int[] is);
+
+	public abstract SLEXMMDataModelResultSet getDatamodelsForActivities(int[] is);
+
+	public abstract SLEXMMDataModelResultSet getDatamodelsForClasses(int[] is);
+
+	public abstract SLEXMMDataModelResultSet getDatamodelsForRelationships(int[] is);
+
+	public abstract SLEXMMDataModelResultSet getDatamodelsForObjectVersions(int[] is);
+
+	public abstract SLEXMMDataModelResultSet getDatamodelsForRelations(int[] is);
+
+	public abstract SLEXMMDataModelResultSet getDatamodelsForActivityInstances(int[] is);
+
+	public abstract SLEXMMDataModelResultSet getDatamodelsForAttributes(int[] is);
+
+	public abstract SLEXMMDataModelResultSet getDatamodelsForLogs(int[] is);
+
+	public abstract SLEXMMDataModelResultSet getDatamodelsForProcesses(int[] is);
+
+	public abstract SLEXMMProcessResultSet getProcessesForObjects(int[] is);
+
+	public abstract SLEXMMProcessResultSet getProcessesForEvents(int[] is);
+
+	public abstract SLEXMMProcessResultSet getProcessesForCases(int[] is);
+
+	public abstract SLEXMMProcessResultSet getProcessesForActivities(int[] is);
+
+	public abstract SLEXMMProcessResultSet getProcessesForClasses(int[] is);
+
+	public abstract SLEXMMProcessResultSet getProcessesForRelationships(int[] is);
+
+	public abstract SLEXMMProcessResultSet getProcessesForObjectVersions(int[] is);
+
+	public abstract SLEXMMProcessResultSet getProcessesForRelations(int[] is);
+
+	public abstract SLEXMMProcessResultSet getProcessesForActivityInstances(int[] is);
+
+	public abstract SLEXMMProcessResultSet getProcessesForAttributes(int[] is);
+
+	public abstract SLEXMMProcessResultSet getProcessesForDatamodels(int[] is);
+
+	public abstract SLEXMMProcessResultSet getProcessesForLogs(int[] is);
+
+	public abstract SLEXMMLogResultSet getLogsForObjects(int[] is);
+
+	public abstract SLEXMMLogResultSet getLogsForEvents(int[] is);
+
+	public abstract SLEXMMLogResultSet getLogsForCases(int[] is);
+
+	public abstract SLEXMMLogResultSet getLogsForActivities(int[] is);
+
+	public abstract SLEXMMLogResultSet getLogsForClasses(int[] is);
+
+	public abstract SLEXMMLogResultSet getLogsForRelationships(int[] is);
+
+	public abstract SLEXMMLogResultSet getLogsForObjectVersions(int[] is);
+
+	public abstract SLEXMMLogResultSet getLogsForRelations(int[] is);
+
+	public abstract SLEXMMLogResultSet getLogsForActivityInstances(int[] is);
+
+	public abstract SLEXMMLogResultSet getLogsForAttributes(int[] is);
+
+	public abstract SLEXMMLogResultSet getLogsForDatamodels(int[] is);
+
+	public abstract SLEXMMLogResultSet getLogsForProcesses(int[] is);
+
+	public abstract SLEXMMObjectResultSet getObjectsForPeriods(int[] is);
+
+	public abstract SLEXMMCaseResultSet getCasesForPeriods(int[] is);
+
+	public abstract SLEXMMEventResultSet getEventsForPeriods(int[] is);
+
+	public abstract SLEXMMObjectVersionResultSet getVersionsForPeriods(int[] is);
+
+	public abstract SLEXMMActivityResultSet getActivitiesForPeriods(int[] is);
+
+	public abstract SLEXMMClassResultSet getClassesForPeriods(int[] is);
+
+	public abstract SLEXMMRelationResultSet getRelationsForPeriods(int[] is);
+
+	public abstract SLEXMMRelationshipResultSet getRelationshipsForPeriods(int[] is);
+
+	public abstract SLEXMMActivityInstanceResultSet getActivityInstancesForPeriods(int[] is);
+
+	public abstract SLEXMMAttributeResultSet getAttributesForPeriods(int[] is);
+
+	public abstract SLEXMMDataModelResultSet getDatamodelsForPeriods(int[] is);
+
+	public abstract SLEXMMProcessResultSet getProcessesForPeriods(int[] is);
+
+	public abstract SLEXMMLogResultSet getLogsForPeriods(int[] is);
+
+	public abstract SLEXMMPeriodResultSet getPeriodsForEvents(int[] is);
+
+	public abstract SLEXMMPeriodResultSet getPeriodsForCases(int[] is);
+
+	public abstract SLEXMMPeriodResultSet getPeriodsForActivities(int[] is);
+
+	public abstract SLEXMMPeriodResultSet getPeriodsForClasses(int[] is);
+
+	public abstract SLEXMMPeriodResultSet getPeriodsForRelationships(int[] is);
+
+	public abstract SLEXMMPeriodResultSet getPeriodsForVersions(int[] is);
+
+	public abstract SLEXMMPeriodResultSet getPeriodsForRelations(int[] is);
+
+	public abstract SLEXMMPeriodResultSet getPeriodsForActivityInstances(int[] is);
+
+	public abstract SLEXMMPeriodResultSet getPeriodsForAttributes(int[] is);
+
+	public abstract SLEXMMPeriodResultSet getPeriodsForDatamodels(int[] is);
+
+	public abstract SLEXMMPeriodResultSet getPeriodsForLogs(int[] is);
+
+	public abstract SLEXMMPeriodResultSet getPeriodsForProcesses(int[] is);
 	
 }
