@@ -1092,7 +1092,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		try {
 			statement = createStatement();
 			statement.setQueryTimeout(30);
-			statement.execute("INSERT INTO "+METAMODEL_ALIAS+".case (name) VALUES ('"+t.getName()+"')");
+			statement.execute("INSERT INTO "+METAMODEL_ALIAS+".'case' (name) VALUES ('"+t.getName()+"')");
 			t.setId(getLastInsertedRowId(statement));
 			result = true;
 		} catch (Exception e) {
@@ -1115,7 +1115,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		try {
 			statement = createStatement();
 			statement.setQueryTimeout(30);
-			statement.execute("UPDATE "+METAMODEL_ALIAS+".case SET name = '"+t.getName()+"' WHERE id = '"+t.getId()+"'");
+			statement.execute("UPDATE "+METAMODEL_ALIAS+".'case' SET name = '"+t.getName()+"' WHERE id = '"+t.getId()+"'");
 			result = true;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1956,7 +1956,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		try {
 			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT * FROM "
-					+METAMODEL_ALIAS+".case ");
+					+METAMODEL_ALIAS+".'case' ");
 			erset = new SLEXMMCaseResultSet(this, rset);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -2839,7 +2839,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		try {
 			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJV.object_id as originIdQuery, C.* FROM "
-					+METAMODEL_ALIAS+".case AS C, "
+					+METAMODEL_ALIAS+".'case' AS C, "
 					+METAMODEL_ALIAS+".object_version AS OBJV, "
 					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
 					+METAMODEL_ALIAS+".event AS EV, "
@@ -2880,7 +2880,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		try {
 			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT EV.id as originIdQuery, C.* FROM "
-					+METAMODEL_ALIAS+".case AS C, "
+					+METAMODEL_ALIAS+".'case' AS C, "
 					+METAMODEL_ALIAS+".event AS EV, "
 					+METAMODEL_ALIAS+".activity_instance_to_case AS AITC "
 					+" WHERE C.id = AITC.case_id "
@@ -2917,7 +2917,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		try {
 			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT AI.activity_id as originIdQuery, C.* FROM "
-					+METAMODEL_ALIAS+".case AS C, "
+					+METAMODEL_ALIAS+".'case' AS C, "
 					+METAMODEL_ALIAS+".activity_instance AS AI, "
 					+METAMODEL_ALIAS+".activity_instance_to_case AS AITC "
 					+" WHERE C.id = AITC.case_id "
@@ -2954,7 +2954,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		try {
 			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJ.class_id as originIdQuery, C.* FROM "
-					+METAMODEL_ALIAS+".case AS C, "
+					+METAMODEL_ALIAS+".'case' AS C, "
 					+METAMODEL_ALIAS+".object AS OBJ, "
 					+METAMODEL_ALIAS+".object_version AS OBJV, "
 					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
@@ -2997,7 +2997,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		try {
 			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT REL.relationship_id as originIdQuery, C.* FROM "
-					+METAMODEL_ALIAS+".case AS C, "
+					+METAMODEL_ALIAS+".'case' AS C, "
 					+METAMODEL_ALIAS+".relation AS REL, "
 					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
 					+METAMODEL_ALIAS+".event AS EV, "
@@ -3040,7 +3040,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		try {
 			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT ETOV.object_version_id as originIdQuery, C.* FROM "
-					+METAMODEL_ALIAS+".case AS C, "
+					+METAMODEL_ALIAS+".'case' AS C, "
 					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
 					+METAMODEL_ALIAS+".event AS EV, "
 					+METAMODEL_ALIAS+".activity_instance_to_case AS AITC "
@@ -3079,7 +3079,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		try {
 			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT REL.id as originIdQuery, C.* FROM "
-					+METAMODEL_ALIAS+".case AS C, "
+					+METAMODEL_ALIAS+".'case' AS C, "
 					+METAMODEL_ALIAS+".relation AS REL, "
 					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
 					+METAMODEL_ALIAS+".event AS EV, "
@@ -3124,7 +3124,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		try {
 			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT AI.id as originIdQuery, C.* FROM "
-					+METAMODEL_ALIAS+".case AS C, "
+					+METAMODEL_ALIAS+".'case' AS C, "
 					+METAMODEL_ALIAS+".activity_instance AS AI, "
 					+METAMODEL_ALIAS+".activity_instance_to_case AS AITC "
 					+" WHERE C.id = AITC.case_id "
@@ -3161,7 +3161,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		try {
 			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT ATV.attribute_name_id as originIdQuery, C.* FROM "
-					+METAMODEL_ALIAS+".case AS C, "
+					+METAMODEL_ALIAS+".'case' AS C, "
 					+METAMODEL_ALIAS+".event_to_object_version AS ETOV, "
 					+METAMODEL_ALIAS+".event AS EV, "
 					+METAMODEL_ALIAS+".attribute_value AS ATV, "
@@ -5990,7 +5990,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		try {
 			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT CTL.log_id as originIdQuery, C.* FROM "
-					+METAMODEL_ALIAS+".case C, "
+					+METAMODEL_ALIAS+".'case' C, "
 					+METAMODEL_ALIAS+".case_to_log CTL "
 							+ " WHERE C.id = CTL.case_id "
 							+ " AND CTL.log_id IN ("+logsList+") ");
@@ -6018,7 +6018,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		try {
 			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT L.process_id as originIdQuery, C.* FROM "
-					+METAMODEL_ALIAS+".case C, "
+					+METAMODEL_ALIAS+".'case' C, "
 					+METAMODEL_ALIAS+".case_to_log CTL, "
 					+METAMODEL_ALIAS+".log L "
 							+ " WHERE C.id = CTL.case_id "
@@ -7078,6 +7078,17 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	public SLEXMMPeriodResultSet getPeriodsForProcesses(int[] is) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public SLEXMMLog createLog(int process_id, String name) {
+		SLEXMMLog l = new SLEXMMLog(this);
+		l.setName(name);
+		l.setProcessId(process_id);
+		if (isAutoCommitOnCreationEnabled()) {
+			l.commit();
+		}
+		return l;
 	}
 	
 }

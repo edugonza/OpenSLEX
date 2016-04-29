@@ -2523,5 +2523,7 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	public abstract SLEXMMPeriodResultSet getPeriodsForLogs(int[] is);
 
 	public abstract SLEXMMPeriodResultSet getPeriodsForProcesses(int[] is);
+
+	public abstract SLEXMMLog createLog(int processId, String name);
 	
 }
