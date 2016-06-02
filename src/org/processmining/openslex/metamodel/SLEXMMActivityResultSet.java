@@ -20,7 +20,7 @@ public class SLEXMMActivityResultSet extends SLEXMMAbstractResultSetObject {
 	 * @param storage the storage
 	 * @param rset the rset
 	 */
-	protected SLEXMMActivityResultSet(SLEXMMStorageMetaModel storage, ResultSet rset) {
+	public SLEXMMActivityResultSet(SLEXMMStorageMetaModel storage, ResultSet rset) {
 		super(storage, rset);
 	}
 	

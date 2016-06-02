@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.Executor;
 
+import org.processmining.openslex.metamodel.querygen.SLEXMMStorageQueryGenerator;
 import org.processmining.openslex.utils.ScriptRunner;
 
 // TODO: Auto-generated Javadoc
@@ -32,10 +33,11 @@ import org.processmining.openslex.utils.ScriptRunner;
  */
 public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	
+	private SLEXMMStorageQueryGenerator slxmmstrqgen = null;
 	//private static final String STORAGE_METAMODEL = PATH+File.separator+"metamodels.db";
 	
 	/** The Constant METAMODEL_ALIAS. */
-	private static final String METAMODEL_ALIAS = "metamodeldb";
+	public static final String METAMODEL_ALIAS = "metamodeldb";
 	
 	/** The metamodel schema in. */
 	private InputStream METAMODEL_SCHEMA_IN = SLEXMMStorage.class.getResourceAsStream("/org/processmining/openslex/resources/metamodel.sql");
@@ -76,6 +78,8 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		this.filename = filename;
 		this.path = path;
 		openMetaModelStorage(path,filename);
+		
+		slxmmstrqgen = new SLEXMMStorageQueryGenerator();
 	}
 	
 	/* (non-Javadoc)
@@ -4624,7 +4628,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	 * @param ids the ids
 	 * @return the string
 	 */
-	private String buildStringFromArray(int[] ids) {
+	public static String buildStringFromArray(int[] ids) {
 		StringBuffer buf = new StringBuffer();
 		
 		for (int i = 0; i < ids.length; i++) {
@@ -6608,50 +6612,50 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMActivityResultSet getActivitiesForDatamodels(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMActivityResultSet) getResultSetFor(SLEXMMActivityResultSet.class,
+				"activity", "datamodel", is);
 	}
 
 	@Override
 	public SLEXMMActivityResultSet getActivitiesForLogs(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMActivityResultSet) getResultSetFor(SLEXMMActivityResultSet.class,
+				"activity", "log", is);
 	}
 
 	@Override
 	public SLEXMMActivityResultSet getActivitiesForProcesses(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMActivityResultSet) getResultSetFor(SLEXMMActivityResultSet.class,
+				"activity", "process", is);
 	}
 
 	@Override
 	public SLEXMMClassResultSet getClassesForDatamodels(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMClassResultSet) getResultSetFor(SLEXMMClassResultSet.class,
+				"class", "datamodel", is);
 	}
 
 	@Override
 	public SLEXMMClassResultSet getClassesForLogs(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMClassResultSet) getResultSetFor(SLEXMMClassResultSet.class,
+				"class", "log", is);
 	}
 
 	@Override
 	public SLEXMMClassResultSet getClassesForProcesses(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMClassResultSet) getResultSetFor(SLEXMMClassResultSet.class,
+				"class", "process", is);
 	}
 
 	@Override
 	public SLEXMMRelationResultSet getRelationsForDatamodels(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMRelationResultSet) getResultSetFor(SLEXMMRelationResultSet.class,
+				"relation", "datamodel", is);
 	}
 
 	@Override
 	public SLEXMMRelationResultSet getRelationsForLogs(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMRelationResultSet) getResultSetFor(SLEXMMRelationResultSet.class,
+				"relation", "log", is);
 	}
 
 	@Override
@@ -7089,6 +7093,28 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 			l.commit();
 		}
 		return l;
+	}
+	
+	public SLEXMMAbstractResultSetObject getResultSetFor(Class<?> rsetClass, String tableA, String tableB, int[] idsB) {
+		
+		String query = slxmmstrqgen.getQuery(slxmmstrqgen.getPath(tableA, tableB), idsB);
+		
+		SLEXMMAbstractResultSetObject arset = null;
+		Statement statement = null;
+		
+		try {
+			statement = createStatement();
+			ResultSet rset = statement.executeQuery(query);
+			arset = (SLEXMMAbstractResultSetObject) rsetClass.
+					getConstructor(SLEXMMStorageMetaModel.class,ResultSet.class).
+					newInstance(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return arset;
+		
 	}
 	
 }
