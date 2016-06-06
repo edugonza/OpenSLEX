@@ -13,18 +13,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
-import java.util.concurrent.Executor;
-
 import org.processmining.openslex.metamodel.querygen.SLEXMMStorageQueryGenerator;
+import org.processmining.openslex.metamodel.querygen.SLEXMMTables;
 import org.processmining.openslex.utils.ScriptRunner;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class SLEXMMStorageMetaModelImpl.
  *
@@ -472,89 +469,11 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		return ev;
 	}
 	
-//	@Override
-//	public SLEXMMClass findClass(String name, int datamodelId) {
-//		SLEXMMClass cl = null;
-//		Statement statement = null;
-//		try {
-//			statement = connection.createStatement();
-//			statement.setQueryTimeout(30);
-//			ResultSet rset = statement.executeQuery("SELECT id,name FROM "+METAMODEL_ALIAS
-//					+".class WHERE name = '"+name+"' AND datamodel_id = '"+datamodelId+"'");
-//			
-//			if (rset.next()) {
-//				int id = rset.getInt("id");
-//				cl = new SLEXMMClass(this, name, datamodelId);
-//				cl.setId(id);
-//				cl.setDirty(false);
-//				cl.setInserted(false);
-//			}
-//			
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			cl = null;
-//		} finally {
-//			closeStatement(statement);
-//		}
-//		
-//		return cl;
-//	}
-	
-//	@Override
-//	public SLEXMMAttribute findAttribute(int datamodelId, String className, String name) {
-//		SLEXMMAttribute at = null;
-//		Statement statement = null;
-//		String classNameC = className.trim();
-//		String nameC = name.trim();
-//		try {
-//			statement = connection.createStatement();
-//			statement.setQueryTimeout(30);
-//			ResultSet rset = statement.executeQuery("SELECT AT.id,AT.name,AT.class_id FROM "
-//														+METAMODEL_ALIAS+".attribute_name AS AT, "
-//														+METAMODEL_ALIAS+".class as CL WHERE "
-//															+" AT.name = '"+nameC+"' AND "
-//															+" AT.class_id = CL.id AND "
-//															+" CL.name = '"+classNameC+"' AND "
-//															+" CL.datamodel_id = '"+datamodelId+"'");
-//			
-//			if (rset.next()) {
-//				int classId = rset.getInt("class_id");
-//				int id = rset.getInt("id");
-//				at = new SLEXMMAttribute(this);
-//				at.setId(id);
-//				at.setClassId(classId);
-//				at.setName(name);
-//				at.setDirty(false);
-//				at.setInserted(false);
-//			}
-//			
-//			
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			at = null;
-//		} finally {
-//			closeStatement(statement);
-//		}
-//		
-//		return at;
-//	}
-	
-//	@Override
-//	public SLEXMMAttribute findOrCreateAttribute(int datamodelId, String className, String name) {
-//		
-//		SLEXMMAttribute at = findAttribute(datamodelId, className, name);
-//		
-//		if (at == null) {
-//			at = createAttribute(classId, name);
-//		}
-//		
-//		return at;
-//	}
 	
 	/* (non-Javadoc)
- * @see org.processmining.openslex.metamodel.SLEXMMStorageMetaModel#createAttributeValue(int, int, java.lang.String, java.lang.String)
- */
-@Override
+	 * @see org.processmining.openslex.metamodel.SLEXMMStorageMetaModel#createAttributeValue(int, int, java.lang.String, java.lang.String)
+ 	*/
+	@Override
 	public SLEXMMAttributeValue createAttributeValue(int attributeId, int objectVersionId, String value, String type) {
 		SLEXMMAttributeValue av = new SLEXMMAttributeValue(this,attributeId,objectVersionId);
 		av.setValue(value);
@@ -1136,30 +1055,16 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	 */
 	@Override
 	public SLEXMMEventResultSet getEventsOfCase(SLEXMMCase c) {
-		return getEventsOfCase(c.getId());
+		return getEventsOfCase(new int[] {c.getId()});
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.processmining.openslex.metamodel.SLEXMMStorageMetaModel#getEventsOfCase(int)
 	 */
 	@Override
-	public SLEXMMEventResultSet getEventsOfCase(int cId) {
-		SLEXMMEventResultSet erset = null;
-		Statement statement = null;
-		try {
-			statement = createStatement();
-			ResultSet rset = statement.executeQuery("SELECT DISTINCT AITC.case_id as originIdQuery, EV.* FROM "
-					+METAMODEL_ALIAS+".event as EV, "
-					+METAMODEL_ALIAS+".activity_instance_to_case as AITC "
-					+" WHERE EV.activity_instance_id = AITC.activity_instance_id "
-					+" AND AITC.case_id = '"+cId+"'");
-			erset = new SLEXMMEventResultSet(this, rset);
-		} catch (Exception e) {
-			e.printStackTrace();
-			closeStatement(statement);
-		}
-		
-		return erset; 
+	public SLEXMMEventResultSet getEventsOfCase(int[] is) {
+		return (SLEXMMEventResultSet) getResultSetFor(SLEXMMEventResultSet.class,
+				SLEXMMTables.T_EVENT, SLEXMMTables.T_CASE, is);
 	}
 	
 	/* (non-Javadoc)
@@ -1211,25 +1116,6 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 			closeStatement(statement);
 		}
 		return attributeValues;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.processmining.openslex.metamodel.SLEXMMStorageMetaModel#getClassesForDataModel(org.processmining.openslex.metamodel.SLEXMMDataModel)
-	 */
-	@Override
-	public SLEXMMClassResultSet getClassesForDataModel(SLEXMMDataModel dm) {
-		SLEXMMClassResultSet crset = null;
-		Statement statement = null;
-		try {
-			statement = createStatement();
-			ResultSet rset = statement.executeQuery("SELECT DISTINCT datamodel_id as originIdQuery, * FROM "+METAMODEL_ALIAS+".class WHERE datamodel_id = '"+dm.getId()+"'");
-			crset = new SLEXMMClassResultSet(this, rset);
-		} catch (Exception e) {
-			e.printStackTrace();
-			closeStatement(statement);
-		}
-		
-		return crset;
 	}
 	
 	/* (non-Javadoc)
@@ -2146,6 +2032,22 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 			statement = createStatement();
 			ResultSet rset = statement.executeQuery("SELECT DISTINCT * FROM "+METAMODEL_ALIAS+".activity");
 			actrset = new SLEXMMActivityResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		return actrset;
+	}
+	
+	@Override
+	public SLEXMMClassResultSet getClasses() {
+		SLEXMMClassResultSet actrset = null;
+		Statement statement = null;
+		
+		try {
+			statement = createStatement();
+			ResultSet rset = statement.executeQuery("SELECT DISTINCT * FROM "+METAMODEL_ALIAS+".class");
+			actrset = new SLEXMMClassResultSet(this, rset);
 		} catch (Exception e) {
 			e.printStackTrace();
 			closeStatement(statement);
@@ -5904,33 +5806,6 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.processmining.openslex.metamodel.SLEXMMStorageMetaModel#getPeriodsForObjects(int[])
-	 */
-	@Override
-	public SLEXMMPeriodResultSet getPeriodsForObjects(int[] objectIds) {
-		SLEXMMPeriodResultSet prset = null;
-		Statement statement = null;
-		
-		String objectList = buildStringFromArray(objectIds);
-		
-		try {
-			statement = createStatement();
-			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJV.object_id as originIdQuery, "
-					+" min(start_timestamp) as start,"
-					+" max(end_timestamp) as end,"
-					+" min(end_timestamp) as end2 FROM "
-					+METAMODEL_ALIAS+".object_version OBJV "
-							+ " WHERE OBJV.object_id IN ("+objectList+") GROUP BY OBJV.object_id ");
-			prset = new SLEXMMPeriodResultSet(this, rset);
-		} catch (Exception e) {
-			e.printStackTrace();
-			closeStatement(statement);
-		}
-		
-		return prset;
-	}
-	
-	/* (non-Javadoc)
 	 * @see org.processmining.openslex.metamodel.SLEXMMStorageMetaModel#insert(org.processmining.openslex.metamodel.SLEXMMLog)
 	 */
 	@Override
@@ -6552,536 +6427,606 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 
 	@Override
 	public SLEXMMObjectResultSet getObjectsForLogs(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMObjectResultSet) getResultSetFor(SLEXMMObjectResultSet.class,
+				SLEXMMTables.T_OBJECT,
+				SLEXMMTables.T_LOG, is);
 	}
 
 	@Override
 	public SLEXMMObjectResultSet getObjectsForProcesses(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMObjectResultSet) getResultSetFor(SLEXMMObjectResultSet.class,
+				SLEXMMTables.T_OBJECT,
+				SLEXMMTables.T_PROCESS, is);
 	}
 
 	@Override
 	public SLEXMMCaseResultSet getCasesForDatamodels(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMCaseResultSet) getResultSetFor(SLEXMMCaseResultSet.class,
+				SLEXMMTables.T_CASE,
+				SLEXMMTables.T_DATAMODEL, is);
 	}
 
 	@Override
 	public SLEXMMCaseResultSet getCasesForProcesses(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMCaseResultSet) getResultSetFor(SLEXMMCaseResultSet.class,
+				SLEXMMTables.T_CASE,
+				SLEXMMTables.T_PROCESS, is);
 	}
 
 	@Override
 	public SLEXMMEventResultSet getEventsForDatamodels(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMEventResultSet) getResultSetFor(SLEXMMEventResultSet.class,
+				SLEXMMTables.T_EVENT,
+				SLEXMMTables.T_DATAMODEL, is);
 	}
 
 	@Override
 	public SLEXMMEventResultSet getEventsForLogs(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMEventResultSet) getResultSetFor(SLEXMMEventResultSet.class,
+				SLEXMMTables.T_EVENT,
+				SLEXMMTables.T_LOG, is);
 	}
 
 	@Override
 	public SLEXMMEventResultSet getEventsForProcesses(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMEventResultSet) getResultSetFor(SLEXMMEventResultSet.class,
+				SLEXMMTables.T_EVENT,
+				SLEXMMTables.T_PROCESS, is);
 	}
 
 	@Override
 	public SLEXMMObjectVersionResultSet getVersionsForDatamodels(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMObjectVersionResultSet) getResultSetFor(SLEXMMObjectVersionResultSet.class,
+				SLEXMMTables.T_OBJECT_VERSION,
+				SLEXMMTables.T_DATAMODEL, is);
 	}
 
 	@Override
 	public SLEXMMObjectVersionResultSet getVersionsForLogs(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMObjectVersionResultSet) getResultSetFor(SLEXMMObjectVersionResultSet.class,
+				SLEXMMTables.T_OBJECT_VERSION,
+				SLEXMMTables.T_LOG, is);
 	}
 
 	@Override
 	public SLEXMMObjectVersionResultSet getVersionsForProcesses(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMObjectVersionResultSet) getResultSetFor(SLEXMMObjectVersionResultSet.class,
+				SLEXMMTables.T_OBJECT_VERSION,
+				SLEXMMTables.T_PROCESS, is);
 	}
 
 	@Override
 	public SLEXMMActivityResultSet getActivitiesForDatamodels(int[] is) {
 		return (SLEXMMActivityResultSet) getResultSetFor(SLEXMMActivityResultSet.class,
-				"activity", "datamodel", is);
+				SLEXMMTables.T_ACTIVITY,
+				SLEXMMTables.T_DATAMODEL, is);
 	}
 
 	@Override
 	public SLEXMMActivityResultSet getActivitiesForLogs(int[] is) {
 		return (SLEXMMActivityResultSet) getResultSetFor(SLEXMMActivityResultSet.class,
-				"activity", "log", is);
+				SLEXMMTables.T_ACTIVITY,
+				SLEXMMTables.T_LOG, is);
 	}
 
 	@Override
 	public SLEXMMActivityResultSet getActivitiesForProcesses(int[] is) {
 		return (SLEXMMActivityResultSet) getResultSetFor(SLEXMMActivityResultSet.class,
-				"activity", "process", is);
+				SLEXMMTables.T_ACTIVITY,
+				SLEXMMTables.T_PROCESS, is);
 	}
 
 	@Override
 	public SLEXMMClassResultSet getClassesForDatamodels(int[] is) {
 		return (SLEXMMClassResultSet) getResultSetFor(SLEXMMClassResultSet.class,
-				"class", "datamodel", is);
+				SLEXMMTables.T_CLASS,
+				SLEXMMTables.T_DATAMODEL, is);
 	}
 
 	@Override
 	public SLEXMMClassResultSet getClassesForLogs(int[] is) {
 		return (SLEXMMClassResultSet) getResultSetFor(SLEXMMClassResultSet.class,
-				"class", "log", is);
+				SLEXMMTables.T_CLASS,
+				SLEXMMTables.T_LOG, is);
 	}
 
 	@Override
 	public SLEXMMClassResultSet getClassesForProcesses(int[] is) {
 		return (SLEXMMClassResultSet) getResultSetFor(SLEXMMClassResultSet.class,
-				"class", "process", is);
+				SLEXMMTables.T_CLASS,
+				SLEXMMTables.T_PROCESS, is);
 	}
 
 	@Override
 	public SLEXMMRelationResultSet getRelationsForDatamodels(int[] is) {
 		return (SLEXMMRelationResultSet) getResultSetFor(SLEXMMRelationResultSet.class,
-				"relation", "datamodel", is);
+				SLEXMMTables.T_RELATION,
+				SLEXMMTables.T_DATAMODEL, is);
 	}
 
 	@Override
 	public SLEXMMRelationResultSet getRelationsForLogs(int[] is) {
 		return (SLEXMMRelationResultSet) getResultSetFor(SLEXMMRelationResultSet.class,
-				"relation", "log", is);
+				SLEXMMTables.T_RELATION,
+				SLEXMMTables.T_LOG, is);
 	}
 
 	@Override
 	public SLEXMMRelationResultSet getRelationsForProcesses(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMRelationResultSet) getResultSetFor(SLEXMMRelationResultSet.class,
+				SLEXMMTables.T_RELATION,
+				SLEXMMTables.T_PROCESS, is);
 	}
 
 	@Override
 	public SLEXMMRelationshipResultSet getRelationshipsForDatamodels(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMRelationshipResultSet) getResultSetFor(SLEXMMRelationshipResultSet.class,
+				SLEXMMTables.T_RELATIONSHIP,
+				SLEXMMTables.T_DATAMODEL, is);
 	}
 
 	@Override
 	public SLEXMMRelationshipResultSet getRelationshipsForLogs(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMRelationshipResultSet) getResultSetFor(SLEXMMRelationshipResultSet.class,
+				SLEXMMTables.T_RELATIONSHIP,
+				SLEXMMTables.T_LOG, is);
 	}
 
 	@Override
 	public SLEXMMRelationshipResultSet getRelationshipsForProcesses(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMRelationshipResultSet) getResultSetFor(SLEXMMRelationshipResultSet.class,
+				SLEXMMTables.T_RELATIONSHIP,
+				SLEXMMTables.T_PROCESS, is);
 	}
 
 	@Override
 	public SLEXMMActivityInstanceResultSet getActivityInstancesForDatamodels(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMActivityInstanceResultSet) getResultSetFor(SLEXMMActivityInstanceResultSet.class,
+				SLEXMMTables.T_ACTIVITY_INSTANCE,
+				SLEXMMTables.T_DATAMODEL, is);
 	}
 
 	@Override
 	public SLEXMMActivityInstanceResultSet getActivityInstancesForLogs(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMActivityInstanceResultSet) getResultSetFor(SLEXMMActivityInstanceResultSet.class,
+				SLEXMMTables.T_ACTIVITY_INSTANCE,
+				SLEXMMTables.T_LOG, is);
 	}
 
 	@Override
 	public SLEXMMActivityInstanceResultSet getActivityInstancesForProcesses(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMActivityInstanceResultSet) getResultSetFor(SLEXMMActivityInstanceResultSet.class,
+				SLEXMMTables.T_ACTIVITY_INSTANCE,
+				SLEXMMTables.T_PROCESS, is);
 	}
 
 	@Override
 	public SLEXMMAttributeResultSet getAttributesForDatamodels(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMAttributeResultSet) getResultSetFor(SLEXMMAttributeResultSet.class,
+				SLEXMMTables.T_ATTRIBUTE_NAME,
+				SLEXMMTables.T_DATAMODEL, is);
 	}
 
 	@Override
 	public SLEXMMAttributeResultSet getAttributesForLogs(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMAttributeResultSet) getResultSetFor(SLEXMMAttributeResultSet.class,
+				SLEXMMTables.T_ATTRIBUTE_NAME,
+				SLEXMMTables.T_LOG, is);
 	}
 
 	@Override
 	public SLEXMMAttributeResultSet getAttributesForProcesses(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMAttributeResultSet) getResultSetFor(SLEXMMAttributeResultSet.class,
+				SLEXMMTables.T_ATTRIBUTE_NAME,
+				SLEXMMTables.T_PROCESS, is);
 	}
 
 	@Override
 	public SLEXMMDataModelResultSet getDatamodelsForObjects(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMDataModelResultSet) getResultSetFor(SLEXMMDataModelResultSet.class,
+				SLEXMMTables.T_DATAMODEL,
+				SLEXMMTables.T_OBJECT, is);
 	}
 
 	@Override
 	public SLEXMMDataModelResultSet getDatamodelsForEvents(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMDataModelResultSet) getResultSetFor(SLEXMMDataModelResultSet.class,
+				SLEXMMTables.T_DATAMODEL,
+				SLEXMMTables.T_EVENT, is);
 	}
 
 	@Override
 	public SLEXMMDataModelResultSet getDatamodelsForCases(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMDataModelResultSet) getResultSetFor(SLEXMMDataModelResultSet.class,
+				SLEXMMTables.T_DATAMODEL,
+				SLEXMMTables.T_CASE, is);
 	}
 
 	@Override
 	public SLEXMMDataModelResultSet getDatamodelsForActivities(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMDataModelResultSet) getResultSetFor(SLEXMMDataModelResultSet.class,
+				SLEXMMTables.T_DATAMODEL,
+				SLEXMMTables.T_ACTIVITY, is);
 	}
 
 	@Override
 	public SLEXMMDataModelResultSet getDatamodelsForClasses(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMDataModelResultSet) getResultSetFor(SLEXMMDataModelResultSet.class,
+				SLEXMMTables.T_DATAMODEL,
+				SLEXMMTables.T_CLASS, is);
 	}
 
 	@Override
 	public SLEXMMDataModelResultSet getDatamodelsForRelationships(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMDataModelResultSet) getResultSetFor(SLEXMMDataModelResultSet.class,
+				SLEXMMTables.T_DATAMODEL,
+				SLEXMMTables.T_RELATIONSHIP, is);
 	}
 
 	@Override
 	public SLEXMMDataModelResultSet getDatamodelsForObjectVersions(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMDataModelResultSet) getResultSetFor(SLEXMMDataModelResultSet.class,
+				SLEXMMTables.T_DATAMODEL,
+				SLEXMMTables.T_OBJECT_VERSION, is);
 	}
 
 	@Override
 	public SLEXMMDataModelResultSet getDatamodelsForRelations(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMDataModelResultSet) getResultSetFor(SLEXMMDataModelResultSet.class,
+				SLEXMMTables.T_DATAMODEL,
+				SLEXMMTables.T_RELATION, is);
 	}
 
 	@Override
 	public SLEXMMDataModelResultSet getDatamodelsForActivityInstances(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMDataModelResultSet) getResultSetFor(SLEXMMDataModelResultSet.class,
+				SLEXMMTables.T_DATAMODEL,
+				SLEXMMTables.T_ACTIVITY_INSTANCE, is);
 	}
 
 	@Override
 	public SLEXMMDataModelResultSet getDatamodelsForAttributes(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMDataModelResultSet) getResultSetFor(SLEXMMDataModelResultSet.class,
+				SLEXMMTables.T_DATAMODEL,
+				SLEXMMTables.T_ATTRIBUTE_NAME, is);
 	}
 
 	@Override
 	public SLEXMMDataModelResultSet getDatamodelsForLogs(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMDataModelResultSet) getResultSetFor(SLEXMMDataModelResultSet.class,
+				SLEXMMTables.T_DATAMODEL,
+				SLEXMMTables.T_LOG, is);
 	}
 
 	@Override
 	public SLEXMMDataModelResultSet getDatamodelsForProcesses(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMDataModelResultSet) getResultSetFor(SLEXMMDataModelResultSet.class,
+				SLEXMMTables.T_DATAMODEL,
+				SLEXMMTables.T_PROCESS, is);
 	}
 
 	@Override
 	public SLEXMMProcessResultSet getProcessesForObjects(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMProcessResultSet) getResultSetFor(SLEXMMProcessResultSet.class,
+				SLEXMMTables.T_PROCESS,
+				SLEXMMTables.T_OBJECT, is);
 	}
 
 	@Override
 	public SLEXMMProcessResultSet getProcessesForEvents(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMProcessResultSet) getResultSetFor(SLEXMMProcessResultSet.class,
+				SLEXMMTables.T_PROCESS,
+				SLEXMMTables.T_EVENT, is);
 	}
 
 	@Override
 	public SLEXMMProcessResultSet getProcessesForCases(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMProcessResultSet) getResultSetFor(SLEXMMProcessResultSet.class,
+				SLEXMMTables.T_PROCESS,
+				SLEXMMTables.T_CASE, is);
 	}
 
 	@Override
 	public SLEXMMProcessResultSet getProcessesForActivities(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMProcessResultSet) getResultSetFor(SLEXMMProcessResultSet.class,
+				SLEXMMTables.T_PROCESS,
+				SLEXMMTables.T_ACTIVITY, is);
 	}
 
 	@Override
 	public SLEXMMProcessResultSet getProcessesForClasses(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMProcessResultSet) getResultSetFor(SLEXMMProcessResultSet.class,
+				SLEXMMTables.T_PROCESS,
+				SLEXMMTables.T_CLASS, is);
 	}
 
 	@Override
 	public SLEXMMProcessResultSet getProcessesForRelationships(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMProcessResultSet) getResultSetFor(SLEXMMProcessResultSet.class,
+				SLEXMMTables.T_PROCESS,
+				SLEXMMTables.T_RELATIONSHIP, is);
 	}
 
 	@Override
 	public SLEXMMProcessResultSet getProcessesForObjectVersions(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMProcessResultSet) getResultSetFor(SLEXMMProcessResultSet.class,
+				SLEXMMTables.T_PROCESS,
+				SLEXMMTables.T_OBJECT_VERSION, is);
 	}
 
 	@Override
 	public SLEXMMProcessResultSet getProcessesForRelations(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMProcessResultSet) getResultSetFor(SLEXMMProcessResultSet.class,
+				SLEXMMTables.T_PROCESS,
+				SLEXMMTables.T_RELATION, is);
 	}
 
 	@Override
 	public SLEXMMProcessResultSet getProcessesForActivityInstances(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMProcessResultSet) getResultSetFor(SLEXMMProcessResultSet.class,
+				SLEXMMTables.T_PROCESS,
+				SLEXMMTables.T_ACTIVITY_INSTANCE, is);
 	}
 
 	@Override
 	public SLEXMMProcessResultSet getProcessesForAttributes(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMProcessResultSet) getResultSetFor(SLEXMMProcessResultSet.class,
+				SLEXMMTables.T_PROCESS,
+				SLEXMMTables.T_ATTRIBUTE_NAME, is);
 	}
 
 	@Override
 	public SLEXMMProcessResultSet getProcessesForDatamodels(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMProcessResultSet) getResultSetFor(SLEXMMProcessResultSet.class,
+				SLEXMMTables.T_PROCESS,
+				SLEXMMTables.T_DATAMODEL, is);
 	}
 
 	@Override
 	public SLEXMMProcessResultSet getProcessesForLogs(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMProcessResultSet) getResultSetFor(SLEXMMProcessResultSet.class,
+				SLEXMMTables.T_PROCESS,
+				SLEXMMTables.T_LOG, is);
 	}
 
 	@Override
 	public SLEXMMLogResultSet getLogsForObjects(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMLogResultSet) getResultSetFor(SLEXMMLogResultSet.class,
+				SLEXMMTables.T_LOG,
+				SLEXMMTables.T_OBJECT, is);
 	}
 
 	@Override
 	public SLEXMMLogResultSet getLogsForEvents(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMLogResultSet) getResultSetFor(SLEXMMLogResultSet.class,
+				SLEXMMTables.T_LOG,
+				SLEXMMTables.T_EVENT, is);
 	}
 
 	@Override
 	public SLEXMMLogResultSet getLogsForCases(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMLogResultSet) getResultSetFor(SLEXMMLogResultSet.class,
+				SLEXMMTables.T_LOG,
+				SLEXMMTables.T_CASE, is);
 	}
 
 	@Override
 	public SLEXMMLogResultSet getLogsForActivities(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMLogResultSet) getResultSetFor(SLEXMMLogResultSet.class,
+				SLEXMMTables.T_LOG,
+				SLEXMMTables.T_ACTIVITY, is);
 	}
 
 	@Override
 	public SLEXMMLogResultSet getLogsForClasses(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMLogResultSet) getResultSetFor(SLEXMMLogResultSet.class,
+				SLEXMMTables.T_LOG,
+				SLEXMMTables.T_CLASS, is);
 	}
 
 	@Override
 	public SLEXMMLogResultSet getLogsForRelationships(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMLogResultSet) getResultSetFor(SLEXMMLogResultSet.class,
+				SLEXMMTables.T_LOG,
+				SLEXMMTables.T_RELATIONSHIP, is);
 	}
 
 	@Override
 	public SLEXMMLogResultSet getLogsForObjectVersions(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMLogResultSet) getResultSetFor(SLEXMMLogResultSet.class,
+				SLEXMMTables.T_LOG,
+				SLEXMMTables.T_OBJECT_VERSION, is);
 	}
 
 	@Override
 	public SLEXMMLogResultSet getLogsForRelations(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMLogResultSet) getResultSetFor(SLEXMMLogResultSet.class,
+				SLEXMMTables.T_LOG,
+				SLEXMMTables.T_RELATION, is);
 	}
 
 	@Override
 	public SLEXMMLogResultSet getLogsForActivityInstances(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMLogResultSet) getResultSetFor(SLEXMMLogResultSet.class,
+				SLEXMMTables.T_LOG,
+				SLEXMMTables.T_ACTIVITY_INSTANCE, is);
 	}
 
 	@Override
 	public SLEXMMLogResultSet getLogsForAttributes(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMLogResultSet) getResultSetFor(SLEXMMLogResultSet.class,
+				SLEXMMTables.T_LOG,
+				SLEXMMTables.T_ATTRIBUTE_NAME, is);
 	}
 
 	@Override
 	public SLEXMMLogResultSet getLogsForDatamodels(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMLogResultSet) getResultSetFor(SLEXMMLogResultSet.class,
+				SLEXMMTables.T_LOG,
+				SLEXMMTables.T_DATAMODEL, is);
 	}
 
 	@Override
 	public SLEXMMLogResultSet getLogsForProcesses(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMLogResultSet) getResultSetFor(SLEXMMLogResultSet.class,
+				SLEXMMTables.T_LOG,
+				SLEXMMTables.T_PROCESS, is);
 	}
 
 	@Override
-	public SLEXMMObjectResultSet getObjectsForPeriods(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+	public SLEXMMObjectResultSet getObjectsForPeriod(SLEXMMPeriod p) {
+		return (SLEXMMObjectResultSet) getResultSetForPeriod(SLEXMMObjectResultSet.class,
+				SLEXMMTables.T_OBJECT, p);
 	}
 
 	@Override
-	public SLEXMMCaseResultSet getCasesForPeriods(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+	public SLEXMMCaseResultSet getCasesForPeriod(SLEXMMPeriod p) {
+		return (SLEXMMCaseResultSet) getResultSetForPeriod(SLEXMMCaseResultSet.class,
+				SLEXMMTables.T_CASE, p);
 	}
 
 	@Override
-	public SLEXMMEventResultSet getEventsForPeriods(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+	public SLEXMMEventResultSet getEventsForPeriod(SLEXMMPeriod p) {
+		return (SLEXMMEventResultSet) getResultSetForPeriod(SLEXMMEventResultSet.class,
+				SLEXMMTables.T_EVENT, p);
 	}
 
 	@Override
-	public SLEXMMObjectVersionResultSet getVersionsForPeriods(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+	public SLEXMMObjectVersionResultSet getVersionsForPeriod(SLEXMMPeriod p) {
+		return (SLEXMMObjectVersionResultSet) getResultSetForPeriod(SLEXMMObjectVersionResultSet.class,
+				SLEXMMTables.T_OBJECT_VERSION, p);
 	}
 
 	@Override
-	public SLEXMMActivityResultSet getActivitiesForPeriods(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+	public SLEXMMActivityResultSet getActivitiesForPeriod(SLEXMMPeriod p) {
+		return (SLEXMMActivityResultSet) getResultSetForPeriod(SLEXMMActivityResultSet.class,
+				SLEXMMTables.T_ACTIVITY, p);
 	}
 
 	@Override
-	public SLEXMMClassResultSet getClassesForPeriods(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+	public SLEXMMClassResultSet getClassesForPeriod(SLEXMMPeriod p) {
+		return (SLEXMMClassResultSet) getResultSetForPeriod(SLEXMMClassResultSet.class,
+				SLEXMMTables.T_CLASS, p);
 	}
 
 	@Override
-	public SLEXMMRelationResultSet getRelationsForPeriods(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+	public SLEXMMRelationResultSet getRelationsForPeriod(SLEXMMPeriod p) {
+		return (SLEXMMRelationResultSet) getResultSetForPeriod(SLEXMMRelationResultSet.class,
+				SLEXMMTables.T_RELATION, p);
 	}
 
 	@Override
-	public SLEXMMRelationshipResultSet getRelationshipsForPeriods(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+	public SLEXMMRelationshipResultSet getRelationshipsForPeriod(SLEXMMPeriod p) {
+		return (SLEXMMRelationshipResultSet) getResultSetForPeriod(SLEXMMRelationshipResultSet.class,
+				SLEXMMTables.T_RELATIONSHIP, p);
 	}
 
 	@Override
-	public SLEXMMActivityInstanceResultSet getActivityInstancesForPeriods(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+	public SLEXMMActivityInstanceResultSet getActivityInstancesForPeriod(SLEXMMPeriod p) {
+		return (SLEXMMActivityInstanceResultSet) getResultSetForPeriod(SLEXMMActivityInstanceResultSet.class,
+				SLEXMMTables.T_ACTIVITY_INSTANCE, p);
 	}
 
 	@Override
-	public SLEXMMAttributeResultSet getAttributesForPeriods(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+	public SLEXMMAttributeResultSet getAttributesForPeriod(SLEXMMPeriod p) {
+		return (SLEXMMAttributeResultSet) getResultSetForPeriod(SLEXMMAttributeResultSet.class,
+				SLEXMMTables.T_ATTRIBUTE_NAME, p);
 	}
 
 	@Override
-	public SLEXMMDataModelResultSet getDatamodelsForPeriods(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+	public SLEXMMDataModelResultSet getDatamodelsForPeriod(SLEXMMPeriod p) {
+		return (SLEXMMDataModelResultSet) getResultSetForPeriod(SLEXMMDataModelResultSet.class,
+				SLEXMMTables.T_DATAMODEL, p);
 	}
 
 	@Override
-	public SLEXMMProcessResultSet getProcessesForPeriods(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+	public SLEXMMProcessResultSet getProcessesForPeriod(SLEXMMPeriod p) {
+		return (SLEXMMProcessResultSet) getResultSetForPeriod(SLEXMMProcessResultSet.class,
+				SLEXMMTables.T_PROCESS, p);
 	}
 
 	@Override
-	public SLEXMMLogResultSet getLogsForPeriods(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+	public SLEXMMLogResultSet getLogsForPeriod(SLEXMMPeriod p) {
+		return (SLEXMMLogResultSet) getResultSetForPeriod(SLEXMMLogResultSet.class,
+				SLEXMMTables.T_LOG, p);
 	}
 
+	@Override
+	public SLEXMMPeriodResultSet getPeriodsForObjects(int[] is) {
+		return (SLEXMMPeriodResultSet) getPeriodsFor(
+				SLEXMMTables.T_OBJECT, is);
+	}
+	
 	@Override
 	public SLEXMMPeriodResultSet getPeriodsForEvents(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMPeriodResultSet) getPeriodsFor(
+				SLEXMMTables.T_EVENT, is);
 	}
 
 	@Override
 	public SLEXMMPeriodResultSet getPeriodsForCases(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMPeriodResultSet) getPeriodsFor(
+				SLEXMMTables.T_CASE, is);
 	}
 
 	@Override
 	public SLEXMMPeriodResultSet getPeriodsForActivities(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMPeriodResultSet) getPeriodsFor(
+				SLEXMMTables.T_ACTIVITY, is);
 	}
 
 	@Override
 	public SLEXMMPeriodResultSet getPeriodsForClasses(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMPeriodResultSet) getPeriodsFor(
+				SLEXMMTables.T_CLASS, is);
 	}
 
 	@Override
 	public SLEXMMPeriodResultSet getPeriodsForRelationships(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMPeriodResultSet) getPeriodsFor(
+				SLEXMMTables.T_RELATIONSHIP, is);
 	}
 
 	@Override
 	public SLEXMMPeriodResultSet getPeriodsForVersions(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMPeriodResultSet) getPeriodsFor(
+				SLEXMMTables.T_OBJECT_VERSION, is);
 	}
 
 	@Override
 	public SLEXMMPeriodResultSet getPeriodsForRelations(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMPeriodResultSet) getPeriodsFor(
+				SLEXMMTables.T_RELATION, is);
 	}
 
 	@Override
 	public SLEXMMPeriodResultSet getPeriodsForActivityInstances(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMPeriodResultSet) getPeriodsFor(
+				SLEXMMTables.T_ACTIVITY_INSTANCE, is);
 	}
 
 	@Override
 	public SLEXMMPeriodResultSet getPeriodsForAttributes(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMPeriodResultSet) getPeriodsFor(
+				SLEXMMTables.T_ATTRIBUTE_NAME, is);
 	}
 
 	@Override
 	public SLEXMMPeriodResultSet getPeriodsForDatamodels(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMPeriodResultSet) getPeriodsFor(
+				SLEXMMTables.T_DATAMODEL, is);
 	}
 
 	@Override
 	public SLEXMMPeriodResultSet getPeriodsForLogs(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMPeriodResultSet) getPeriodsFor(
+				SLEXMMTables.T_LOG, is);
 	}
 
 	@Override
 	public SLEXMMPeriodResultSet getPeriodsForProcesses(int[] is) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SLEXMMPeriodResultSet) getPeriodsFor(
+				SLEXMMTables.T_PROCESS, is);
 	}
 
 	@Override
@@ -7095,9 +7040,9 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		return l;
 	}
 	
-	public SLEXMMAbstractResultSetObject getResultSetFor(Class<?> rsetClass, String tableA, String tableB, int[] idsB) {
+	public SLEXMMAbstractResultSetObject getResultSetFor(Class<?> rsetClass, SLEXMMTables tableA, SLEXMMTables tableB, int[] idsB) {
 		
-		String query = slxmmstrqgen.getQuery(slxmmstrqgen.getPath(tableA, tableB), idsB);
+		String query = slxmmstrqgen.getSelectQuery(slxmmstrqgen.getPath(tableA, tableB), idsB);
 		
 		SLEXMMAbstractResultSetObject arset = null;
 		Statement statement = null;
@@ -7114,6 +7059,84 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		}
 		
 		return arset;
+		
+	}
+	
+	public SLEXMMAbstractResultSetObject getResultSetForPeriod(Class<?> rsetClass, SLEXMMTables tableA, SLEXMMPeriod p) {
+		
+		SLEXMMTables tableB = null;
+		
+		switch (tableA) {
+		case T_DATAMODEL:
+		case T_CLASS:
+		case T_OBJECT:
+		case T_OBJECT_VERSION:
+		case T_ATTRIBUTE_NAME:
+		case T_ATTRIBUTE_VALUE:
+			tableB = SLEXMMTables.T_OBJECT_VERSION;
+			break;
+		case T_RELATIONSHIP:
+		case T_RELATION:
+			tableB = SLEXMMTables.T_RELATION;
+		default:
+			tableB = SLEXMMTables.T_EVENT;
+		}
+		
+		String query = slxmmstrqgen.getSelectQueryForPeriod(slxmmstrqgen.getPath(tableA, tableB), p);
+		
+		SLEXMMAbstractResultSetObject arset = null;
+		Statement statement = null;
+		
+		try {
+			statement = createStatement();
+			ResultSet rset = statement.executeQuery(query);
+			arset = (SLEXMMAbstractResultSetObject) rsetClass.
+					getConstructor(SLEXMMStorageMetaModel.class,ResultSet.class).
+					newInstance(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return arset;
+		
+	}
+	
+	public SLEXMMPeriodResultSet getPeriodsFor(SLEXMMTables tableB, int[] idsB) {
+		
+		SLEXMMTables tableA = null;
+		
+		switch (tableB) {
+		case T_DATAMODEL:
+		case T_CLASS:
+		case T_OBJECT:
+		case T_OBJECT_VERSION:
+		case T_ATTRIBUTE_NAME:
+		case T_ATTRIBUTE_VALUE:
+			tableA = SLEXMMTables.T_OBJECT_VERSION;
+			break;
+		case T_RELATIONSHIP:
+		case T_RELATION:
+			tableA = SLEXMMTables.T_RELATION;
+		default:
+			tableA = SLEXMMTables.T_EVENT;
+		}
+
+		String query = slxmmstrqgen.getPeriodsQuery(slxmmstrqgen.getPath(tableA, tableB), idsB);
+		
+		SLEXMMPeriodResultSet prset = null;
+		Statement statement = null;
+		
+		try {
+			statement = createStatement();
+			ResultSet rset = statement.executeQuery(query);
+			prset = new SLEXMMPeriodResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return prset;
 		
 	}
 	

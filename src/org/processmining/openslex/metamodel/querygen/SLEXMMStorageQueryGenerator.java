@@ -1,55 +1,124 @@
 package org.processmining.openslex.metamodel.querygen;
 
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import org.jgrapht.alg.DijkstraShortestPath;
 import org.jgrapht.graph.DirectedWeightedMultigraph;
+import org.processmining.openslex.metamodel.SLEXMMPeriod;
+import org.processmining.openslex.metamodel.SLEXMMPeriodResultSet;
 import org.processmining.openslex.metamodel.SLEXMMStorageMetaModel;
 import org.processmining.openslex.metamodel.SLEXMMStorageMetaModelImpl;
+
+import prefuse.data.Tuple;
 
 public class SLEXMMStorageQueryGenerator {
 
 	private DirectedWeightedMultigraph<SLEXMMNode, SLEXMMEdge> wmgraph = null;
-	private HashMap<String,SLEXMMNode> nodesMap = null;
+	private HashMap<SLEXMMTables,SLEXMMNode> nodesMap = null;
 	private HashMap<SLEXMMNode,List<String>> fieldsMap = null;
 	private final static String METAMODEL_ALIAS = SLEXMMStorageMetaModelImpl.METAMODEL_ALIAS;
 	
-	private final static String[][] nodesStr = new String[][] {
-			{"class","id","datamodel_id","name"},
-			{"datamodel","id","name"},
-			{"object","id","class_id"},
-			{"object_version","id","object_id","start_timestamp","end_timestamp"},
-			{"log","id","process_id","name"},
-			{"case","id","name"},
-			{"case_to_log","case_id","log_id"},
-			{"process","id","name"},
-			{"activity_to_process","process_id","activity_id"},
-			{"activity","id","name"},
-			{"activity_instance","id","activity_id"},
-			{"activity_instance_to_case","activity_instance_id","case_id"},
-			{"event","id","activity_instance_id","ordering","timestamp","lifecycle","resource"},
-			{"event_to_object_version","event_id","object_version_id","label"}
-		};
+	private final static HashMap<SLEXMMTables,String[]> tablesMap;
 	
-	private final static String[][] edgesStr = new String[][] {
-			{"class","datamodel","datamodel_id","id"},
-			{"object","class","class_id","id"},
-			{"object_version","object","object_id","id"},
-			{"activity_instance","activity","activity_id","id"},
-			{"activity_to_process","activity","activity_id","id"},
-			{"activity_to_process","process","process_id","id"},
-			{"log","process","process_id","id"},
-			{"case_to_log","log","log_id","id"},
-			{"case_to_log","case","case_id","id"},
-			{"activity_instance_to_case","case","case_id","id"},
-			{"activity_instance_to_case","activity_instance","activity_instance_id","id"},
-			{"event","activity_instance","activity_instance_id","id"},
-			{"event_to_object_version","event","event_id","id"},
-			{"event_to_object_version","object_version","object_version_id","id"}
-		};		
+	static {
+		tablesMap = new HashMap<>();
+		tablesMap.put(SLEXMMTables.T_CLASS, new String[] { "id", "datamodel_id", "name" });
+		tablesMap.put(SLEXMMTables.T_DATAMODEL, new String[] { "id", "name" });
+		tablesMap.put(SLEXMMTables.T_OBJECT, new String[] { "id", "class_id" });
+		tablesMap.put(SLEXMMTables.T_OBJECT_VERSION,
+				new String[] { "id", "object_id", "start_timestamp", "end_timestamp" });
+		tablesMap.put(SLEXMMTables.T_LOG, new String[] { "id", "process_id", "name" });
+		tablesMap.put(SLEXMMTables.T_CASE, new String[] { "id", "name" });
+		tablesMap.put(SLEXMMTables.T_CASE_TO_LOG, new String[] { "case_id", "log_id" });
+		tablesMap.put(SLEXMMTables.T_PROCESS, new String[] { "id", "name" });
+		tablesMap.put(SLEXMMTables.T_ACTIVITY_TO_PROCESS, new String[] { "process_id", "activity_id" });
+		tablesMap.put(SLEXMMTables.T_ACTIVITY, new String[] { "id", "name" });
+		tablesMap.put(SLEXMMTables.T_ACTIVITY_INSTANCE, new String[] { "id", "activity_id" });
+		tablesMap.put(SLEXMMTables.T_ACTIVITY_INSTANCE_TO_CASE, new String[] { "activity_instance_id", "case_id" });
+		tablesMap.put(SLEXMMTables.T_EVENT,
+				new String[] { "id", "activity_instance_id", "ordering", "timestamp", "lifecycle", "resource" });
+		tablesMap.put(SLEXMMTables.T_EVENT_TO_OBJECT_VERSION,
+				new String[] { "event_id", "object_version_id", "label" });
+		tablesMap.put(SLEXMMTables.T_ATTRIBUTE_NAME, new String[] { "id", "class_id", "name" });
+		tablesMap.put(SLEXMMTables.T_RELATIONSHIP, new String[] { "id", "source", "target", "name" });
+		tablesMap.put(SLEXMMTables.T_RELATION, new String[] { "id", "source_object_version_id",
+				"target_object_version_id", "relationship_id", "start_timestamp", "end_timestamp" });
+		tablesMap.put(SLEXMMTables.T_ATTRIBUTE_VALUE,
+				new String[] { "id", "object_version_id", "attribute_name_id", "value", "type" });
+		tablesMap.put(SLEXMMTables.T_EVENT_ATTRIBUTE_VALUE,
+				new String[] { "id", "event_id", "event_attribute_name_id", "value", "type" });
+		tablesMap.put(SLEXMMTables.T_EVENT_ATTRIBUTE_NAME, new String[] { "id", "name" });
+		tablesMap.put(SLEXMMTables.T_CASE_ATTRIBUTE_NAME, new String[] { "id", "name" });
+		tablesMap.put(SLEXMMTables.T_CASE_ATTRIBUTE_VALUE,
+				new String[] { "id", "case_id", "case_attribute_name_id", "value", "type" });
+		tablesMap.put(SLEXMMTables.T_LOG_ATTRIBUTE_NAME, new String[] { "id", "name" });
+		tablesMap.put(SLEXMMTables.T_LOG_ATTRIBUTE_VALUE,
+				new String[] { "id", "log_attribute_name_id", "log_id", "value", "type" });
+		tablesMap.put(SLEXMMTables.T_CLASSIFIER, new String[] { "id", "log_id", "name" });
+		tablesMap.put(SLEXMMTables.T_CLASSIFIER_ATTRIBUTES,
+				new String[] { "id", "classifier_id", "event_attribute_name_id" });
+	}
 	
+	private final static HashMap<Pair<SLEXMMTables>,Pair<String>> edgesMap;
+	
+	static {
+		edgesMap = new HashMap<>();
+		edgesMap.put(new Pair<>(SLEXMMTables.T_CLASS, SLEXMMTables.T_DATAMODEL), new Pair<>("datamodel_id", "id"));
+		edgesMap.put(new Pair<>(SLEXMMTables.T_OBJECT, SLEXMMTables.T_CLASS), new Pair<>("class_id", "id"));
+		edgesMap.put(new Pair<>(SLEXMMTables.T_OBJECT_VERSION, SLEXMMTables.T_OBJECT), new Pair<>("object_id", "id"));
+		edgesMap.put(new Pair<>(SLEXMMTables.T_ACTIVITY_INSTANCE, SLEXMMTables.T_ACTIVITY),
+				new Pair<>("activity_id", "id"));
+		edgesMap.put(new Pair<>(SLEXMMTables.T_ACTIVITY_TO_PROCESS, SLEXMMTables.T_ACTIVITY),
+				new Pair<>("activity_id", "id"));
+		edgesMap.put(new Pair<>(SLEXMMTables.T_ACTIVITY_TO_PROCESS, SLEXMMTables.T_PROCESS),
+				new Pair<>("process_id", "id"));
+		edgesMap.put(new Pair<>(SLEXMMTables.T_LOG, SLEXMMTables.T_PROCESS), new Pair<>("process_id", "id"));
+		edgesMap.put(new Pair<>(SLEXMMTables.T_CASE_TO_LOG, SLEXMMTables.T_LOG), new Pair<>("log_id", "id"));
+		edgesMap.put(new Pair<>(SLEXMMTables.T_CASE_TO_LOG, SLEXMMTables.T_CASE), new Pair<>("case_id", "id"));
+		edgesMap.put(new Pair<>(SLEXMMTables.T_ACTIVITY_INSTANCE_TO_CASE, SLEXMMTables.T_CASE),
+				new Pair<>("case_id", "id"));
+		edgesMap.put(new Pair<>(SLEXMMTables.T_ACTIVITY_INSTANCE_TO_CASE, SLEXMMTables.T_ACTIVITY_INSTANCE),
+				new Pair<>("activity_instance_id", "id"));
+		edgesMap.put(new Pair<>(SLEXMMTables.T_EVENT, SLEXMMTables.T_ACTIVITY_INSTANCE),
+				new Pair<>("activity_instance_id", "id"));
+		edgesMap.put(new Pair<>(SLEXMMTables.T_EVENT_TO_OBJECT_VERSION, SLEXMMTables.T_EVENT),
+				new Pair<>("event_id", "id"));
+		edgesMap.put(new Pair<>(SLEXMMTables.T_EVENT_TO_OBJECT_VERSION, SLEXMMTables.T_OBJECT_VERSION),
+				new Pair<>("object_version_id", "id"));
+		edgesMap.put(new Pair<>(SLEXMMTables.T_ATTRIBUTE_NAME, SLEXMMTables.T_CLASS), new Pair<>("class_id", "id"));
+		edgesMap.put(new Pair<>(SLEXMMTables.T_RELATIONSHIP, SLEXMMTables.T_CLASS), new Pair<>("source", "id"));
+		edgesMap.put(new Pair<>(SLEXMMTables.T_RELATIONSHIP, SLEXMMTables.T_CLASS), new Pair<>("target", "id"));
+		edgesMap.put(new Pair<>(SLEXMMTables.T_RELATION, SLEXMMTables.T_OBJECT_VERSION),
+				new Pair<>("source_object_version_id", "id"));
+		edgesMap.put(new Pair<>(SLEXMMTables.T_RELATION, SLEXMMTables.T_OBJECT_VERSION),
+				new Pair<>("target_object_version_id", "id"));
+		edgesMap.put(new Pair<>(SLEXMMTables.T_RELATION, SLEXMMTables.T_RELATIONSHIP),
+				new Pair<>("relationship_id", "id"));
+		edgesMap.put(new Pair<>(SLEXMMTables.T_ATTRIBUTE_VALUE, SLEXMMTables.T_OBJECT_VERSION),
+				new Pair<>("object_version_id", "id"));
+		edgesMap.put(new Pair<>(SLEXMMTables.T_ATTRIBUTE_VALUE, SLEXMMTables.T_ATTRIBUTE_NAME),
+				new Pair<>("attribute_name_id", "id"));
+		edgesMap.put(new Pair<>(SLEXMMTables.T_EVENT_ATTRIBUTE_VALUE, SLEXMMTables.T_EVENT),
+				new Pair<>("event_id", "id"));
+		edgesMap.put(new Pair<>(SLEXMMTables.T_EVENT_ATTRIBUTE_VALUE, SLEXMMTables.T_EVENT_ATTRIBUTE_NAME),
+				new Pair<>("event_attribute_name_id", "id"));
+		edgesMap.put(new Pair<>(SLEXMMTables.T_CASE_ATTRIBUTE_VALUE, SLEXMMTables.T_CASE), new Pair<>("case_id", "id"));
+		edgesMap.put(new Pair<>(SLEXMMTables.T_CASE_ATTRIBUTE_VALUE, SLEXMMTables.T_CASE_ATTRIBUTE_NAME),
+				new Pair<>("case_attribute_name_id", "id"));
+		edgesMap.put(new Pair<>(SLEXMMTables.T_LOG_ATTRIBUTE_VALUE, SLEXMMTables.T_LOG), new Pair<>("log_id", "id"));
+		edgesMap.put(new Pair<>(SLEXMMTables.T_LOG_ATTRIBUTE_VALUE, SLEXMMTables.T_LOG_ATTRIBUTE_NAME),
+				new Pair<>("log_attribute_name_id", "id"));
+		edgesMap.put(new Pair<>(SLEXMMTables.T_CLASSIFIER, SLEXMMTables.T_LOG), new Pair<>("log_id", "id"));
+		edgesMap.put(new Pair<>(SLEXMMTables.T_CLASSIFIER_ATTRIBUTES, SLEXMMTables.T_CLASSIFIER),
+				new Pair<>("classifier_id", "id"));
+		edgesMap.put(new Pair<>(SLEXMMTables.T_CLASSIFIER_ATTRIBUTES, SLEXMMTables.T_EVENT_ATTRIBUTE_NAME),
+				new Pair<>("event_attribute_name_id", "id"));
+	}
+		
 	public SLEXMMStorageQueryGenerator() {
 		init();
 	}
@@ -59,10 +128,11 @@ public class SLEXMMStorageQueryGenerator {
 		fieldsMap = new HashMap<>();
 		wmgraph = new DirectedWeightedMultigraph<>(SLEXMMEdge.class);
 							
-		for (String[] nodeInfo: nodesStr) {
-			SLEXMMNode n = new SLEXMMNode(nodeInfo[0]);
-			nodesMap.put(nodeInfo[0],n);
-			for (int i = 1; i < nodeInfo.length; i++) {
+		for (SLEXMMTables table: tablesMap.keySet()) {
+			SLEXMMNode n = new SLEXMMNode(table);
+			nodesMap.put(table,n);
+			String[] nodeInfo = tablesMap.get(table);
+			for (int i = 0; i < nodeInfo.length; i++) {
 				List<String> fields = fieldsMap.get(n);
 				if (fields == null) {
 					fields = new ArrayList<>();
@@ -73,11 +143,11 @@ public class SLEXMMStorageQueryGenerator {
 			wmgraph.addVertex(n);
 		}
 		
-		for (String[] edgeS: edgesStr) {
-			SLEXMMNode nsource = nodesMap.get(edgeS[0]);
-			SLEXMMNode ntarget = nodesMap.get(edgeS[1]);
-			String sourceField = edgeS[2];
-			String targetField = edgeS[3];
+		for (Pair<SLEXMMTables> edgeK: edgesMap.keySet()) {
+			SLEXMMNode nsource = nodesMap.get(edgeK.a);
+			SLEXMMNode ntarget = nodesMap.get(edgeK.b);
+			String sourceField = edgesMap.get(edgeK).a;
+			String targetField = edgesMap.get(edgeK).b;
 			SLEXMMEdge e = new SLEXMMEdge(nsource,ntarget,sourceField,targetField);
 			SLEXMMEdge eI = new SLEXMMEdge(ntarget,nsource,targetField,sourceField);
 			wmgraph.addEdge(e.getSourceNode(), e.getTargetNode(), e);
@@ -88,20 +158,24 @@ public class SLEXMMStorageQueryGenerator {
 		
 	}
 	
-	public List<SLEXMMEdge> getPath(String orig, String dest) {
+	public List<SLEXMMEdge> getPath(SLEXMMTables orig, SLEXMMTables dest) {
 		SLEXMMNode norig = nodesMap.get(orig);
 		SLEXMMNode ndest = nodesMap.get(dest);
-				
-		return DijkstraShortestPath.findPathBetween(wmgraph, norig, ndest);
+		
+		List<SLEXMMEdge> path = DijkstraShortestPath.findPathBetween(wmgraph, norig, ndest);
+		
+		if (path.isEmpty()) {
+			SLEXMMEdge e = new SLEXMMEdge(norig, ndest, "id", "id");
+			path.add(e);
+		}
+		
+		return path;
 	}
 	
-	public String getQuery(List<SLEXMMEdge> path, int[] ids) {
+	private String getFromAndWhereOfQuery(List<SLEXMMEdge> path, int[] ids) {
 		StringBuilder strbldr = new StringBuilder();
 		
 		SLEXMMEdge lastEdge = path.get(path.size()-1);
-		
-		strbldr.append("SELECT DISTINCT t"+(path.size()+1)+"."+lastEdge.getTargetField()+
-				" as originIdQuery, t1.* ");
 		
 		strbldr.append("FROM ");
 		
@@ -124,9 +198,15 @@ public class SLEXMMStorageQueryGenerator {
 		
 		strbldr.append(" WHERE ");
 		
-		String idsStr = SLEXMMStorageMetaModelImpl.buildStringFromArray(ids);
+		String idsStr = null; 
 		
-		strbldr.append(" t"+i+"."+lastEdge.getTargetField()+" IN ("+idsStr+")");
+		if (ids != null) {
+			idsStr = SLEXMMStorageMetaModelImpl.buildStringFromArray(ids);
+			strbldr.append(" t"+i+"."+lastEdge.getTargetField()+" IN ("+idsStr+")");
+		} else {
+			strbldr.append(" 1 ");
+		}
+		
 		i = 1;
 		for (SLEXMMEdge e: path) {
 			strbldr.append(" AND t"+i+"."+e.getSourceField()+
@@ -137,32 +217,94 @@ public class SLEXMMStorageQueryGenerator {
 		return strbldr.toString();
 	}
 	
-	public static void main(String[] args) {
-		SLEXMMStorageQueryGenerator slxmmsqgen = new SLEXMMStorageQueryGenerator();
-		String orig = "datamodel";
-		String dest = "version";
-		List<SLEXMMEdge> path = slxmmsqgen.getPath(orig, dest);
-		System.out.println(orig+" to "+dest);
-		System.out.println(path);
+	public String getSelectQuery(List<SLEXMMEdge> path, int[] ids) {
+		StringBuilder strbldr = new StringBuilder();
 		
-		System.out.println("Query: "+slxmmsqgen.getQuery(path,new int[]{1,2,3}));
+		SLEXMMEdge lastEdge = path.get(path.size()-1);
 		
-		orig = "case";
-		dest = "process";
-		path = slxmmsqgen.getPath(orig, dest);
-		System.out.println(orig+" to "+dest);
-		System.out.println(path);
+		strbldr.append("SELECT DISTINCT t"+(path.size()+1)+"."+lastEdge.getTargetField()+
+				" as originIdQuery, t1.* ");
 		
-		System.out.println("Query: "+slxmmsqgen.getQuery(path,new int[]{1,2,3}));
+		strbldr.append(getFromAndWhereOfQuery(path, ids));
 		
-		orig = "case";
-		dest = "datamodel";
-		path = slxmmsqgen.getPath(orig, dest);
-		System.out.println(orig+" to "+dest);
-		System.out.println(path);
+		return strbldr.toString();
+	}
+	
+	public String getSelectQueryForPeriod(List<SLEXMMEdge> path, SLEXMMPeriod p) {
+		StringBuilder strbldr = new StringBuilder();
 		
-		System.out.println("Query: "+slxmmsqgen.getQuery(path,new int[]{1,2,3}));
+		SLEXMMEdge lastEdge = path.get(path.size()-1);
+		SLEXMMNode lastNode = lastEdge.getTargetNode();
+		String startTField = null;
+		String endTField = null;
 		
+		switch (lastNode.getTable()) {
+			case T_EVENT:
+				startTField = "timestamp";
+				endTField = "timestamp";
+				break;
+			case T_OBJECT_VERSION:
+				startTField = "start_timestamp";
+				endTField = "end_timestamp";
+				break;
+			case T_RELATION:
+				startTField = "start_timestamp";
+				endTField = "end_timestamp";
+				break;
+			default:
+				return null;
+		}
+		
+		strbldr.append("SELECT DISTINCT t1.* ");
+		
+		strbldr.append(getFromAndWhereOfQuery(path, null));
+		
+		strbldr.append(" AND (t"+(path.size()+1)+"."+endTField+" >= "+p.getStart());
+		strbldr.append(" OR t"+(path.size()+1)+"."+endTField+" = -1)");
+		
+		if (p.getEnd() != -1) {
+			strbldr.append(" AND t"+(path.size()+1)+"."+startTField+" <= "+p.getEnd());
+		}
+		
+		return strbldr.toString();
+	}
+	
+	public String getPeriodsQuery(List<SLEXMMEdge> path, int[] ids) {
+		StringBuilder strbldr = new StringBuilder();
+		
+		SLEXMMEdge lastEdge = path.get(path.size()-1);
+		SLEXMMEdge firstEdge = path.get(0);
+		SLEXMMNode firstNode = firstEdge.getSourceNode();
+		String startTField = null;
+		String endTField = null;
+		
+		switch (firstNode.getTable()) {
+			case T_EVENT:
+				startTField = "timestamp";
+				endTField = "timestamp";
+				break;
+			case T_OBJECT_VERSION:
+				startTField = "start_timestamp";
+				endTField = "end_timestamp";
+				break;
+			case T_RELATION:
+				startTField = "start_timestamp";
+				endTField = "end_timestamp";
+				break;
+			default:
+				return null;
+		}
+		
+		strbldr.append("SELECT DISTINCT t"+(path.size()+1)+"."+lastEdge.getTargetField()+
+				" as originIdQuery, min(t1."+startTField+") as start, "+
+				" max(t1."+endTField+") as end, "+
+				" min(t1."+endTField+") as end2 ");
+		
+		strbldr.append(getFromAndWhereOfQuery(path, ids));
+		
+		strbldr.append(" GROUP BY originIdQuery ");
+		
+		return strbldr.toString();
 	}
 	
 }

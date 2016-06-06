@@ -20,7 +20,7 @@ public class SLEXMMPeriodResultSet extends SLEXMMAbstractResultSetObject {
 	 * @param storage the storage
 	 * @param rset the rset
 	 */
-	protected SLEXMMPeriodResultSet(SLEXMMStorageMetaModel storage, ResultSet rset) {
+	public SLEXMMPeriodResultSet(SLEXMMStorageMetaModel storage, ResultSet rset) {
 		super(storage, rset);
 	}
 	

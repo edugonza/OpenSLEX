@@ -208,10 +208,10 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	/**
 	 * Gets the events of case.
 	 *
-	 * @param caseId the case id
+	 * @param is the case ids
 	 * @return the events of case
 	 */
-	public abstract SLEXMMEventResultSet getEventsOfCase(int caseId);
+	public abstract SLEXMMEventResultSet getEventsOfCase(int[] is);
 
 	/**
 	 * Gets the number events of case.
@@ -264,15 +264,6 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	 */
 	public abstract SLEXMMRelationship createRelationship(String name,
 			int sourceClassId, int targetClassId);
-
-	/**
-	 * Gets the classes for data model.
-	 *
-	 * @param dm the dm
-	 * @return the classes for data model
-	 */
-	public abstract SLEXMMClassResultSet getClassesForDataModel(
-			SLEXMMDataModel dm);
 
 	/**
 	 * Gets the data models.
@@ -643,6 +634,14 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	 */
 	public abstract SLEXMMActivityResultSet getActivities();
 
+	/**
+	 * Gets the classes.
+	 *
+	 * @return the classes
+	 */
+	public abstract SLEXMMClassResultSet getClasses();
+
+	
 	/**
 	 * Gets the object versions.
 	 *
@@ -2474,31 +2473,31 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 
 	public abstract SLEXMMLogResultSet getLogsForProcesses(int[] is);
 
-	public abstract SLEXMMObjectResultSet getObjectsForPeriods(int[] is);
+	public abstract SLEXMMObjectResultSet getObjectsForPeriod(SLEXMMPeriod p);
 
-	public abstract SLEXMMCaseResultSet getCasesForPeriods(int[] is);
+	public abstract SLEXMMCaseResultSet getCasesForPeriod(SLEXMMPeriod p);
 
-	public abstract SLEXMMEventResultSet getEventsForPeriods(int[] is);
+	public abstract SLEXMMEventResultSet getEventsForPeriod(SLEXMMPeriod p);
 
-	public abstract SLEXMMObjectVersionResultSet getVersionsForPeriods(int[] is);
+	public abstract SLEXMMObjectVersionResultSet getVersionsForPeriod(SLEXMMPeriod p);
 
-	public abstract SLEXMMActivityResultSet getActivitiesForPeriods(int[] is);
+	public abstract SLEXMMActivityResultSet getActivitiesForPeriod(SLEXMMPeriod p);
 
-	public abstract SLEXMMClassResultSet getClassesForPeriods(int[] is);
+	public abstract SLEXMMClassResultSet getClassesForPeriod(SLEXMMPeriod p);
 
-	public abstract SLEXMMRelationResultSet getRelationsForPeriods(int[] is);
+	public abstract SLEXMMRelationResultSet getRelationsForPeriod(SLEXMMPeriod p);
 
-	public abstract SLEXMMRelationshipResultSet getRelationshipsForPeriods(int[] is);
+	public abstract SLEXMMRelationshipResultSet getRelationshipsForPeriod(SLEXMMPeriod p);
 
-	public abstract SLEXMMActivityInstanceResultSet getActivityInstancesForPeriods(int[] is);
+	public abstract SLEXMMActivityInstanceResultSet getActivityInstancesForPeriod(SLEXMMPeriod p);
 
-	public abstract SLEXMMAttributeResultSet getAttributesForPeriods(int[] is);
+	public abstract SLEXMMAttributeResultSet getAttributesForPeriod(SLEXMMPeriod p);
 
-	public abstract SLEXMMDataModelResultSet getDatamodelsForPeriods(int[] is);
+	public abstract SLEXMMDataModelResultSet getDatamodelsForPeriod(SLEXMMPeriod p);
 
-	public abstract SLEXMMProcessResultSet getProcessesForPeriods(int[] is);
+	public abstract SLEXMMProcessResultSet getProcessesForPeriod(SLEXMMPeriod p);
 
-	public abstract SLEXMMLogResultSet getLogsForPeriods(int[] is);
+	public abstract SLEXMMLogResultSet getLogsForPeriod(SLEXMMPeriod p);
 
 	public abstract SLEXMMPeriodResultSet getPeriodsForEvents(int[] is);
 

@@ -59,7 +59,7 @@ abstract class SLEXMMAbstractResultSetObject {
 			try {
 				originId = this.rset.getInt("originIdQuery");
 			} catch (SQLException e) {
-				e.printStackTrace();
+				//e.printStackTrace();
 			}
 		}
 		

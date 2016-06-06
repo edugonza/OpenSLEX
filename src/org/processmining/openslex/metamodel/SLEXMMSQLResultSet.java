@@ -34,7 +34,7 @@ public class SLEXMMSQLResultSet extends SLEXMMAbstractResultSetObject {
 	 * @param storage the storage
 	 * @param rset the rset
 	 */
-	protected SLEXMMSQLResultSet(SLEXMMStorageMetaModel storage, ResultSet rset) {
+	public SLEXMMSQLResultSet(SLEXMMStorageMetaModel storage, ResultSet rset) {
 		super(storage, rset);
 		
 		try {

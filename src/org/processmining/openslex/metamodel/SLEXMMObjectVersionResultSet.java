@@ -22,7 +22,7 @@ public class SLEXMMObjectVersionResultSet extends SLEXMMAbstractResultSetObject 
 	 * @param storage the storage
 	 * @param rset the rset
 	 */
-	protected SLEXMMObjectVersionResultSet(SLEXMMStorageMetaModel storage, ResultSet rset) {
+	public SLEXMMObjectVersionResultSet(SLEXMMStorageMetaModel storage, ResultSet rset) {
 		super(storage, rset);
 	}
 	
