@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.jgrapht.GraphPath;
 import org.jgrapht.alg.DijkstraShortestPath;
+import org.jgrapht.alg.KShortestPaths;
 import org.jgrapht.graph.DirectedWeightedMultigraph;
 import org.processmining.openslex.metamodel.SLEXMMPeriod;
 import org.processmining.openslex.metamodel.SLEXMMPeriodResultSet;
@@ -23,6 +25,8 @@ public class SLEXMMStorageQueryGenerator {
 	private final static String METAMODEL_ALIAS = SLEXMMStorageMetaModelImpl.METAMODEL_ALIAS;
 	
 	private final static HashMap<SLEXMMTables,String[]> tablesMap;
+	
+	private final static int MAX_PATHS = 4;
 	
 	static {
 		tablesMap = new HashMap<>();
@@ -152,24 +156,60 @@ public class SLEXMMStorageQueryGenerator {
 			SLEXMMEdge eI = new SLEXMMEdge(ntarget,nsource,targetField,sourceField);
 			wmgraph.addEdge(e.getSourceNode(), e.getTargetNode(), e);
 			wmgraph.addEdge(eI.getSourceNode(), eI.getTargetNode(), eI);
-			wmgraph.setEdgeWeight(e,0.0);
-			wmgraph.setEdgeWeight(eI,1.0);
+			wmgraph.setEdgeWeight(e,1.0);
+			wmgraph.setEdgeWeight(eI,0.0);
 		}
 		
 	}
 	
-	public List<SLEXMMEdge> getPath(SLEXMMTables orig, SLEXMMTables dest) {
+	public List<List<SLEXMMEdge>> getPaths(SLEXMMTables orig, SLEXMMTables dest) {
 		SLEXMMNode norig = nodesMap.get(orig);
 		SLEXMMNode ndest = nodesMap.get(dest);
 		
-		List<SLEXMMEdge> path = DijkstraShortestPath.findPathBetween(wmgraph, norig, ndest);
+		//List<SLEXMMEdge> path = DijkstraShortestPath.findPathBetween(wmgraph, norig, ndest);
+		KShortestPaths<SLEXMMNode, SLEXMMEdge> kspc = new KShortestPaths<SLEXMMNode, SLEXMMEdge>(wmgraph, norig,
+				MAX_PATHS);
 		
-		if (path.isEmpty()) {
-			SLEXMMEdge e = new SLEXMMEdge(norig, ndest, "id", "id");
-			path.add(e);
+		List<GraphPath<SLEXMMNode,SLEXMMEdge>> paths = kspc.getPaths(ndest);
+		
+		List<List<SLEXMMEdge>> listPaths = new ArrayList<>();
+		
+		int i = 0;
+		double minWeight = Double.MAX_VALUE;
+		int minLength = Integer.MAX_VALUE;
+		
+		for (GraphPath<SLEXMMNode,SLEXMMEdge> p : paths) {
+			int length = p.getEdgeList().size();
+			double weight = p.getWeight();
+			
+			if (length < minLength) {
+				minLength = length;
+			}
+			
+			if (weight < minWeight) {
+				minWeight = weight;
+			}
 		}
 		
-		return path;
+		for (GraphPath<SLEXMMNode,SLEXMMEdge> p : paths) {
+			int length = p.getEdgeList().size();
+			double weight = p.getWeight();
+			
+			if (weight == minWeight) {
+				if (length == minLength) {
+					listPaths.add(p.getEdgeList());
+				}
+			}
+		}
+		
+		if (listPaths.isEmpty()) {
+			SLEXMMEdge e = new SLEXMMEdge(norig, ndest, "id", "id");
+			List<SLEXMMEdge> path = new ArrayList<>();
+			path.add(e);
+			listPaths.add(path);
+		}
+		
+		return listPaths;
 	}
 	
 	private String getFromAndWhereOfQuery(List<SLEXMMEdge> path, int[] ids) {
@@ -202,7 +242,7 @@ public class SLEXMMStorageQueryGenerator {
 		
 		if (ids != null) {
 			idsStr = SLEXMMStorageMetaModelImpl.buildStringFromArray(ids);
-			strbldr.append(" t"+i+"."+lastEdge.getTargetField()+" IN ("+idsStr+")");
+			strbldr.append(" t"+i+".id IN ("+idsStr+")");
 		} else {
 			strbldr.append(" 1 ");
 		}
@@ -217,28 +257,52 @@ public class SLEXMMStorageQueryGenerator {
 		return strbldr.toString();
 	}
 	
-	public String getSelectQuery(List<SLEXMMEdge> path, int[] ids) {
+	public String getSelectQuery(List<List<SLEXMMEdge>> paths, int[] ids) {
 		StringBuilder strbldr = new StringBuilder();
 		
-		SLEXMMEdge lastEdge = path.get(path.size()-1);
+		boolean first = true;
+
+		for (List<SLEXMMEdge> path : paths) {
+
+			if (!first) {
+				strbldr.append(" UNION ");
+			} else {
+				first = false;
+			}
+
+			SLEXMMEdge lastEdge = path.get(path.size() - 1);
+
+			strbldr.append("SELECT DISTINCT t" + (path.size() + 1) + ".id"
+					+ " as originIdQuery, t1.* ");
+
+			strbldr.append(getFromAndWhereOfQuery(path, ids));
+
+		}
 		
-		strbldr.append("SELECT DISTINCT t"+(path.size()+1)+"."+lastEdge.getTargetField()+
-				" as originIdQuery, t1.* ");
-		
-		strbldr.append(getFromAndWhereOfQuery(path, ids));
+		System.out.println("Query: "+strbldr.toString());
 		
 		return strbldr.toString();
 	}
 	
-	public String getSelectQueryForPeriod(List<SLEXMMEdge> path, SLEXMMPeriod p) {
+	public String getSelectQueryForPeriod(List<List<SLEXMMEdge>> paths, SLEXMMPeriod p) {
 		StringBuilder strbldr = new StringBuilder();
 		
-		SLEXMMEdge lastEdge = path.get(path.size()-1);
-		SLEXMMNode lastNode = lastEdge.getTargetNode();
-		String startTField = null;
-		String endTField = null;
-		
-		switch (lastNode.getTable()) {
+		boolean first = true;
+
+		for (List<SLEXMMEdge> path : paths) {
+
+			if (!first) {
+				strbldr.append(" UNION ");
+			} else {
+				first = false;
+			}
+
+			SLEXMMEdge lastEdge = path.get(path.size() - 1);
+			SLEXMMNode lastNode = lastEdge.getTargetNode();
+			String startTField = null;
+			String endTField = null;
+
+			switch (lastNode.getTable()) {
 			case T_EVENT:
 				startTField = "timestamp";
 				endTField = "timestamp";
@@ -253,32 +317,46 @@ public class SLEXMMStorageQueryGenerator {
 				break;
 			default:
 				return null;
+			}
+
+			strbldr.append("SELECT DISTINCT t1.* ");
+
+			strbldr.append(getFromAndWhereOfQuery(path, null));
+
+			strbldr.append(" AND (t" + (path.size() + 1) + "." + endTField + " >= " + p.getStart());
+			strbldr.append(" OR t" + (path.size() + 1) + "." + endTField + " = -1)");
+
+			if (p.getEnd() != -1) {
+				strbldr.append(" AND t" + (path.size() + 1) + "." + startTField + " <= " + p.getEnd());
+			}
+
 		}
 		
-		strbldr.append("SELECT DISTINCT t1.* ");
-		
-		strbldr.append(getFromAndWhereOfQuery(path, null));
-		
-		strbldr.append(" AND (t"+(path.size()+1)+"."+endTField+" >= "+p.getStart());
-		strbldr.append(" OR t"+(path.size()+1)+"."+endTField+" = -1)");
-		
-		if (p.getEnd() != -1) {
-			strbldr.append(" AND t"+(path.size()+1)+"."+startTField+" <= "+p.getEnd());
-		}
+		System.out.println("Query: "+strbldr.toString());
 		
 		return strbldr.toString();
 	}
 	
-	public String getPeriodsQuery(List<SLEXMMEdge> path, int[] ids) {
+	public String getPeriodsQuery(List<List<SLEXMMEdge>> paths, int[] ids) {
 		StringBuilder strbldr = new StringBuilder();
 		
-		SLEXMMEdge lastEdge = path.get(path.size()-1);
-		SLEXMMEdge firstEdge = path.get(0);
-		SLEXMMNode firstNode = firstEdge.getSourceNode();
-		String startTField = null;
-		String endTField = null;
-		
-		switch (firstNode.getTable()) {
+		boolean first = true;
+
+		for (List<SLEXMMEdge> path : paths) {
+
+			if (!first) {
+				strbldr.append(" UNION ");
+			} else {
+				first = false;
+			}
+
+			SLEXMMEdge lastEdge = path.get(path.size() - 1);
+			SLEXMMEdge firstEdge = path.get(0);
+			SLEXMMNode firstNode = firstEdge.getSourceNode();
+			String startTField = null;
+			String endTField = null;
+
+			switch (firstNode.getTable()) {
 			case T_EVENT:
 				startTField = "timestamp";
 				endTField = "timestamp";
@@ -293,16 +371,19 @@ public class SLEXMMStorageQueryGenerator {
 				break;
 			default:
 				return null;
+			}
+
+			strbldr.append("SELECT DISTINCT t" + (path.size() + 1) + ".id"
+					+ " as originIdQuery, min(t1." + startTField + ") as start, " + " max(t1." + endTField
+					+ ") as end, " + " min(t1." + endTField + ") as end2 ");
+
+			strbldr.append(getFromAndWhereOfQuery(path, ids));
+
+			strbldr.append(" GROUP BY originIdQuery ");
+
 		}
-		
-		strbldr.append("SELECT DISTINCT t"+(path.size()+1)+"."+lastEdge.getTargetField()+
-				" as originIdQuery, min(t1."+startTField+") as start, "+
-				" max(t1."+endTField+") as end, "+
-				" min(t1."+endTField+") as end2 ");
-		
-		strbldr.append(getFromAndWhereOfQuery(path, ids));
-		
-		strbldr.append(" GROUP BY originIdQuery ");
+
+		System.out.println("Query: "+strbldr.toString());
 		
 		return strbldr.toString();
 	}
