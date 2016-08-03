@@ -224,7 +224,7 @@ public class SLEXMMStorageQueryGenerator {
 		for (SLEXMMEdge e: path) {
 			SLEXMMNode n = e.getSourceNode();
 			strbldr.append(METAMODEL_ALIAS+".");
-			strbldr.append(n.getName());
+			strbldr.append('"'+n.getName()+'"');
 			strbldr.append(" as t");
 			strbldr.append(i);
 			strbldr.append(", ");
@@ -232,7 +232,7 @@ public class SLEXMMStorageQueryGenerator {
 		}
 		
 		strbldr.append(METAMODEL_ALIAS+".");
-		strbldr.append(lastEdge.getTargetNode().getName());
+		strbldr.append('"'+lastEdge.getTargetNode().getName()+'"');
 		strbldr.append(" as t");
 		strbldr.append(i);
 		

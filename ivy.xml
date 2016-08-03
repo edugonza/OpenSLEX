@@ -21,7 +21,7 @@
     <info
         organisation="db-process-mining"
         module="OpenSLEX"
-        revision="0.5">
+        revision="0.6">
     </info>
 	<dependencies>
 		<dependency org="org.jgrapht" name="jgrapht-core" rev="0.9.2"/>

@@ -39,7 +39,7 @@ public class SLEXMMClassResultSet extends SLEXMMAbstractResultSetObject {
 				String name = this.rset.getString("name");
 				cl = new SLEXMMClass((SLEXMMStorageMetaModel)storage,name,dataModelId);
 				cl.setId(id);
-				cl.retrieveAttributesAndKeys();
+				//cl.retrieveAttributesAndKeys();
 				cl.setDirty(false);
 				cl.setInserted(true);
 			}
