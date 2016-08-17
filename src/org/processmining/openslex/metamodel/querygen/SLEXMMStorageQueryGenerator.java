@@ -170,7 +170,13 @@ public class SLEXMMStorageQueryGenerator {
 		KShortestPaths<SLEXMMNode, SLEXMMEdge> kspc = new KShortestPaths<SLEXMMNode, SLEXMMEdge>(wmgraph, norig,
 				MAX_PATHS);
 		
-		List<GraphPath<SLEXMMNode,SLEXMMEdge>> paths = kspc.getPaths(ndest);
+		List<GraphPath<SLEXMMNode,SLEXMMEdge>> paths = null;
+		
+		if (norig != ndest) {
+			paths = kspc.getPaths(ndest);
+		} else {
+			paths = new ArrayList<>();
+		}
 		
 		List<List<SLEXMMEdge>> listPaths = new ArrayList<>();
 		

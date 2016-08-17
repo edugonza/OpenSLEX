@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 import org.processmining.openslex.metamodel.querygen.SLEXMMEdge;
@@ -2045,6 +2046,34 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 					+METAMODEL_ALIAS+".relation AS RL "
 					+" WHERE ( RL.source_object_version_id = "+ob.getId()+" AND OBJV.id = RL.target_object_version_id ) "
 					+" OR ( RL.target_object_version_id = "+ob.getId()+" AND OBJV.id = RL.source_object_version_id ) ";
+			ResultSet rset = statement.executeQuery(query);
+			erset = new SLEXMMObjectVersionResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.err.println(query);
+			closeStatement(statement);
+		}
+		
+		return erset; 
+		 
+	}
+	
+	@Override
+	public SLEXMMObjectVersionResultSet getVersionsRelatedToObjectVersions(int[] verIds) {
+		
+		SLEXMMObjectVersionResultSet erset = null;
+		Statement statement = null;
+		String idsStr = buildStringFromArray(verIds);
+		String query = "";
+		try {
+			statement = createStatement();
+			query = "SELECT DISTINCT OBJV1.id as originIdQuery, OBJV2.* FROM "
+					+METAMODEL_ALIAS+".object_version AS OBJV1, "
+					+METAMODEL_ALIAS+".object_version AS OBJV2, "
+					+METAMODEL_ALIAS+".relation AS RL "
+					+" WHERE (( RL.source_object_version_id = OBJV1.id AND OBJV2.id = RL.target_object_version_id ) "
+					+" OR ( RL.target_object_version_id = OBJV1.id AND OBJV2.id = RL.source_object_version_id )) "
+					+" AND OBJV1.id IN ("+idsStr+")";
 			ResultSet rset = statement.executeQuery(query);
 			erset = new SLEXMMObjectVersionResultSet(this, rset);
 		} catch (Exception e) {
@@ -5221,6 +5250,84 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		
 		return prset;
 		
+	}
+	
+	public SLEXMMEventResultSet getEventsAndAttributeValues(Set<SLEXMMEvent> set) {
+		
+		int[] ids = new int[set.size()];
+		
+		int i = 0;
+		for (SLEXMMEvent e : set) {
+			ids[i] = e.getId();
+			i++;
+		}
+		
+		return getEventsAndAttributeValues(ids);
+	}
+	
+	public SLEXMMEventResultSet getEventsAndAttributeValues(int[] ids) {
+		
+		SLEXMMEventResultSet erset = null;
+		Statement statement = null;
+		try {
+			statement = createStatement();
+			String query = "SELECT DISTINCT EV.*, EVAT.id as atId, "
+					+" EVAT.name as atName, EVATV.value as atValue, "
+					+" EVATV.type as atType FROM "
+					+METAMODEL_ALIAS+".event as EV, "
+					+METAMODEL_ALIAS+".event_attribute_name as EVAT, "
+					+METAMODEL_ALIAS+".event_attribute_value as EVATV "
+					+" WHERE EV.id IN ("+buildStringFromArray(ids)+") "
+					+"   AND EV.id = EVATV.event_id "
+					+"   AND EVATV.event_attribute_name_id = EVAT.id "
+					+" ORDER BY EV.id ";
+			ResultSet rset = statement.executeQuery(query);
+			erset = new SLEXMMEventResultSet(this, rset);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return erset;
+	}
+	
+	public SLEXMMObjectVersionResultSet getVersionsAndAttributeValues(Set<SLEXMMObjectVersion> set) {
+		
+		int[] ids = new int[set.size()];
+		
+		int i = 0;
+		for (SLEXMMObjectVersion e : set) {
+			ids[i] = e.getId();
+			i++;
+		}
+		
+		return getVersionsAndAttributeValues(ids);
+	}
+	
+	public SLEXMMObjectVersionResultSet getVersionsAndAttributeValues(int[] ids) {
+		
+		SLEXMMObjectVersionResultSet ovrset = null;
+		Statement statement = null;
+		try {
+			statement = createStatement();
+			String query = "SELECT DISTINCT OV.*, OVAT.id as atId, "
+					+" OVAT.name as atName, OVATV.value as atValue, "
+					+" OVATV.type as atType FROM "
+					+METAMODEL_ALIAS+".object_version as OV, "
+					+METAMODEL_ALIAS+".attribute_name as OVAT, "
+					+METAMODEL_ALIAS+".attribute_value as OVATV "
+					+" WHERE OV.id IN ("+buildStringFromArray(ids)+") "
+					+"   AND OV.id = OVATV.object_version_id "
+					+"   AND OVATV.attribute_name_id = OVAT.id "
+					+" ORDER BY OV.id ";
+			ResultSet rset = statement.executeQuery(query);
+			ovrset = new SLEXMMObjectVersionResultSet(this, rset);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return ovrset;
 	}
 	
 }

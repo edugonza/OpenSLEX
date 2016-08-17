@@ -75,4 +75,10 @@ public class SLEXMMEventAttribute extends SLEXMMAbstractDatabaseObject {
 	public int hashCode() {
 		return ("event_attribute#"+getId()).hashCode();
 	}
+	
+	@Override
+	public String toString() {
+		return getId()+":"+getName();
+	}
+	
 }

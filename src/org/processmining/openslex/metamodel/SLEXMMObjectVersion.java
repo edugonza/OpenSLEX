@@ -146,6 +146,11 @@ public class SLEXMMObjectVersion extends SLEXMMAbstractDatabaseObject {
 		attributeValues = getStorage().getAttributeValuesForObjectVersion(this);
 	}
 	
+	protected void setAttributeValues(HashMap<SLEXMMAttribute, SLEXMMAttributeValue> attributeValues) {
+		this.attributeValues = attributeValues;
+	}
+	
+	
 	/**
 	 * Gets the attribute values.
 	 *

@@ -6,6 +6,7 @@ package org.processmining.openslex.metamodel;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -658,6 +659,15 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	public abstract SLEXMMObjectVersionResultSet getVersionsRelatedToObjectVersion(
 			SLEXMMObjectVersion ob);
 
+	/**
+	 * Gets the versions related to object versions.
+	 *
+	 * @param verIds the version Ids
+	 * @return the versions related to object versions
+	 */
+	public abstract SLEXMMObjectVersionResultSet getVersionsRelatedToObjectVersions(int[] verIds);
+
+	
 	/**
 	 * Gets the object per id.
 	 *
@@ -2524,5 +2534,13 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	public abstract SLEXMMPeriodResultSet getPeriodsForProcesses(int[] is);
 
 	public abstract SLEXMMLog createLog(int processId, String name);
+	
+	public abstract SLEXMMEventResultSet getEventsAndAttributeValues(Set<SLEXMMEvent> set);
+	
+	public abstract SLEXMMEventResultSet getEventsAndAttributeValues(int[] ids);
+	
+	public abstract SLEXMMObjectVersionResultSet getVersionsAndAttributeValues(Set<SLEXMMObjectVersion> set);
+	
+	public abstract SLEXMMObjectVersionResultSet getVersionsAndAttributeValues(int[] ids);
 	
 }

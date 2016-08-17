@@ -168,6 +168,10 @@ public class SLEXMMEvent extends SLEXMMAbstractDatabaseObject {
 		attributeValues = getStorage().getAttributeValuesForEvent(this);
 	}
 	
+	protected void setAttributeValues(HashMap<SLEXMMEventAttribute, SLEXMMEventAttributeValue> attributeValues) {
+		this.attributeValues = attributeValues;
+	}
+	
 	/**
 	 * Gets the attribute values.
 	 *
