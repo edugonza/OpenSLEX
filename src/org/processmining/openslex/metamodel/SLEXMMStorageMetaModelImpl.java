@@ -5266,7 +5266,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 	
 	public SLEXMMEventResultSet getEventsAndAttributeValues(int[] ids) {
-		
+		// FIXME
 		SLEXMMEventResultSet erset = null;
 		Statement statement = null;
 		try {
@@ -5305,7 +5305,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 	
 	public SLEXMMObjectVersionResultSet getVersionsAndAttributeValues(int[] ids) {
-		
+		// FIXME
 		SLEXMMObjectVersionResultSet ovrset = null;
 		Statement statement = null;
 		try {
@@ -5330,4 +5330,81 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		return ovrset;
 	}
 	
+	public SLEXMMCaseResultSet getCasesAndAttributeValues(Set<SLEXMMCase> set) {
+		
+		int[] ids = new int[set.size()];
+		
+		int i = 0;
+		for (SLEXMMCase c : set) {
+			ids[i] = c.getId();
+			i++;
+		}
+		
+		return getCasesAndAttributeValues(ids);
+	}
+	
+	public SLEXMMCaseResultSet getCasesAndAttributeValues(int[] ids) {
+		// FIXME
+		SLEXMMCaseResultSet crset = null;
+		Statement statement = null;
+		try {
+			statement = createStatement();
+			String query = "SELECT DISTINCT C.*, CAT.id as atId, "
+					+" CAT.name as atName, CATV.value as atValue, "
+					+" CATV.type as atType FROM "
+					+METAMODEL_ALIAS+".'case' as C, "
+					+METAMODEL_ALIAS+".case_attribute_name as CAT, "
+					+METAMODEL_ALIAS+".case_attribute_value as CATV "
+					+" WHERE C.id IN ("+buildStringFromArray(ids)+") "
+					+"   AND C.id = CATV.case_id "
+					+"   AND CATV.case_attribute_name_id = CAT.id "
+					+" ORDER BY C.id ";
+			ResultSet rset = statement.executeQuery(query);
+			crset = new SLEXMMCaseResultSet(this, rset);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return crset;
+	}
+	
+	public SLEXMMLogResultSet getLogsAndAttributeValues(Set<SLEXMMLog> set) {
+		
+		int[] ids = new int[set.size()];
+		
+		int i = 0;
+		for (SLEXMMLog c : set) {
+			ids[i] = c.getId();
+			i++;
+		}
+		
+		return getLogsAndAttributeValues(ids);
+	}
+	
+	public SLEXMMLogResultSet getLogsAndAttributeValues(int[] ids) {
+		// FIXME
+		SLEXMMLogResultSet lrset = null;
+		Statement statement = null;
+		try {
+			statement = createStatement();
+			String query = "SELECT DISTINCT L.*, LAT.id as atId, "
+					+" LAT.name as atName, LATV.value as atValue, "
+					+" LATV.type as atType FROM "
+					+METAMODEL_ALIAS+".log as L, "
+					+METAMODEL_ALIAS+".log_attribute_name as LAT, "
+					+METAMODEL_ALIAS+".log_attribute_value as LATV "
+					+" WHERE L.id IN ("+buildStringFromArray(ids)+") "
+					+"   AND L.id = LATV.log_id "
+					+"   AND LATV.log_attribute_name_id = LAT.id "
+					+" ORDER BY L.id ";
+			ResultSet rset = statement.executeQuery(query);
+			lrset = new SLEXMMLogResultSet(this, rset);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return lrset;
+	}
 }

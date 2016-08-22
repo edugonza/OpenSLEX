@@ -2543,4 +2543,12 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	
 	public abstract SLEXMMObjectVersionResultSet getVersionsAndAttributeValues(int[] ids);
 	
+	public abstract SLEXMMCaseResultSet getCasesAndAttributeValues(Set<SLEXMMCase> set);
+	
+	public abstract SLEXMMCaseResultSet getCasesAndAttributeValues(int[] ids);
+	
+	public abstract SLEXMMLogResultSet getLogsAndAttributeValues(Set<SLEXMMLog> set);
+	
+	public abstract SLEXMMLogResultSet getLogsAndAttributeValues(int[] ids);
+	
 }

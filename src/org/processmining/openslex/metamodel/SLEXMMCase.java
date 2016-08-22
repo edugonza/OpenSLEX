@@ -104,6 +104,10 @@ public class SLEXMMCase extends SLEXMMAbstractDatabaseObject {
 		attributeValues = getStorage().getAttributeValuesForCase(this);
 	}
 	
+	protected void setAttributeValues(HashMap<SLEXMMCaseAttribute, SLEXMMCaseAttributeValue> attributeValues) {
+		this.attributeValues = attributeValues;
+	}
+	
 	/**
 	 * Gets the attribute values.
 	 *

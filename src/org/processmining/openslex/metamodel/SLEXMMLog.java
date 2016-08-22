@@ -122,6 +122,11 @@ public class SLEXMMLog extends SLEXMMAbstractDatabaseObject {
 		attributeValues = getStorage().getAttributeValuesForLog(this);
 	}
 	
+	
+	protected void setAttributeValues(HashMap<SLEXMMLogAttribute, SLEXMMLogAttributeValue> attributeValues) {
+		this.attributeValues = attributeValues;
+	}
+	
 	/**
 	 * Gets the attribute values.
 	 *
