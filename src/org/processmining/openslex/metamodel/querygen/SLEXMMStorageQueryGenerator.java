@@ -285,7 +285,7 @@ public class SLEXMMStorageQueryGenerator {
 
 		}
 		
-		System.out.println("Query: "+strbldr.toString());
+		//System.out.println("Query: "+strbldr.toString());
 		
 		return strbldr.toString();
 	}
@@ -338,7 +338,7 @@ public class SLEXMMStorageQueryGenerator {
 
 		}
 		
-		System.out.println("Query: "+strbldr.toString());
+		//System.out.println("Query: "+strbldr.toString());
 		
 		return strbldr.toString();
 	}
@@ -389,7 +389,7 @@ public class SLEXMMStorageQueryGenerator {
 
 		}
 
-		System.out.println("Query: "+strbldr.toString());
+		//System.out.println("Query: "+strbldr.toString());
 		
 		return strbldr.toString();
 	}

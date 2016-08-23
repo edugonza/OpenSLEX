@@ -5266,20 +5266,23 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 	
 	public SLEXMMEventResultSet getEventsAndAttributeValues(int[] ids) {
-		// FIXME
 		SLEXMMEventResultSet erset = null;
 		Statement statement = null;
 		try {
 			statement = createStatement();
 			String query = "SELECT DISTINCT EV.*, EVAT.id as atId, "
-					+" EVAT.name as atName, EVATV.value as atValue, "
-					+" EVATV.type as atType FROM "
-					+METAMODEL_ALIAS+".event as EV, "
-					+METAMODEL_ALIAS+".event_attribute_name as EVAT, "
+					+ " EVAT.name as atName,"
+					+ " EVATV.value as atValue, "
+					+ " EVATV.type as atType "
+					+ " FROM "
+					+METAMODEL_ALIAS+".event as EV "
+					+ " LEFT OUTER JOIN "
 					+METAMODEL_ALIAS+".event_attribute_value as EVATV "
-					+" WHERE EV.id IN ("+buildStringFromArray(ids)+") "
-					+"   AND EV.id = EVATV.event_id "
-					+"   AND EVATV.event_attribute_name_id = EVAT.id "
+					+ " ON EV.id = EVATV.event_id "
+					+ " LEFT OUTER JOIN "
+					+METAMODEL_ALIAS+".event_attribute_name as EVAT "
+					+ " ON EVATV.event_attribute_name_id = EVAT.id "
+					+ " WHERE EV.id IN ("+buildStringFromArray(ids)+") "
 					+" ORDER BY EV.id ";
 			ResultSet rset = statement.executeQuery(query);
 			erset = new SLEXMMEventResultSet(this, rset);
@@ -5305,20 +5308,23 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 	
 	public SLEXMMObjectVersionResultSet getVersionsAndAttributeValues(int[] ids) {
-		// FIXME
 		SLEXMMObjectVersionResultSet ovrset = null;
 		Statement statement = null;
 		try {
 			statement = createStatement();
 			String query = "SELECT DISTINCT OV.*, OVAT.id as atId, "
-					+" OVAT.name as atName, OVATV.value as atValue, "
-					+" OVATV.type as atType FROM "
-					+METAMODEL_ALIAS+".object_version as OV, "
-					+METAMODEL_ALIAS+".attribute_name as OVAT, "
+					+ " OVAT.name as atName,"
+					+ " OVATV.value as atValue, "
+					+ " OVATV.type as atType "
+					+ " FROM "
+					+METAMODEL_ALIAS+".object_version as OV "
+					+ " LEFT OUTER JOIN "
 					+METAMODEL_ALIAS+".attribute_value as OVATV "
-					+" WHERE OV.id IN ("+buildStringFromArray(ids)+") "
-					+"   AND OV.id = OVATV.object_version_id "
-					+"   AND OVATV.attribute_name_id = OVAT.id "
+					+ " ON OV.id = OVATV.object_version_id "
+					+ " LEFT OUTER JOIN "
+					+METAMODEL_ALIAS+".attribute_name as OVAT "
+					+ " ON OVATV.attribute_name_id = OVAT.id "
+					+ " WHERE OV.id IN ("+buildStringFromArray(ids)+") "
 					+" ORDER BY OV.id ";
 			ResultSet rset = statement.executeQuery(query);
 			ovrset = new SLEXMMObjectVersionResultSet(this, rset);
@@ -5344,20 +5350,23 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 	
 	public SLEXMMCaseResultSet getCasesAndAttributeValues(int[] ids) {
-		// FIXME
 		SLEXMMCaseResultSet crset = null;
 		Statement statement = null;
 		try {
 			statement = createStatement();
 			String query = "SELECT DISTINCT C.*, CAT.id as atId, "
-					+" CAT.name as atName, CATV.value as atValue, "
-					+" CATV.type as atType FROM "
-					+METAMODEL_ALIAS+".'case' as C, "
-					+METAMODEL_ALIAS+".case_attribute_name as CAT, "
+					+ " CAT.name as atName,"
+					+ " CATV.value as atValue, "
+					+ " CATV.type as atType "
+					+ " FROM "
+					+METAMODEL_ALIAS+".'case' as C "
+					+ " LEFT OUTER JOIN "
 					+METAMODEL_ALIAS+".case_attribute_value as CATV "
-					+" WHERE C.id IN ("+buildStringFromArray(ids)+") "
-					+"   AND C.id = CATV.case_id "
-					+"   AND CATV.case_attribute_name_id = CAT.id "
+					+ " ON C.id = CATV.case_id "
+					+ " LEFT OUTER JOIN "
+					+METAMODEL_ALIAS+".case_attribute_name as CAT "
+					+ " ON CATV.case_attribute_name_id = CAT.id "
+					+ " WHERE C.id IN ("+buildStringFromArray(ids)+") "
 					+" ORDER BY C.id ";
 			ResultSet rset = statement.executeQuery(query);
 			crset = new SLEXMMCaseResultSet(this, rset);
@@ -5383,20 +5392,23 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 	
 	public SLEXMMLogResultSet getLogsAndAttributeValues(int[] ids) {
-		// FIXME
 		SLEXMMLogResultSet lrset = null;
 		Statement statement = null;
 		try {
 			statement = createStatement();
 			String query = "SELECT DISTINCT L.*, LAT.id as atId, "
-					+" LAT.name as atName, LATV.value as atValue, "
-					+" LATV.type as atType FROM "
-					+METAMODEL_ALIAS+".log as L, "
-					+METAMODEL_ALIAS+".log_attribute_name as LAT, "
+					+ " LAT.name as atName,"
+					+ " LATV.value as atValue, "
+					+ " LATV.type as atType "
+					+ " FROM "
+					+METAMODEL_ALIAS+".log as L "
+					+ " LEFT OUTER JOIN "
 					+METAMODEL_ALIAS+".log_attribute_value as LATV "
-					+" WHERE L.id IN ("+buildStringFromArray(ids)+") "
-					+"   AND L.id = LATV.log_id "
-					+"   AND LATV.log_attribute_name_id = LAT.id "
+					+ " ON L.id = LATV.log_id "
+					+ " LEFT OUTER JOIN "
+					+METAMODEL_ALIAS+".log_attribute_name as LAT "
+					+ " ON LATV.log_attribute_name_id = LAT.id "
+					+ " WHERE L.id IN ("+buildStringFromArray(ids)+") "
 					+" ORDER BY L.id ";
 			ResultSet rset = statement.executeQuery(query);
 			lrset = new SLEXMMLogResultSet(this, rset);
