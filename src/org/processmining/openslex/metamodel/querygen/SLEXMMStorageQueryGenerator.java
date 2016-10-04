@@ -15,8 +15,6 @@ import org.processmining.openslex.metamodel.SLEXMMPeriodResultSet;
 import org.processmining.openslex.metamodel.SLEXMMStorageMetaModel;
 import org.processmining.openslex.metamodel.SLEXMMStorageMetaModelImpl;
 
-import prefuse.data.Tuple;
-
 public class SLEXMMStorageQueryGenerator {
 
 	private DirectedWeightedMultigraph<SLEXMMNode, SLEXMMEdge> wmgraph = null;

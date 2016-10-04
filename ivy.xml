@@ -21,12 +21,12 @@
     <info
         organisation="db-process-mining"
         module="OpenSLEX"
-        revision="0.6">
+        revision="0.7">
     </info>
 	<dependencies>
 		<dependency org="org.jgrapht" name="jgrapht-core" rev="0.9.2"/>
 		<dependency org="org.xerial" name="sqlite-jdbc" rev="3.8.11.2"/>
-		<dependency org="org.rapidprom" name="XESLite" rev="6.5.168" />
+		<dependency org="org.rapidprom" name="XESLite" rev="6.7.217" />
 	</dependencies>
 
 </ivy-module>
