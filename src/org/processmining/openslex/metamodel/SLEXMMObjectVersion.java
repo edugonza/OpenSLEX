@@ -26,6 +26,7 @@ public class SLEXMMObjectVersion extends SLEXMMAbstractDatabaseObject {
 	/** The attribute values. */
 	private HashMap<SLEXMMAttribute,SLEXMMAttributeValue> attributeValues = null;
 	
+	private HashMap<String,SLEXMMAttribute> attributeNamesMap = null;
 	/**
 	 * Instantiates a new SLEXMM object version.
 	 *
@@ -143,11 +144,17 @@ public class SLEXMMObjectVersion extends SLEXMMAbstractDatabaseObject {
 	 * Retrieve attribute values.
 	 */
 	protected void retrieveAttributeValues() {
-		attributeValues = getStorage().getAttributeValuesForObjectVersion(this);
+		HashMap<SLEXMMAttribute, SLEXMMAttributeValue> attributeValuesMap = getStorage().getAttributeValuesForObjectVersion(this);
+		this.setAttributeValues(attributeValuesMap);
 	}
 	
 	protected void setAttributeValues(HashMap<SLEXMMAttribute, SLEXMMAttributeValue> attributeValues) {
 		this.attributeValues = attributeValues;
+		HashMap<String,SLEXMMAttribute> atNamesMap = new HashMap<>();
+		for (SLEXMMAttribute at: attributeValues.keySet()) {
+			atNamesMap.put(at.getName(), at);
+		}
+		this.attributeNamesMap = atNamesMap;
 	}
 	
 	
@@ -163,6 +170,20 @@ public class SLEXMMObjectVersion extends SLEXMMAbstractDatabaseObject {
 		return attributeValues;
 	}
 
+	public SLEXMMAttributeValue getAttributeValue(String attribute) {
+		HashMap<SLEXMMAttribute,SLEXMMAttributeValue> atMap = getAttributeValues();
+		SLEXMMAttribute at = getAttribute(attribute);
+		
+		if (at != null) {
+			return atMap.get(at);
+		}
+		return null;
+	}
+	
+	public SLEXMMAttribute getAttribute(String attribute) {
+		return attributeNamesMap.get(attribute);
+	}
+	
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
