@@ -1,0 +1,75 @@
+apply plugin: 'java'
+apply plugin: 'ivy-publish'
+
+version = '0.8'
+group = 'org.processmining'
+
+println name+" v"+version
+
+ext {
+	rapidprom_version = '4.0.2'
+}
+
+repositories {
+	mavenCentral()
+	ivy {
+		url "https://github.com/rapidprom/rapidprom-libraries/raw/${rapidprom_version}/prom/"
+		layout "pattern", {
+			artifact "[module]-[revision]/[module]-[revision].[ext]"
+			artifact "[module]-[revision]/[artifact].[ext]"
+			ivy "[module]-[revision]/ivy-[module]-[revision].xml"
+		}
+	}
+	ivy {
+		url "https://github.com/rapidprom/rapidprom-libraries/raw/${rapidprom_version}/thirdparty/lib/"
+		layout "pattern", {
+			artifact "[module]-[revision]/[module]-[revision].[ext]"
+			ivy "[module]-[revision]/ivy-[module]-[revision].xml"
+		}
+	}
+	ivy {
+		url "https://github.com/rapidprom/rapidprom-libraries/raw/${rapidprom_version}/thirdparty/resource/"
+		layout "pattern", {
+			artifact "[module]-[revision]/[module]-[revision].[ext]"
+			ivy "[module]-[revision]/ivy-[module]-[revision].xml"
+		}
+	}
+	ivy {
+		url "http://git.yerappa.com/gitbucket/TUE-PhD/DatabaseProcessMining-Repository/raw/master/Releases/"
+		layout "pattern", {
+			artifact "[module]/[module]-[revision].[ext]"
+			ivy "[module]/[module]-[revision]-ivy.xml"
+		}
+	}
+}
+
+sourceSets {
+	main {
+		java {
+			srcDirs = ['src/']
+		}
+		resources {
+			srcDirs = ['resources/']
+		}
+	}
+}
+
+publishing {
+	repositories {
+		ivy {
+			url "${rootProject.buildDir}/repo"
+		}
+	}
+	publications {
+		ivyJava(IvyPublication) {
+			from components.java
+		}
+	}
+}
+
+dependencies {
+	compile  'log4j:log4j:1.2.16'
+	compile  'org.jgrapht:jgrapht-core:1.0.0'
+	compile  'org.xerial:sqlite-jdbc:3.15.1'
+	compile  'org.rapidprom:XESLite:6.7.217'
+}
