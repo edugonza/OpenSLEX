@@ -35,10 +35,10 @@ repositories {
 		}
 	}
 	ivy {
-		url "http://git.yerappa.com/gitbucket/TUE-PhD/DatabaseProcessMining-Repository/raw/master/Releases/"
+		url "https://github.com/edugonza/DatabaseProcessMining-Repository/raw/master/Releases/"
 		layout "pattern", {
-			artifact "[module]/[module]-[revision].[ext]"
-			ivy "[module]/[module]-[revision]-ivy.xml"
+			artifact "[organization]/[module]/[revision]/[module]-[revision].[ext]"
+			ivy "[organization]/[module]/[revision]/ivy-[revision].xml"
 		}
 	}
 }
@@ -57,7 +57,7 @@ sourceSets {
 publishing {
 	repositories {
 		ivy {
-			url "${rootProject.buildDir}/repo"
+			url "../DatabaseProcessMining-Repository/Releases/"
 		}
 	}
 	publications {
