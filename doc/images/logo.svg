@@ -15,7 +15,10 @@
    id="svg5144"
    version="1.1"
    inkscape:version="0.91 r13725"
-   sodipodi:docname="logo.svg">
+   sodipodi:docname="logo.svg"
+   inkscape:export-filename="/home/eduardo/Code/workspace/OpenSLEX/doc/images/logo.png"
+   inkscape:export-xdpi="123.16"
+   inkscape:export-ydpi="123.16">
   <defs
      id="defs5146">
     <inkscape:path-effect
@@ -153,8 +156,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.35"
-     inkscape:cx="-497.65026"
-     inkscape:cy="-71.538732"
+     inkscape:cx="110.92117"
+     inkscape:cy="137.0327"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -175,7 +178,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
