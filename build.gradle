@@ -1,7 +1,7 @@
 apply plugin: 'java'
 apply plugin: 'ivy-publish'
 
-version = '0.8'
+version = '0.9'
 group = 'org.processmining'
 
 println name+" v"+version
