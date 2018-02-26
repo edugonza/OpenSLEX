@@ -1,1 +1,10 @@
 language: java
+deploy:
+  provider: releases
+  api_key:
+    secure: ftzdRfLbaIRV7H1NxuXb2D+dYCG17tV+zDsgl1RPp+P1tZvtXCXvH6Z0jbcTXHyrBa+S10JoZPGegvZx+20gcQ1lpyI9GGoWUhaS/BtCSgF9iccXW1FOqKINrvDdIQn62iLmEEYXPJHuG/2lwwIsy4tNTscAiPKtVM44z5a7N+twFSN3P4jxouuSdf8e4BFXeIgLRz9/0vgIb4hM5UYBppgDXH8H+5edVXElZ3CtjqOgwM42aBS9w/qJIICo24UDaG/uAy5yFmuV3qZ2yCSXTeo8nIue04i4AMZiPcTBVI8dCBhAkuvNBvJDH8/jXiIDkXJuLebVSd/po90bBW8+60NFotKQjzx+vlarTJyfOMnaWfxNaQUvQyQ9Ztywl8O5tKVcOUI+qtgTMGiPmEzVwO/rUNC7h9rGQcDeCm6U5MafC2BZIYWDdK0vWPXP0myu2YzKauuLkNjBdml6/QbMp/AM4Wdbl5oaAnVvEYmD1IWh7tK+ffzOf/4v0SFNsjfg5ULOLv8Mdw7LNOsvTM/zylnydSRgfViE7lgeIerPmeOBjYxFyAytxEvyRUcK5jH8L137RDluE4gkqoEy2Y7MJVa1LBavxI6d4XRfGd2mgrLV7QDVXdzsHCox8h8vT/nLj0Nkmea+nNErFQL8IBDgpjJf2XXV2ho479F/T1TZwEM=
+  file_glob: true
+  file: libs/*
+  skip_cleanup: true
+  on:
+    tags: true
