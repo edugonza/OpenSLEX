@@ -33,7 +33,7 @@ import org.processmining.openslex.utils.ScriptRunner;
  */
 public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	
-	private SLEXMMStorageQueryGenerator slxmmstrqgen = null;
+	private SLEXMMStorageQueryGenerator slxmmstrqgen;
 	//private static final String STORAGE_METAMODEL = PATH+File.separator+"metamodels.db";
 	
 	/** The Constant METAMODEL_ALIAS. */
@@ -49,22 +49,22 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	private static final String PRAGMA_SYNCHRONOUS_MODE = "OFF";
 	
 	/** The metamodel_attached. */
-	private boolean metamodel_attached = false;
+	private boolean metamodel_attached;
 	
 	/** The auto commit on creation. */
-	private boolean autoCommitOnCreation = true;
+	private boolean autoCommitOnCreation;
 	
 	/** The filename. */
-	private String filename = null;
+	private String filename;
 	
 	/** The path. */
-	private String path = null;	
+	private String path;	
 	
 	/** The connection. */
-	private Connection connection = null;
+	private Connection connection;
 	
 	/** The statements. */
-	private HashSet<Statement> statements = new HashSet<>();
+	private HashSet<Statement> statements;
 	
 	/**
 	 * Instantiates a new SLEXMM storage meta model impl.
@@ -74,6 +74,17 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	 * @throws Exception the exception
 	 */
 	public SLEXMMStorageMetaModelImpl(String path, String filename) throws Exception {
+		startConnection(path, filename);
+	}
+	
+	private void startConnection(String path, String filename) throws Exception {
+		this.slxmmstrqgen = null;
+		this.metamodel_attached = false;
+		this.autoCommitOnCreation = true;
+		this.filename = null;
+		this.path = null;
+		this.connection = null;
+		this.statements = new HashSet<>();
 		init();
 		this.filename = filename;
 		this.path = path;
@@ -83,10 +94,9 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 	
 	@Override
-	public void reconnect() {
+	public void reconnect() throws Exception {
 		disconnect();
-		openMetaModelStorage(path, filename);
-		slxmmstrqgen = new SLEXMMStorageQueryGenerator();
+		startConnection(this.path, this.filename);
 	}
 	
 	/* (non-Javadoc)
@@ -194,6 +204,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		try {
 			connAux = DriverManager.getConnection("jdbc:sqlite:"+filename);
 			ScriptRunner scriptRunner = new ScriptRunner(connAux, false, false);
+			scriptRunner.setLogWriter(null);
 			scriptRunner.runScript(new InputStreamReader(schemaIn));
 			result = true;
 		} catch (Exception e) {

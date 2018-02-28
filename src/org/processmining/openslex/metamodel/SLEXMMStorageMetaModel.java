@@ -19,8 +19,10 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	
 	/**
 	 * Reconnects to the storage
+	 * @return 
+	 * @throws Exception 
 	 */
-	public abstract void reconnect();
+	public abstract void reconnect() throws Exception;
 	
 	/**
 	 * Creates the event.
