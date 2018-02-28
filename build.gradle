@@ -64,6 +64,7 @@ sourceSets {
 }
 
 jar {
+	dependsOn javadoc
 	from sourceSets.main.allSource
 	from javadoc.destinationDir
 }
