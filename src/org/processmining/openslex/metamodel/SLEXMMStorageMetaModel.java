@@ -606,7 +606,6 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	/**
 	 * Creates the activity.
 	 *
-	 * @param processId the process id
 	 * @param name the name
 	 * @return the SLEXMM activity
 	 */
