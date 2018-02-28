@@ -82,6 +82,13 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		slxmmstrqgen = new SLEXMMStorageQueryGenerator();
 	}
 	
+	@Override
+	public void reconnect() {
+		disconnect();
+		openMetaModelStorage(path, filename);
+		slxmmstrqgen = new SLEXMMStorageQueryGenerator();
+	}
+	
 	/* (non-Javadoc)
 	 * @see java.lang.Object#finalize()
 	 */

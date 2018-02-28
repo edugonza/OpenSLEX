@@ -18,6 +18,11 @@ import java.util.Set;
 public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	
 	/**
+	 * Reconnects to the storage
+	 */
+	public abstract void reconnect();
+	
+	/**
 	 * Creates the event.
 	 *
 	 * @param order the order
