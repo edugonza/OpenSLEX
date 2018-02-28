@@ -9,7 +9,7 @@ apply plugin: 'net.saliman.cobertura'
 
 cobertura.coverageFormats = ['html', 'xml']
 
-version = '0.9'
+version = '1.0-alpha'
 group = 'com.github.edugonza'
 
 println name+" v"+version
