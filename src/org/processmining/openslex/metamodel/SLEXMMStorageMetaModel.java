@@ -3,7 +3,6 @@
  */
 package org.processmining.openslex.metamodel;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -2555,5 +2554,7 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	public abstract SLEXMMLogResultSet getLogsAndAttributeValues(Set<SLEXMMLog> set);
 	
 	public abstract SLEXMMLogResultSet getLogsAndAttributeValues(int[] ids);
+
+	SLEXMMRelationshipResultSet getRelationshipsRS();
 	
 }

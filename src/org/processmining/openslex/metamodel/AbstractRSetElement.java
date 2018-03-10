@@ -11,15 +11,24 @@ import java.sql.SQLException;
  * The Class SLEXMMAbstractResultSetObject.
  *
  * @author <a href="mailto:e.gonzalez@tue.nl">Eduardo Gonzalez Lopez de Murillas</a>
+ * @param <T>
  * @see <a href="https://www.win.tue.nl/~egonzale/projects/openslex/" target="_blank">OpenSLEX</a>
  */
-abstract class SLEXMMAbstractResultSetObject {
+public abstract class AbstractRSetElement<T> {
 	
 	/** The rset. */
 	protected ResultSet rset = null;
 	
 	/** The storage. */
-	protected SLEXMMStorage storage = null;
+	protected SLEXMMStorageMetaModel storage = null;
+	
+	protected Class<T> typeClass = null;
+	
+	protected Class<T> getTypeClass() {
+		return typeClass;
+	}
+			
+	public abstract T getNext();
 	
 	/**
 	 * Instantiates a new SLEXMM abstract result set object.
@@ -27,9 +36,10 @@ abstract class SLEXMMAbstractResultSetObject {
 	 * @param storage the storage
 	 * @param rset the rset
 	 */
-	protected SLEXMMAbstractResultSetObject(SLEXMMStorage storage, ResultSet rset) {
+	protected AbstractRSetElement(SLEXMMStorageMetaModel storage, ResultSet rset, Class<T> type) {
 		this.storage = storage;
 		this.rset = rset;
+		this.typeClass = type;
 	}
 	
 	/**
@@ -41,7 +51,7 @@ abstract class SLEXMMAbstractResultSetObject {
 				storage.closeStatement(rset.getStatement());
 				storage.closeResultSet(rset);
 			} catch (Exception e) {
-				e.printStackTrace();
+				//e.printStackTrace();
 			}
 		}
 	}

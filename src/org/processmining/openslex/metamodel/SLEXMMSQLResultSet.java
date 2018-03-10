@@ -14,7 +14,7 @@ import java.sql.SQLException;
  * @author <a href="mailto:e.gonzalez@tue.nl">Eduardo Gonzalez Lopez de Murillas</a>
  * @see <a href="https://www.win.tue.nl/~egonzale/projects/openslex/" target="_blank">OpenSLEX</a>
  */
-public class SLEXMMSQLResultSet extends SLEXMMAbstractResultSetObject {
+public class SLEXMMSQLResultSet extends AbstractRSetElement<SLEXMMSQLResult> {
 	
 	/** The metadata. */
 	private ResultSetMetaData metadata = null;
@@ -35,7 +35,7 @@ public class SLEXMMSQLResultSet extends SLEXMMAbstractResultSetObject {
 	 * @param rset the rset
 	 */
 	public SLEXMMSQLResultSet(SLEXMMStorageMetaModel storage, ResultSet rset) {
-		super(storage, rset);
+		super(storage, rset, SLEXMMSQLResult.class);
 		
 		try {
 			

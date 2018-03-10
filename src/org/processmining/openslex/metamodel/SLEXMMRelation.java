@@ -10,7 +10,7 @@ package org.processmining.openslex.metamodel;
  * @author <a href="mailto:e.gonzalez@tue.nl">Eduardo Gonzalez Lopez de Murillas</a>
  * @see <a href="https://www.win.tue.nl/~egonzale/projects/openslex/" target="_blank">OpenSLEX</a>
  */
-public class SLEXMMRelation extends SLEXMMAbstractDatabaseObject {
+public class SLEXMMRelation extends AbstractDBElement {
 
 	/** The source object version id. */
 	private int sourceObjectVersionId = -1;
@@ -144,7 +144,7 @@ public class SLEXMMRelation extends SLEXMMAbstractDatabaseObject {
 	 * @see org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject#insert(org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject)
 	 */
 	@Override
-	boolean insert(SLEXMMAbstractDatabaseObject e) {
+	boolean insert(AbstractDBElement e) {
 		return getStorage().insert((SLEXMMRelation)e);
 	}
 
@@ -152,15 +152,15 @@ public class SLEXMMRelation extends SLEXMMAbstractDatabaseObject {
 	 * @see org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject#update(org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject)
 	 */
 	@Override
-	boolean update(SLEXMMAbstractDatabaseObject e) {
+	boolean update(AbstractDBElement e) {
 		return getStorage().update((SLEXMMRelation)e);
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		return ("relation#"+getId()).hashCode();
-	}
+//	/* (non-Javadoc)
+//	 * @see java.lang.Object#hashCode()
+//	 */
+//	@Override
+//	public int hashCode() {
+//		return ("relation#"+getId()).hashCode();
+//	}
 }

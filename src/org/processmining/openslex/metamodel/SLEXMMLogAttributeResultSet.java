@@ -12,7 +12,7 @@ import java.sql.ResultSet;
  * @author <a href="mailto:e.gonzalez@tue.nl">Eduardo Gonzalez Lopez de Murillas</a>
  * @see <a href="https://www.win.tue.nl/~egonzale/projects/openslex/" target="_blank">OpenSLEX</a>
  */
-public class SLEXMMLogAttributeResultSet extends SLEXMMAbstractResultSetObject {
+public class SLEXMMLogAttributeResultSet extends AbstractRSetElement<SLEXMMLogAttribute> {
 	
 	/**
 	 * Instantiates a new SLEXMM log attribute result set.
@@ -21,7 +21,7 @@ public class SLEXMMLogAttributeResultSet extends SLEXMMAbstractResultSetObject {
 	 * @param rset the rset
 	 */
 	public SLEXMMLogAttributeResultSet(SLEXMMStorageMetaModel storage, ResultSet rset) {
-		super(storage, rset);
+		super(storage, rset, SLEXMMLogAttribute.class);
 	}
 	
 	/**
@@ -36,11 +36,15 @@ public class SLEXMMLogAttributeResultSet extends SLEXMMAbstractResultSetObject {
 				
 				int id = this.rset.getInt("id");
 				String name = this.rset.getString("name");
-				ai = new SLEXMMLogAttribute((SLEXMMStorageMetaModel) storage);
-				ai.setId(id);
-				ai.setName(name);
-				ai.setDirty(false);
-				ai.setInserted(true);
+				ai = storage.getFromCache(SLEXMMLogAttribute.class, id);
+				if (ai == null) {
+					ai = new SLEXMMLogAttribute((SLEXMMStorageMetaModel) storage);
+					ai.setId(id);
+					ai.setName(name);
+					ai.setDirty(false);
+					ai.setInserted(true);
+					storage.putInCache(ai);
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

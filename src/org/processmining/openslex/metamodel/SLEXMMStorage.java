@@ -5,6 +5,7 @@ package org.processmining.openslex.metamodel;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.HashMap;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -98,4 +99,16 @@ public interface SLEXMMStorage {
 	 */
 	public abstract void closeResultSet(ResultSet rset);
 	
+	public abstract <T extends AbstractDBElement> T getFromCache(Class<?> c, int id);
+	
+	public abstract void putInCache(AbstractDBElement o);
+
+	public abstract HashMap getAttsFromCache(Class<?> c, int id);
+	
+	public abstract void putAttsInCache(AbstractDBElement o, HashMap map);
+
+	public abstract HashMap getAttNamesFromCache(Class<?> c, int id);
+	
+	public abstract void putAttNamesInCache(AbstractDBElement o, HashMap map);
+
 }

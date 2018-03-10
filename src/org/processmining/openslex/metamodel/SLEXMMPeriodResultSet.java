@@ -12,7 +12,7 @@ import java.sql.ResultSet;
  * @author <a href="mailto:e.gonzalez@tue.nl">Eduardo Gonzalez Lopez de Murillas</a>
  * @see <a href="https://www.win.tue.nl/~egonzale/projects/openslex/" target="_blank">OpenSLEX</a>
  */
-public class SLEXMMPeriodResultSet extends SLEXMMAbstractResultSetObject {
+public class SLEXMMPeriodResultSet extends AbstractRSetElement<SLEXMMPeriod> {
 	
 	/**
 	 * Instantiates a new SLEXMM period result set.
@@ -21,7 +21,7 @@ public class SLEXMMPeriodResultSet extends SLEXMMAbstractResultSetObject {
 	 * @param rset the rset
 	 */
 	public SLEXMMPeriodResultSet(SLEXMMStorageMetaModel storage, ResultSet rset) {
-		super(storage, rset);
+		super(storage, rset, SLEXMMPeriod.class);
 	}
 	
 	/**
@@ -41,7 +41,7 @@ public class SLEXMMPeriodResultSet extends SLEXMMAbstractResultSetObject {
 				if (end2Timestamp == -1) {
 					endTimestamp = end2Timestamp;
 				}
-				p = new SLEXMMPeriod(startTimestamp,endTimestamp);
+				p = new SLEXMMPeriod(storage, startTimestamp,endTimestamp);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

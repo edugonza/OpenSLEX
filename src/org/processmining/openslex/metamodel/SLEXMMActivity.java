@@ -3,6 +3,8 @@
  */
 package org.processmining.openslex.metamodel;
 
+import org.processmining.openslex.utils.MMUtils;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class SLEXMMActivity.
@@ -10,7 +12,7 @@ package org.processmining.openslex.metamodel;
  * @author <a href="mailto:e.gonzalez@tue.nl">Eduardo Gonzalez Lopez de Murillas</a>
  * @see <a href="https://www.win.tue.nl/~egonzale/projects/openslex/" target="_blank">OpenSLEX</a>
  */
-public class SLEXMMActivity extends SLEXMMAbstractDatabaseObject {
+public class SLEXMMActivity extends AbstractDBElement {
 
 	/** The name. */
 	private String name = null;
@@ -23,7 +25,7 @@ public class SLEXMMActivity extends SLEXMMAbstractDatabaseObject {
 	 */
 	protected SLEXMMActivity(SLEXMMStorageMetaModel storage, String name) {
 		super(storage);
-		this.name = name;
+		setName(name);
 	}
 	
 	/**
@@ -50,7 +52,7 @@ public class SLEXMMActivity extends SLEXMMAbstractDatabaseObject {
 	 * @param name the new name
 	 */
 	protected void setName(String name) {
-		this.name = name;
+		this.name = MMUtils.intern(name);
 		setDirty(true);
 	}
 	
@@ -59,7 +61,7 @@ public class SLEXMMActivity extends SLEXMMAbstractDatabaseObject {
 	 * @see org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject#insert(org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject)
 	 */
 	@Override
-	boolean insert(SLEXMMAbstractDatabaseObject cl) {
+	boolean insert(AbstractDBElement cl) {
 		return getStorage().insert((SLEXMMActivity) cl);
 	}
 
@@ -67,16 +69,16 @@ public class SLEXMMActivity extends SLEXMMAbstractDatabaseObject {
 	 * @see org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject#update(org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject)
 	 */
 	@Override
-	boolean update(SLEXMMAbstractDatabaseObject cl) {
+	boolean update(AbstractDBElement cl) {
 		return getStorage().update((SLEXMMActivity) cl);
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		return ("activity#"+getId()).hashCode();
-	}
+//	/* (non-Javadoc)
+//	 * @see java.lang.Object#hashCode()
+//	 */
+//	@Override
+//	public int hashCode() {
+//		return ("activity#"+getId()).hashCode();
+//	}
 	
 }

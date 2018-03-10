@@ -5,6 +5,8 @@ package org.processmining.openslex.metamodel;
 
 import java.util.HashMap;
 
+import org.processmining.openslex.utils.MMUtils;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class SLEXMMEvent.
@@ -12,16 +14,18 @@ import java.util.HashMap;
  * @author <a href="mailto:e.gonzalez@tue.nl">Eduardo Gonzalez Lopez de Murillas</a>
  * @see <a href="https://www.win.tue.nl/~egonzale/projects/openslex/" target="_blank">OpenSLEX</a>
  */
-public class SLEXMMEvent extends SLEXMMAbstractDatabaseObject {
+public class SLEXMMEvent extends AbstractDBElementWithAtts<SLEXMMEventAttribute,SLEXMMEventAttributeValue> {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5582256466655309436L;
 
 	/** The activity instance id. */
 	private int activityInstanceId = -1;
 	
 	/** The order. */
 	private int order = -1;
-	
-	/** The attribute values. */
-	private HashMap<SLEXMMEventAttribute, SLEXMMEventAttributeValue> attributeValues = null;
 	
 	/** The lifecycle. */
 	private String lifecycle = null;
@@ -39,15 +43,6 @@ public class SLEXMMEvent extends SLEXMMAbstractDatabaseObject {
 	 */
 	protected SLEXMMEvent(SLEXMMStorageMetaModel storage) {
 		super(storage);
-	}
-	
-	/**
-	 * Gets the storage.
-	 *
-	 * @return the storage
-	 */
-	public SLEXMMStorageMetaModel getStorage() {
-		return (SLEXMMStorageMetaModel) super.storage;
 	}
 	
 	/**
@@ -121,7 +116,7 @@ public class SLEXMMEvent extends SLEXMMAbstractDatabaseObject {
 	 * @param lifecycle the new lifecycle
 	 */
 	protected void setLifecycle(String lifecycle) {
-		this.lifecycle = lifecycle;
+		this.lifecycle = MMUtils.intern(lifecycle);
 		setDirty(true);
 	}
 	
@@ -131,7 +126,7 @@ public class SLEXMMEvent extends SLEXMMAbstractDatabaseObject {
 	 * @param resource the new resource
 	 */
 	protected void setResource(String resource) {
-		this.resource = resource;
+		this.resource = MMUtils.intern(resource);
 		setDirty(true);
 	}
 	
@@ -149,7 +144,7 @@ public class SLEXMMEvent extends SLEXMMAbstractDatabaseObject {
 	 * @see org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject#insert(org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject)
 	 */
 	@Override
-	boolean insert(SLEXMMAbstractDatabaseObject e) {
+	boolean insert(AbstractDBElement e) {
 		return getStorage().insert((SLEXMMEvent)e);
 	}
 
@@ -157,38 +152,13 @@ public class SLEXMMEvent extends SLEXMMAbstractDatabaseObject {
 	 * @see org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject#update(org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject)
 	 */
 	@Override
-	boolean update(SLEXMMAbstractDatabaseObject e) {
+	boolean update(AbstractDBElement e) {
 		return getStorage().update((SLEXMMEvent)e);
 	}
 
-	/**
-	 * Retrieve attribute values.
-	 */
-	protected void retrieveAttributeValues() {
-		attributeValues = getStorage().getAttributeValuesForEvent(this);
-	}
-	
-	protected void setAttributeValues(HashMap<SLEXMMEventAttribute, SLEXMMEventAttributeValue> attributeValues) {
-		this.attributeValues = attributeValues;
-	}
-	
-	/**
-	 * Gets the attribute values.
-	 *
-	 * @return the attribute values
-	 */
-	public HashMap<SLEXMMEventAttribute, SLEXMMEventAttributeValue> getAttributeValues() {
-		if (attributeValues == null) {
-			retrieveAttributeValues();
-		}
-		return attributeValues;
-	}
-
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
 	@Override
-	public int hashCode() {
-		return ("event#"+getId()).hashCode();
+	protected HashMap<SLEXMMEventAttribute, SLEXMMEventAttributeValue> queryAttributeValues() {
+		return getStorage().getAttributeValuesForEvent(this);
 	}
+	
 }

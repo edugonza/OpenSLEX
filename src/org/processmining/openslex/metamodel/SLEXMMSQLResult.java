@@ -3,6 +3,8 @@
  */
 package org.processmining.openslex.metamodel;
 
+import org.processmining.openslex.utils.MMUtils;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class SLEXMMSQLResult.
@@ -25,8 +27,15 @@ public class SLEXMMSQLResult {
 	 * @param columnNames the column names
 	 */
 	protected SLEXMMSQLResult(String[] values, String[] columnNames) {
-		this.values = values;
-		this.columnNames = columnNames;
+		this.values = new String[values.length];
+		for (int i = 0; i < values.length; i++) {
+			this.values[i] = MMUtils.intern(values[i]);
+		}
+		
+		this.columnNames = new String[columnNames.length];
+		for (int i = 0; i < columnNames.length; i++) {
+			this.columnNames[i] = MMUtils.intern(columnNames[i]);
+		}
 	}
 	
 	/**

@@ -10,7 +10,12 @@ package org.processmining.openslex.metamodel;
  * @author <a href="mailto:e.gonzalez@tue.nl">Eduardo Gonzalez Lopez de Murillas</a>
  * @see <a href="https://www.win.tue.nl/~egonzale/projects/openslex/" target="_blank">OpenSLEX</a>
  */
-public class SLEXMMPeriod {
+public class SLEXMMPeriod extends AbstractDBElement {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -412409433401409499L;
 
 	/** The start. */
 	private long start = -1L;
@@ -18,15 +23,22 @@ public class SLEXMMPeriod {
 	/** The end. */
 	private long end = -1L;
 	
+	private static int counter = 0;
 	/**
 	 * Instantiates a new SLEXMM period.
 	 *
 	 * @param start the start
 	 * @param end the end
 	 */
-	public SLEXMMPeriod(long start, long end) {
-		this.setStart(start);
-		this.setEnd(end);
+	public SLEXMMPeriod(SLEXMMStorageMetaModel storage, long start, long end) {
+		super(storage);
+		this.start = start;
+		this.end = end;
+		this.setId(counter++);
+	}
+	
+	public SLEXMMPeriod(SLEXMMStorageMetaModel storage) {
+		this(storage,-1L,-1L);
 	}
 
 	/**
@@ -39,15 +51,6 @@ public class SLEXMMPeriod {
 	}
 
 	/**
-	 * Sets the start.
-	 *
-	 * @param start the new start
-	 */
-	public void setStart(long start) {
-		this.start = start;
-	}
-
-	/**
 	 * Gets the end.
 	 *
 	 * @return the end
@@ -55,34 +58,23 @@ public class SLEXMMPeriod {
 	public long getEnd() {
 		return end;
 	}
-
-	/**
-	 * Sets the end.
-	 *
-	 * @param end the new end
-	 */
+	
+	public void setStart(long start) {
+		this.start = start;
+	}
+	
 	public void setEnd(long end) {
 		this.end = end;
 	}
 	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
 	@Override
-	public int hashCode() {
-		return new String(getStart()+"#"+getEnd()).hashCode();
+	boolean insert(AbstractDBElement dbob) {
+		return false;
 	}
-	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
+
 	@Override
-	public boolean equals(Object obj) {
-		if (super.equals(obj)) {
-			return true;
-		} else {
-			return this.hashCode() == obj.hashCode();
-		}
+	boolean update(AbstractDBElement dbob) {
+		return false;
 	}
 	
 }

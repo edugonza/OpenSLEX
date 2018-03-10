@@ -4,6 +4,10 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 
 public class SLEXMMEdge extends DefaultWeightedEdge {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4608000824013747092L;
 	private SLEXMMNode nodeSource = null;
 	private SLEXMMNode nodeTarget = null;
 	private String sourceField = null;

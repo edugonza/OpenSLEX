@@ -3,6 +3,8 @@
  */
 package org.processmining.openslex.metamodel;
 
+import org.processmining.openslex.utils.MMUtils;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class SLEXMMRelationship.
@@ -10,7 +12,12 @@ package org.processmining.openslex.metamodel;
  * @author <a href="mailto:e.gonzalez@tue.nl">Eduardo Gonzalez Lopez de Murillas</a>
  * @see <a href="https://www.win.tue.nl/~egonzale/projects/openslex/" target="_blank">OpenSLEX</a>
  */
-public class SLEXMMRelationship extends SLEXMMAbstractDatabaseObject {
+public class SLEXMMRelationship extends AbstractDBElement {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8470384087306138009L;
 
 	/** The name. */
 	private String name = null;
@@ -92,7 +99,7 @@ public class SLEXMMRelationship extends SLEXMMAbstractDatabaseObject {
 	 * @param name the new name
 	 */
 	protected void setName(String name) {
-		this.name = name;
+		this.name = MMUtils.intern(name);
 		setDirty(true);
 	}
 		
@@ -100,7 +107,7 @@ public class SLEXMMRelationship extends SLEXMMAbstractDatabaseObject {
 	 * @see org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject#insert(org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject)
 	 */
 	@Override
-	boolean insert(SLEXMMAbstractDatabaseObject at) {
+	boolean insert(AbstractDBElement at) {
 		return getStorage().insert((SLEXMMRelationship) at);
 	}
 
@@ -108,15 +115,15 @@ public class SLEXMMRelationship extends SLEXMMAbstractDatabaseObject {
 	 * @see org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject#update(org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject)
 	 */
 	@Override
-	boolean update(SLEXMMAbstractDatabaseObject at) {
+	boolean update(AbstractDBElement at) {
 		return getStorage().update((SLEXMMRelationship) at);
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		return ("relationship#"+getId()).hashCode();
-	}
+//	/* (non-Javadoc)
+//	 * @see java.lang.Object#hashCode()
+//	 */
+//	@Override
+//	public int hashCode() {
+//		return ("relationship#"+getId()).hashCode();
+//	}
 }

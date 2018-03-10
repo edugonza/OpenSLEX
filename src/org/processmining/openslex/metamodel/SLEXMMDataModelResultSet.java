@@ -12,7 +12,7 @@ import java.sql.ResultSet;
  * @author <a href="mailto:e.gonzalez@tue.nl">Eduardo Gonzalez Lopez de Murillas</a>
  * @see <a href="https://www.win.tue.nl/~egonzale/projects/openslex/" target="_blank">OpenSLEX</a>
  */
-public class SLEXMMDataModelResultSet extends SLEXMMAbstractResultSetObject {
+public class SLEXMMDataModelResultSet extends AbstractRSetElement<SLEXMMDataModel> {
 	
 	/**
 	 * Instantiates a new SLEXMM data model result set.
@@ -21,7 +21,7 @@ public class SLEXMMDataModelResultSet extends SLEXMMAbstractResultSetObject {
 	 * @param rset the rset
 	 */
 	public SLEXMMDataModelResultSet(SLEXMMStorageMetaModel storage, ResultSet rset) {
-		super(storage, rset);
+		super(storage, rset, SLEXMMDataModel.class);
 	}
 	
 	/**
@@ -36,11 +36,15 @@ public class SLEXMMDataModelResultSet extends SLEXMMAbstractResultSetObject {
 				
 				String name = this.rset.getString("name");
 				int id = this.rset.getInt("id");
-				dm = new SLEXMMDataModel(storage);
-				dm.setName(name);
-				dm.setId(id);
-				dm.setDirty(false);
-				dm.setInserted(true);
+				dm = storage.getFromCache(SLEXMMDataModel.class, id);
+				if (dm == null) {
+					dm = new SLEXMMDataModel(storage);
+					dm.setName(name);
+					dm.setId(id);
+					dm.setDirty(false);
+					dm.setInserted(true);
+					storage.putInCache(dm);
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

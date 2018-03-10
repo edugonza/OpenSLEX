@@ -5,6 +5,8 @@ package org.processmining.openslex.metamodel;
 
 import java.util.HashMap;
 
+import org.processmining.openslex.utils.MMUtils;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class SLEXMMCase.
@@ -12,13 +14,14 @@ import java.util.HashMap;
  * @author <a href="mailto:e.gonzalez@tue.nl">Eduardo Gonzalez Lopez de Murillas</a>
  * @see <a href="https://www.win.tue.nl/~egonzale/projects/openslex/" target="_blank">OpenSLEX</a>
  */
-public class SLEXMMCase extends SLEXMMAbstractDatabaseObject {
+public class SLEXMMCase extends AbstractDBElementWithAtts<SLEXMMCaseAttribute, SLEXMMCaseAttributeValue> {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1589450152725134477L;
 	/** The name. */
 	private String name = null;
-	
-	/** The attribute values. */
-	private HashMap<SLEXMMCaseAttribute, SLEXMMCaseAttributeValue> attributeValues = null;
 	
 	/**
 	 * Instantiates a new SLEXMM case.
@@ -29,15 +32,6 @@ public class SLEXMMCase extends SLEXMMAbstractDatabaseObject {
 		super(storage);
 	}
 
-	/**
-	 * Gets the storage.
-	 *
-	 * @return the storage
-	 */
-	public SLEXMMStorageMetaModel getStorage() {
-		return (SLEXMMStorageMetaModel) super.storage;
-	}
-	
 	/**
 	 * Gets the name.
 	 *
@@ -53,7 +47,7 @@ public class SLEXMMCase extends SLEXMMAbstractDatabaseObject {
 	 * @param name the new name
 	 */
 	public void setName(String name) {
-		this.name = name;
+		this.name = MMUtils.intern(name);
 		setDirty(true);
 	}
 	
@@ -81,7 +75,7 @@ public class SLEXMMCase extends SLEXMMAbstractDatabaseObject {
 	 * @see org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject#insert(org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject)
 	 */
 	@Override
-	boolean insert(SLEXMMAbstractDatabaseObject t) {
+	boolean insert(AbstractDBElement t) {
 		return getStorage().insert((SLEXMMCase) t);
 	}
 
@@ -89,37 +83,10 @@ public class SLEXMMCase extends SLEXMMAbstractDatabaseObject {
 	 * @see org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject#update(org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject)
 	 */
 	@Override
-	boolean update(SLEXMMAbstractDatabaseObject t) {
+	boolean update(AbstractDBElement t) {
 		return getStorage().update((SLEXMMCase) t);
 	}
 
-//	public SLEXMMActivityInstanceResultSet getActivityInstanceResultSet() {
-//		return getStorage().getActivityInstancesOfCase(this);
-//	}
-	
-	/**
-	 * Retrieve attribute values.
-	 */
-	protected void retrieveAttributeValues() {
-		attributeValues = getStorage().getAttributeValuesForCase(this);
-	}
-	
-	protected void setAttributeValues(HashMap<SLEXMMCaseAttribute, SLEXMMCaseAttributeValue> attributeValues) {
-		this.attributeValues = attributeValues;
-	}
-	
-	/**
-	 * Gets the attribute values.
-	 *
-	 * @return the attribute values
-	 */
-	public HashMap<SLEXMMCaseAttribute, SLEXMMCaseAttributeValue> getAttributeValues() {
-		if (attributeValues == null) {
-			retrieveAttributeValues();
-		}
-		return attributeValues;
-	}
-	
 	/**
 	 * Gets the event result set.
 	 *
@@ -128,12 +95,10 @@ public class SLEXMMCase extends SLEXMMAbstractDatabaseObject {
 	public SLEXMMEventResultSet getEventResultSet() {
 		return getStorage().getEventsOfCase(this);
 	}
-	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
+
 	@Override
-	public int hashCode() {
-		return ("case#"+getId()).hashCode();
+	protected HashMap<SLEXMMCaseAttribute, SLEXMMCaseAttributeValue> queryAttributeValues() {
+		return getStorage().getAttributeValuesForCase(this);
 	}
+	
 }

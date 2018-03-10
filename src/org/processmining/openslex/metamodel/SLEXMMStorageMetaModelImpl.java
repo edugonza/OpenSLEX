@@ -17,9 +17,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
+import org.mapdb.HTreeMap;
+import org.mapdb.Serializer;
+import org.mapdb.serializer.SerializerString;
 import org.processmining.openslex.metamodel.querygen.SLEXMMEdge;
 import org.processmining.openslex.metamodel.querygen.SLEXMMStorageQueryGenerator;
 import org.processmining.openslex.metamodel.querygen.SLEXMMTables;
@@ -38,6 +44,12 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	
 	/** The Constant METAMODEL_ALIAS. */
 	public static final String METAMODEL_ALIAS = "metamodeldb";
+	
+	private HTreeMap<String, AbstractDBElement> objectRepo;
+	
+	private HTreeMap<String, HashMap<AbstractAttDBElement, AbstractDBElement>> attsRepo;
+	
+	private HTreeMap<String, HashMap<String, AbstractAttDBElement>> attNamesRepo;
 	
 	/** The metamodel schema in. */
 	private InputStream METAMODEL_SCHEMA_IN = SLEXMMStorage.class.getResourceAsStream("/org/processmining/openslex/resources/metamodel.sql");
@@ -85,6 +97,41 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		this.path = null;
 		this.connection = null;
 		this.statements = new HashSet<>();
+		
+		AttsMapSerializer atMapSerializer =
+				new AttsMapSerializer(this);
+		AttNamesMapSerializer atNamesMapSerializer =
+				new AttNamesMapSerializer(this);
+		DBElementSerializer absDBobjectSerializer =
+				new DBElementSerializer(this);
+		DB db = DBMaker
+				//.heapDB()
+				.tempFileDB()
+				//.memoryDirectDB()
+				.concurrencyDisable()
+				.allocateStartSize( 15 * 1024*1024*1024)  // 10GB
+			    .allocateIncrement(512 * 1024*1024)       // 512MB
+		        .fileMmapEnable()
+		        .fileMmapPreclearDisable()
+		        .make();
+		HTreeMap map = db
+		        .hashMap("objectRepo")
+		        .keySerializer(Serializer.STRING)
+		        .valueSerializer(absDBobjectSerializer)
+		        .create();
+		HTreeMap mapAtts = db
+				.hashMap("attsRepo")
+				.keySerializer(Serializer.STRING)
+				.valueSerializer(atMapSerializer)
+				.create();
+		HTreeMap mapAttNames = db
+				.hashMap("attNamesRepo")
+				.keySerializer(Serializer.STRING)
+				.valueSerializer(atNamesMapSerializer)
+				.create();
+		this.objectRepo = map;
+		this.attsRepo = mapAtts;
+		this.attNamesRepo = mapAttNames;
 		init();
 		this.filename = filename;
 		this.path = path;
@@ -234,7 +281,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 			stm = connection.createStatement();
 			statements.add(stm);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		return stm;
 	}
@@ -250,7 +297,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 				statements.remove(statement);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 	}
 	
@@ -264,7 +311,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 				rset.close();
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 	}
 	
@@ -433,6 +480,24 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 				connection.close();
 			}
 		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			if (objectRepo != null) {
+				objectRepo.close();
+				objectRepo = null;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			if (attsRepo != null) {
+				attsRepo.close();
+				attsRepo = null;
+			}
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -2272,6 +2337,22 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		return kList;
 	}
 
+	@Override
+	public SLEXMMRelationshipResultSet getRelationshipsRS() {
+		SLEXMMRelationshipResultSet rsrset = null;
+		Statement statement = null;
+		try {
+			statement = createStatement();
+			ResultSet rset = statement.executeQuery("SELECT DISTINCT * FROM "+METAMODEL_ALIAS+".relationship ");
+			rsrset = new SLEXMMRelationshipResultSet(this, rset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return rsrset;
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.processmining.openslex.metamodel.SLEXMMStorageMetaModel#getActivityInstances()
 	 */
@@ -5164,19 +5245,19 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		return l;
 	}
 	
-	public SLEXMMAbstractResultSetObject getResultSetFor(Class<?> rsetClass, SLEXMMTables tableA, SLEXMMTables tableB, int[] idsB) {
+	public AbstractRSetElement getResultSetFor(Class<?> rsetClass, SLEXMMTables tableA, SLEXMMTables tableB, int[] idsB) {
 		
 		List<List<SLEXMMEdge>> paths = slxmmstrqgen.getPaths(tableA, tableB);
 				
 		String query = slxmmstrqgen.getSelectQuery(paths, idsB);
 		
-		SLEXMMAbstractResultSetObject arset = null;
+		AbstractRSetElement arset = null;
 		Statement statement = null;
 		
 		try {
 			statement = createStatement();
 			ResultSet rset = statement.executeQuery(query);
-			arset = (SLEXMMAbstractResultSetObject) rsetClass.
+			arset = (AbstractRSetElement) rsetClass.
 					getConstructor(SLEXMMStorageMetaModel.class,ResultSet.class).
 					newInstance(this, rset);
 		} catch (Exception e) {
@@ -5188,7 +5269,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		
 	}
 	
-	public SLEXMMAbstractResultSetObject getResultSetForPeriod(Class<?> rsetClass, SLEXMMTables tableA, SLEXMMPeriod p) {
+	public AbstractRSetElement getResultSetForPeriod(Class<?> rsetClass, SLEXMMTables tableA, SLEXMMPeriod p) {
 		
 		SLEXMMTables tableB = null;
 		
@@ -5213,13 +5294,13 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		
 		String query = slxmmstrqgen.getSelectQueryForPeriod(paths, p);
 		
-		SLEXMMAbstractResultSetObject arset = null;
+		AbstractRSetElement arset = null;
 		Statement statement = null;
 		
 		try {
 			statement = createStatement();
 			ResultSet rset = statement.executeQuery(query);
-			arset = (SLEXMMAbstractResultSetObject) rsetClass.
+			arset = (AbstractRSetElement) rsetClass.
 					getConstructor(SLEXMMStorageMetaModel.class,ResultSet.class).
 					newInstance(this, rset);
 		} catch (Exception e) {
@@ -5291,7 +5372,8 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 			String query = "SELECT DISTINCT EV.*, EVAT.id as atId, "
 					+ " EVAT.name as atName,"
 					+ " EVATV.value as atValue, "
-					+ " EVATV.type as atType "
+					+ " EVATV.type as atType, "
+					+ " EVATV.id as atvId "
 					+ " FROM "
 					+METAMODEL_ALIAS+".event as EV "
 					+ " LEFT OUTER JOIN "
@@ -5333,7 +5415,8 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 			String query = "SELECT DISTINCT OV.*, OVAT.id as atId, "
 					+ " OVAT.name as atName,"
 					+ " OVATV.value as atValue, "
-					+ " OVATV.type as atType "
+					+ " OVATV.type as atType, "
+					+ " OVATV.id as atvId "
 					+ " FROM "
 					+METAMODEL_ALIAS+".object_version as OV "
 					+ " LEFT OUTER JOIN "
@@ -5375,7 +5458,8 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 			String query = "SELECT DISTINCT C.*, CAT.id as atId, "
 					+ " CAT.name as atName,"
 					+ " CATV.value as atValue, "
-					+ " CATV.type as atType "
+					+ " CATV.type as atType, "
+					+ " CATV.id as atvId "
 					+ " FROM "
 					+METAMODEL_ALIAS+".'case' as C "
 					+ " LEFT OUTER JOIN "
@@ -5417,7 +5501,8 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 			String query = "SELECT DISTINCT L.*, LAT.id as atId, "
 					+ " LAT.name as atName,"
 					+ " LATV.value as atValue, "
-					+ " LATV.type as atType "
+					+ " LATV.type as atType, "
+					+ " LATV.id as atvId "
 					+ " FROM "
 					+METAMODEL_ALIAS+".log as L "
 					+ " LEFT OUTER JOIN "
@@ -5437,4 +5522,74 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		
 		return lrset;
 	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public <T extends AbstractDBElement> T getFromCache(Class<?> c, int id) {
+		String uniqueId = AbstractDBElement.computeUniqueId(c, id);
+		if (objectRepo.containsKey(uniqueId)) {
+			AbstractDBElement o = objectRepo.get(uniqueId);
+			return (T) o;
+		} else {
+			return null;
+		}
+	}
+	
+	@Override
+	@SuppressWarnings("unchecked")
+	public void putInCache(AbstractDBElement o) {
+		objectRepo.put(o.getUniqueId(), o);
+	}
+	
+	@Override
+	@SuppressWarnings("unchecked")
+	public HashMap getAttsFromCache(Class<?> c, int id) {
+		String uniqueId = AbstractDBElement.computeUniqueId(c, id);
+		if (attsRepo.containsKey(uniqueId)) {
+			HashMap o = attsRepo.get(uniqueId);
+			return o;
+		} else {
+			return null;
+		}
+	}
+	
+	@Override
+	@SuppressWarnings("unchecked")
+	public void putAttsInCache(AbstractDBElement o, HashMap map) {
+		attsRepo.put(o.getUniqueId(), map);
+	}
+	
+	@Override
+	@SuppressWarnings("unchecked")
+	public HashMap getAttNamesFromCache(Class<?> c, int id) {
+		String uniqueId = AbstractDBElement.computeUniqueId(c, id);
+		if (attNamesRepo.containsKey(uniqueId)) {
+			HashMap o = attNamesRepo.get(uniqueId);
+			return o;
+		} else {
+			return null;
+		}
+	}
+	
+	@Override
+	@SuppressWarnings("unchecked")
+	public void putAttNamesInCache(AbstractDBElement o, HashMap map) {
+		attNamesRepo.put(o.getUniqueId(), map);
+	}
+	
+//	@Override
+//	@SuppressWarnings("unchecked")
+//	public <T extends SLEXMMAbstractDatabaseObject> T getFromCache(
+//			T defaultObj) {
+//		SLEXMMAbstractDatabaseObject o = objectRepo.get(defaultObj);
+//		//return defaultObj;
+//		if (o == null) {
+//			// Does not exist
+//			objectRepo.put(defaultObj, defaultObj);
+//			return defaultObj;
+//		} else {
+//			((SLEXMMAbstractDatabaseObject) o).setStorage(this);
+//			return (T) o;
+//		}
+//	}
 }

@@ -5,6 +5,8 @@ package org.processmining.openslex.metamodel;
 
 import java.util.HashMap;
 
+import org.processmining.openslex.utils.MMUtils;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class SLEXMMLog.
@@ -12,16 +14,18 @@ import java.util.HashMap;
  * @author <a href="mailto:e.gonzalez@tue.nl">Eduardo Gonzalez Lopez de Murillas</a>
  * @see <a href="https://www.win.tue.nl/~egonzale/projects/openslex/" target="_blank">OpenSLEX</a>
  */
-public class SLEXMMLog extends SLEXMMAbstractDatabaseObject {
+public class SLEXMMLog extends AbstractDBElementWithAtts<SLEXMMLogAttribute, SLEXMMLogAttributeValue> {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5285367069736416856L;
 
 	/** The name. */
 	private String name = null;
 	
 	/** The process id. */
 	private int processId = -1;
-	
-	/** The attribute values. */
-	private HashMap<SLEXMMLogAttribute, SLEXMMLogAttributeValue> attributeValues = null;
 	
 	/**
 	 * Instantiates a new SLEXMM log.
@@ -32,15 +36,6 @@ public class SLEXMMLog extends SLEXMMAbstractDatabaseObject {
 		super(storage);
 	}
 
-	/**
-	 * Gets the storage.
-	 *
-	 * @return the storage
-	 */
-	public SLEXMMStorageMetaModel getStorage() {
-		return (SLEXMMStorageMetaModel) super.storage;
-	}
-	
 	/**
 	 * Gets the name.
 	 *
@@ -56,7 +51,7 @@ public class SLEXMMLog extends SLEXMMAbstractDatabaseObject {
 	 * @param name the new name
 	 */
 	public void setName(String name) {
-		this.name = name;
+		this.name = MMUtils.intern(name);
 		setDirty(true);
 	}
 	
@@ -103,7 +98,7 @@ public class SLEXMMLog extends SLEXMMAbstractDatabaseObject {
 	 * @see org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject#insert(org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject)
 	 */
 	@Override
-	boolean insert(SLEXMMAbstractDatabaseObject t) {
+	boolean insert(AbstractDBElement t) {
 		return getStorage().insert((SLEXMMLog) t);
 	}
 
@@ -111,32 +106,8 @@ public class SLEXMMLog extends SLEXMMAbstractDatabaseObject {
 	 * @see org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject#update(org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject)
 	 */
 	@Override
-	boolean update(SLEXMMAbstractDatabaseObject t) {
+	boolean update(AbstractDBElement t) {
 		return getStorage().update((SLEXMMLog) t);
-	}
-	
-	/**
-	 * Retrieve attribute values.
-	 */
-	protected void retrieveAttributeValues() {
-		attributeValues = getStorage().getAttributeValuesForLog(this);
-	}
-	
-	
-	protected void setAttributeValues(HashMap<SLEXMMLogAttribute, SLEXMMLogAttributeValue> attributeValues) {
-		this.attributeValues = attributeValues;
-	}
-	
-	/**
-	 * Gets the attribute values.
-	 *
-	 * @return the attribute values
-	 */
-	public HashMap<SLEXMMLogAttribute, SLEXMMLogAttributeValue> getAttributeValues() {
-		if (attributeValues == null) {
-			retrieveAttributeValues();
-		}
-		return attributeValues;
 	}
 	
 	/**
@@ -147,12 +118,10 @@ public class SLEXMMLog extends SLEXMMAbstractDatabaseObject {
 	public SLEXMMCaseResultSet getCaseResultSet() {
 		return getStorage().getCasesForLog(this.getId());
 	}
-	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
+
 	@Override
-	public int hashCode() {
-		return ("log#"+getId()).hashCode();
+	protected HashMap<SLEXMMLogAttribute, SLEXMMLogAttributeValue> queryAttributeValues() {
+		return getStorage().getAttributeValuesForLog(this);
 	}
+	
 }

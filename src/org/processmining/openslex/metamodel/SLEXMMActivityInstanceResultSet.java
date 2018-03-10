@@ -12,7 +12,7 @@ import java.sql.ResultSet;
  * @author <a href="mailto:e.gonzalez@tue.nl">Eduardo Gonzalez Lopez de Murillas</a>
  * @see <a href="https://www.win.tue.nl/~egonzale/projects/openslex/" target="_blank">OpenSLEX</a>
  */
-public class SLEXMMActivityInstanceResultSet extends SLEXMMAbstractResultSetObject {
+public class SLEXMMActivityInstanceResultSet extends AbstractRSetElement<SLEXMMActivityInstance> {
 	
 	/**
 	 * Instantiates a new SLEXMM activity instance result set.
@@ -21,7 +21,7 @@ public class SLEXMMActivityInstanceResultSet extends SLEXMMAbstractResultSetObje
 	 * @param rset the rset
 	 */
 	public SLEXMMActivityInstanceResultSet(SLEXMMStorageMetaModel storage, ResultSet rset) {
-		super(storage, rset);
+		super(storage, rset, SLEXMMActivityInstance.class);
 	}
 	
 	/**
@@ -36,11 +36,15 @@ public class SLEXMMActivityInstanceResultSet extends SLEXMMAbstractResultSetObje
 				
 				int id = this.rset.getInt("id");
 				int activityId = this.rset.getInt("activity_id");
-				ai = new SLEXMMActivityInstance((SLEXMMStorageMetaModel) storage);
-				ai.setId(id);
-				ai.setActivityId(activityId);
-				ai.setDirty(false);
-				ai.setInserted(true);
+				ai = storage.getFromCache(SLEXMMActivityInstance.class, id);
+				if (ai == null) {
+					ai = new SLEXMMActivityInstance((SLEXMMStorageMetaModel) storage);
+					ai.setId(id);
+					ai.setActivityId(activityId);
+					ai.setDirty(false);
+					ai.setInserted(true);
+					storage.putInCache(ai);
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

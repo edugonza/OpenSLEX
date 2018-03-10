@@ -12,7 +12,7 @@ import java.sql.ResultSet;
  * @author <a href="mailto:e.gonzalez@tue.nl">Eduardo Gonzalez Lopez de Murillas</a>
  * @see <a href="https://www.win.tue.nl/~egonzale/projects/openslex/" target="_blank">OpenSLEX</a>
  */
-public class SLEXMMRelationResultSet extends SLEXMMAbstractResultSetObject {
+public class SLEXMMRelationResultSet extends AbstractRSetElement<SLEXMMRelation> {
 	
 	
 	
@@ -23,7 +23,7 @@ public class SLEXMMRelationResultSet extends SLEXMMAbstractResultSetObject {
 	 * @param rset the rset
 	 */
 	public SLEXMMRelationResultSet(SLEXMMStorageMetaModel storage, ResultSet rset) {
-		super(storage, rset);
+		super(storage, rset, SLEXMMRelation.class);
 	}
 	
 	/**
@@ -42,15 +42,19 @@ public class SLEXMMRelationResultSet extends SLEXMMAbstractResultSetObject {
 				int relationshipId = this.rset.getInt("relationship_id");
 				long startTimestamp = this.rset.getLong("start_timestamp");
 				long endTimestamp = this.rset.getLong("end_timestamp");
-				ev = new SLEXMMRelation((SLEXMMStorageMetaModel) storage);
-				ev.setId(id);
-				ev.setSourceObjectVersionId(sourceObjectId);
-				ev.setTargetObjectVersionId(targetObjectId);
-				ev.setRelationshipId(relationshipId);
-				ev.setStartTimestamp(startTimestamp);
-				ev.setEndTimestamp(endTimestamp);
-				ev.setDirty(false);
-				ev.setInserted(true);
+				ev = storage.getFromCache(SLEXMMRelation.class, id);
+				if (ev == null) {
+					ev = new SLEXMMRelation((SLEXMMStorageMetaModel) storage);
+					ev.setId(id);
+					ev.setSourceObjectVersionId(sourceObjectId);
+					ev.setTargetObjectVersionId(targetObjectId);
+					ev.setRelationshipId(relationshipId);
+					ev.setStartTimestamp(startTimestamp);
+					ev.setEndTimestamp(endTimestamp);
+					ev.setDirty(false);
+					ev.setInserted(true);
+					storage.putInCache(ev);
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

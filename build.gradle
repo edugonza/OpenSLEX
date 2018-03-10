@@ -1,28 +1,25 @@
 plugins {
-  id 'net.saliman.cobertura' version '2.3.1'
-  id 'com.github.kt3k.coveralls' version '2.8.2'
+    id 'jacoco'
+    id 'com.github.kt3k.coveralls' version '2.8.2'
 }
 
+apply plugin: 'eclipse'
 apply plugin: 'java'
-apply plugin: 'maven'
-apply plugin: 'net.saliman.cobertura'
+apply plugin: 'maven-publish'
 
-cobertura.coverageFormats = ['html', 'xml']
+wrapper.gradleVersion = '4.6'
 
 version = 'development-SNAPSHOT'
 group = 'com.github.edugonza'
-
-println name+" v"+version
 
 ext {
 	rapidprom_version = '4.0.2'
 }
 
 repositories {
+	mavenLocal()
 	mavenCentral()
-	maven {
-		url "https://jitpack.io"
-	}
+	maven { url "https://jitpack.io" }
 	ivy {
 		url "https://github.com/rapidprom/rapidprom-libraries/raw/${rapidprom_version}/prom/"
 		layout "pattern", {
@@ -69,10 +66,29 @@ jar {
 	from javadoc.destinationDir
 }
 
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+    repositories {
+        mavenLocal()
+    }
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled = true // coveralls plugin depends on xml format report
+        html.enabled = true
+    }
+}
+
 dependencies {
 	compile  'log4j:log4j:1.2.16'
 	compile  'org.jgrapht:jgrapht-core:1.0.0'
-	compile  'org.xerial:sqlite-jdbc:3.15.1'
+	compile  'org.xerial:sqlite-jdbc:3.21.0.1'
 	compile  'org.rapidprom:XESLite:6.7.333'
+	compile  'org.mapdb:mapdb:3.0.5'
 	testCompile 'junit:junit:4.12'
 }

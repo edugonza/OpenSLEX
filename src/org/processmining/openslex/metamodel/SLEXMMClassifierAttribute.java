@@ -10,7 +10,12 @@ package org.processmining.openslex.metamodel;
  * @author <a href="mailto:e.gonzalez@tue.nl">Eduardo Gonzalez Lopez de Murillas</a>
  * @see <a href="https://www.win.tue.nl/~egonzale/projects/openslex/" target="_blank">OpenSLEX</a>
  */
-public class SLEXMMClassifierAttribute extends SLEXMMAbstractDatabaseObject {
+public class SLEXMMClassifierAttribute extends AbstractDBElement {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4540045327093018394L;
 
 	/** The classifier id. */
 	private int classifier_id = -1;
@@ -78,7 +83,7 @@ public class SLEXMMClassifierAttribute extends SLEXMMAbstractDatabaseObject {
 	 * @see org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject#insert(org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject)
 	 */
 	@Override
-	boolean insert(SLEXMMAbstractDatabaseObject at) {
+	boolean insert(AbstractDBElement at) {
 		return getStorage().insert((SLEXMMClassifierAttribute) at);
 	}
 
@@ -86,15 +91,15 @@ public class SLEXMMClassifierAttribute extends SLEXMMAbstractDatabaseObject {
 	 * @see org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject#update(org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject)
 	 */
 	@Override
-	boolean update(SLEXMMAbstractDatabaseObject at) {
+	boolean update(AbstractDBElement at) {
 		return getStorage().update((SLEXMMClassifierAttribute) at);
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		return ("classifier_attribute#"+getId()).hashCode();
-	}
+//	/* (non-Javadoc)
+//	 * @see java.lang.Object#hashCode()
+//	 */
+//	@Override
+//	public int hashCode() {
+//		return ("classifier_attribute#"+getId()).hashCode();
+//	}
 }

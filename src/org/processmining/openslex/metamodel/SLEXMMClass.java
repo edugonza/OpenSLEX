@@ -5,6 +5,8 @@ package org.processmining.openslex.metamodel;
 
 import java.util.List;
 
+import org.processmining.openslex.utils.MMUtils;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class SLEXMMClass.
@@ -12,7 +14,7 @@ import java.util.List;
  * @author <a href="mailto:e.gonzalez@tue.nl">Eduardo Gonzalez Lopez de Murillas</a>
  * @see <a href="https://www.win.tue.nl/~egonzale/projects/openslex/" target="_blank">OpenSLEX</a>
  */
-public class SLEXMMClass extends SLEXMMAbstractDatabaseObject {
+public class SLEXMMClass extends AbstractDBElement {
 
 	/** The name. */
 	private String name = null;
@@ -35,8 +37,8 @@ public class SLEXMMClass extends SLEXMMAbstractDatabaseObject {
 	 */
 	protected SLEXMMClass(SLEXMMStorageMetaModel storage, String name, int data_modelId) {
 		super(storage);
-		this.name = name;
-		this.datamodelId = data_modelId;
+		setName(name);
+		setDataModelId(data_modelId);
 	}
 	
 	/**
@@ -72,7 +74,7 @@ public class SLEXMMClass extends SLEXMMAbstractDatabaseObject {
 	 * @param name the new name
 	 */
 	protected void setName(String name) {
-		this.name = name;
+		this.name = MMUtils.intern(name);
 		setDirty(true);
 	}
 	
@@ -138,7 +140,7 @@ public class SLEXMMClass extends SLEXMMAbstractDatabaseObject {
 	 * @see org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject#insert(org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject)
 	 */
 	@Override
-	boolean insert(SLEXMMAbstractDatabaseObject cl) {
+	boolean insert(AbstractDBElement cl) {
 		return getStorage().insert((SLEXMMClass) cl);
 	}
 
@@ -146,15 +148,15 @@ public class SLEXMMClass extends SLEXMMAbstractDatabaseObject {
 	 * @see org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject#update(org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject)
 	 */
 	@Override
-	boolean update(SLEXMMAbstractDatabaseObject cl) {
+	boolean update(AbstractDBElement cl) {
 		return getStorage().update((SLEXMMClass) cl);
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		return ("class#"+getId()).hashCode();
-	}
+//	/* (non-Javadoc)
+//	 * @see java.lang.Object#hashCode()
+//	 */
+//	@Override
+//	public int hashCode() {
+//		return ("class#"+getId()).hashCode();
+//	}
 }

@@ -1,9 +1,25 @@
-package org.processmining.openslex.metamodel;
+package org.processmining.openslex.utils;
 
-public class SLEXMMUtils {
+public class MMUtils {
 
 	public static final int INFINITE_FUTURE = -1;
 	public static final int INFINITE_PAST = -2;
+	
+	public static String intern(String str) {
+		if (str == null) {
+			return null;
+		} else {
+			return str.intern();
+		}
+	}
+	
+	public static String str(String str) {
+		if (str == null) {
+			return "".intern();
+		} else {
+			return str;
+		}
+	}
 	
 	public static boolean before(long a, long b) {
 		return (a != b && beforeOrEqual(a,b));

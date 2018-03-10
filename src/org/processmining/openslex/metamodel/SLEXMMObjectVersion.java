@@ -12,7 +12,12 @@ import java.util.HashMap;
  * @author <a href="mailto:e.gonzalez@tue.nl">Eduardo Gonzalez Lopez de Murillas</a>
  * @see <a href="https://www.win.tue.nl/~egonzale/projects/openslex/" target="_blank">OpenSLEX</a>
  */
-public class SLEXMMObjectVersion extends SLEXMMAbstractDatabaseObject {
+public class SLEXMMObjectVersion extends AbstractDBElementWithAtts<SLEXMMAttribute, SLEXMMAttributeValue> {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7322852284760266403L;
 
 	/** The object id. */
 	private int objectId = -1;
@@ -23,10 +28,6 @@ public class SLEXMMObjectVersion extends SLEXMMAbstractDatabaseObject {
 	/** The end timestamp. */
 	private long endTimestamp = -1;
 	
-	/** The attribute values. */
-	private HashMap<SLEXMMAttribute,SLEXMMAttributeValue> attributeValues = null;
-	
-	private HashMap<String,SLEXMMAttribute> attributeNamesMap = null;
 	/**
 	 * Instantiates a new SLEXMM object version.
 	 *
@@ -128,7 +129,7 @@ public class SLEXMMObjectVersion extends SLEXMMAbstractDatabaseObject {
 	 * @see org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject#insert(org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject)
 	 */
 	@Override
-	boolean insert(SLEXMMAbstractDatabaseObject e) {
+	boolean insert(AbstractDBElement e) {
 		return getStorage().insert((SLEXMMObjectVersion)e);
 	}
 
@@ -136,59 +137,13 @@ public class SLEXMMObjectVersion extends SLEXMMAbstractDatabaseObject {
 	 * @see org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject#update(org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject)
 	 */
 	@Override
-	boolean update(SLEXMMAbstractDatabaseObject e) {
+	boolean update(AbstractDBElement e) {
 		return getStorage().update((SLEXMMObjectVersion)e);
 	}
 
-	/**
-	 * Retrieve attribute values.
-	 */
-	protected void retrieveAttributeValues() {
-		HashMap<SLEXMMAttribute, SLEXMMAttributeValue> attributeValuesMap = getStorage().getAttributeValuesForObjectVersion(this);
-		this.setAttributeValues(attributeValuesMap);
-	}
-	
-	protected void setAttributeValues(HashMap<SLEXMMAttribute, SLEXMMAttributeValue> attributeValues) {
-		this.attributeValues = attributeValues;
-		HashMap<String,SLEXMMAttribute> atNamesMap = new HashMap<>();
-		for (SLEXMMAttribute at: attributeValues.keySet()) {
-			atNamesMap.put(at.getName(), at);
-		}
-		this.attributeNamesMap = atNamesMap;
-	}
-	
-	
-	/**
-	 * Gets the attribute values.
-	 *
-	 * @return the attribute values
-	 */
-	public HashMap<SLEXMMAttribute, SLEXMMAttributeValue> getAttributeValues() {
-		if (attributeValues == null) {
-			retrieveAttributeValues();
-		}
-		return attributeValues;
-	}
-
-	public SLEXMMAttributeValue getAttributeValue(String attribute) {
-		HashMap<SLEXMMAttribute,SLEXMMAttributeValue> atMap = getAttributeValues();
-		SLEXMMAttribute at = getAttribute(attribute);
-		
-		if (at != null) {
-			return atMap.get(at);
-		}
-		return null;
-	}
-	
-	public SLEXMMAttribute getAttribute(String attribute) {
-		return attributeNamesMap.get(attribute);
-	}
-	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
 	@Override
-	public int hashCode() {
-		return ("object_version#"+getId()).hashCode();
+	protected HashMap queryAttributeValues() {
+		return getStorage().getAttributeValuesForObjectVersion(this);
 	}
+	
 }

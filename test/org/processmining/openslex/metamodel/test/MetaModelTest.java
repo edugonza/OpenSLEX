@@ -2,6 +2,8 @@ package org.processmining.openslex.metamodel.test;
 
 import static org.junit.Assert.*;
 
+import java.util.List;
+
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -26,12 +28,32 @@ public class MetaModelTest {
 		
 	}
 	
-	@Test
-	public void getProcesses() throws Exception {
-    	SLEXMMEventResultSet out = mm.getEvents();
-    	if (out == null) {
+	private void check(AbstractRSetElement rset) {
+		if (rset == null) {
 			fail("Output was null");
 		}
+	}
+	
+	private void check(List<?> rset) {
+		if (rset == null) {
+			fail("Output was null");
+		}
+	}
+	
+	@Test
+	public void getThings() throws Exception {
+    	check(mm.getEvents());
+    	check(mm.getObjects());
+    	check(mm.getObjectVersions());
+    	check(mm.getActivities());
+    	check(mm.getProcesses());
+    	check(mm.getClasses());
+    	check(mm.getAttributes());
+    	check(mm.getRelationships());
+    	check(mm.getRelations());
+    	check(mm.getActivityInstances());
+    	check(mm.getCases());
+    	check(mm.getLogs());
 	}
 	
 	@AfterClass

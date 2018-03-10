@@ -12,7 +12,7 @@ import java.sql.ResultSet;
  * @author <a href="mailto:e.gonzalez@tue.nl">Eduardo Gonzalez Lopez de Murillas</a>
  * @see <a href="https://www.win.tue.nl/~egonzale/projects/openslex/" target="_blank">OpenSLEX</a>
  */
-public class SLEXMMProcessResultSet extends SLEXMMAbstractResultSetObject {
+public class SLEXMMProcessResultSet extends AbstractRSetElement<SLEXMMProcess> {
 	
 	/**
 	 * Instantiates a new SLEXMM process result set.
@@ -21,7 +21,7 @@ public class SLEXMMProcessResultSet extends SLEXMMAbstractResultSetObject {
 	 * @param rset the rset
 	 */
 	public SLEXMMProcessResultSet(SLEXMMStorageMetaModel storage, ResultSet rset) {
-		super(storage, rset);
+		super(storage, rset, SLEXMMProcess.class);
 	}
 	
 	/**
@@ -36,11 +36,15 @@ public class SLEXMMProcessResultSet extends SLEXMMAbstractResultSetObject {
 				
 				int id = this.rset.getInt("id");
 				String name = this.rset.getString("name");
-				proc = new SLEXMMProcess((SLEXMMStorageMetaModel) storage);
-				proc.setId(id);
-				proc.setName(name);
-				proc.setDirty(false);
-				proc.setInserted(true);
+				proc = storage.getFromCache(SLEXMMProcess.class, id);
+				if (proc == null) {
+					proc = new SLEXMMProcess((SLEXMMStorageMetaModel) storage);
+					proc.setId(id);
+					proc.setName(name);
+					proc.setDirty(false);
+					proc.setInserted(true);
+					storage.putInCache(proc);
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

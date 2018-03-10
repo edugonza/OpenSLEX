@@ -3,6 +3,7 @@
  */
 package org.processmining.openslex.metamodel;
 
+import org.processmining.openslex.utils.MMUtils;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -11,8 +12,13 @@ package org.processmining.openslex.metamodel;
  * @author <a href="mailto:e.gonzalez@tue.nl">Eduardo Gonzalez Lopez de Murillas</a>
  * @see <a href="https://www.win.tue.nl/~egonzale/projects/openslex/" target="_blank">OpenSLEX</a>
  */
-public class SLEXMMProcess extends SLEXMMAbstractDatabaseObject {
+public class SLEXMMProcess extends AbstractDBElement {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4642623195503611984L;
+	
 	/** The name. */
 	private String name = null;
 	
@@ -21,17 +27,8 @@ public class SLEXMMProcess extends SLEXMMAbstractDatabaseObject {
 	 *
 	 * @param storage the storage
 	 */
-	public SLEXMMProcess(SLEXMMStorage storage) {
+	public SLEXMMProcess(SLEXMMStorageMetaModel storage) {
 		super(storage);
-	}
-	
-	/**
-	 * Gets the storage.
-	 *
-	 * @return the storage
-	 */
-	public SLEXMMStorageMetaModel getStorage() {
-		return (SLEXMMStorageMetaModel) super.storage;
 	}
 	
 	/**
@@ -58,7 +55,7 @@ public class SLEXMMProcess extends SLEXMMAbstractDatabaseObject {
 	 * @see org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject#insert(org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject)
 	 */
 	@Override
-	boolean insert(SLEXMMAbstractDatabaseObject dm) {
+	boolean insert(AbstractDBElement dm) {
 		return getStorage().insert((SLEXMMProcess) dm);
 	}
 
@@ -66,7 +63,7 @@ public class SLEXMMProcess extends SLEXMMAbstractDatabaseObject {
 	 * @see org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject#update(org.processmining.openslex.metamodel.SLEXMMAbstractDatabaseObject)
 	 */
 	@Override
-	boolean update(SLEXMMAbstractDatabaseObject dm) {
+	boolean update(AbstractDBElement dm) {
 		return getStorage().update((SLEXMMProcess) dm);
 	}
 
@@ -85,16 +82,8 @@ public class SLEXMMProcess extends SLEXMMAbstractDatabaseObject {
 	 * @param name the new name
 	 */
 	protected void setName(String name) {
-		this.name = name;
+		this.name = MMUtils.intern(name);
 		setDirty(true);
-	}
-	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		return ("process#"+getId()).hashCode();
 	}
 
 }

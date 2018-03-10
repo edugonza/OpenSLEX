@@ -1,18 +1,13 @@
 package org.processmining.openslex.metamodel.querygen;
 
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import org.jgrapht.GraphPath;
-import org.jgrapht.alg.DijkstraShortestPath;
 import org.jgrapht.alg.KShortestPaths;
 import org.jgrapht.graph.DirectedWeightedMultigraph;
 import org.processmining.openslex.metamodel.SLEXMMPeriod;
-import org.processmining.openslex.metamodel.SLEXMMPeriodResultSet;
-import org.processmining.openslex.metamodel.SLEXMMStorageMetaModel;
 import org.processmining.openslex.metamodel.SLEXMMStorageMetaModelImpl;
 
 public class SLEXMMStorageQueryGenerator {
@@ -178,7 +173,7 @@ public class SLEXMMStorageQueryGenerator {
 		
 		List<List<SLEXMMEdge>> listPaths = new ArrayList<>();
 		
-		int i = 0;
+		//int i = 0;
 		double minWeight = Double.MAX_VALUE;
 		int minLength = Integer.MAX_VALUE;
 		
@@ -274,7 +269,7 @@ public class SLEXMMStorageQueryGenerator {
 				first = false;
 			}
 
-			SLEXMMEdge lastEdge = path.get(path.size() - 1);
+			//SLEXMMEdge lastEdge = path.get(path.size() - 1);
 
 			strbldr.append("SELECT DISTINCT t" + (path.size() + 1) + ".id"
 					+ " as originIdQuery, t1.* ");
@@ -354,7 +349,7 @@ public class SLEXMMStorageQueryGenerator {
 				first = false;
 			}
 
-			SLEXMMEdge lastEdge = path.get(path.size() - 1);
+			//SLEXMMEdge lastEdge = path.get(path.size() - 1);
 			SLEXMMEdge firstEdge = path.get(0);
 			SLEXMMNode firstNode = firstEdge.getSourceNode();
 			String startTField = null;
