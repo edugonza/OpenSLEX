@@ -21,11 +21,6 @@ public abstract class AbstractDBElementWithAtts<AT extends AbstractAttDBElement,
 	protected void setAttributeValues(HashMap<AT, ATV> attributeValues, HashMap<String,AT> attributeNamesMap) {
 		this.attributeValues = attributeValues;
 		this.attributeNamesMap = attributeNamesMap;
-//		HashMap<String,AT> atNamesMap = new HashMap<>();
-//		for (AT at: attributeValues.keySet()) {
-//			atNamesMap.put(at.getName(), at);
-//		}
-//		this.attributeNamesMap = atNamesMap;
 	}
 	
 	protected abstract HashMap<AT, ATV> queryAttributeValues();
@@ -33,14 +28,19 @@ public abstract class AbstractDBElementWithAtts<AT extends AbstractAttDBElement,
 	/**
 	 * Retrieve attribute values.
 	 */
+	@SuppressWarnings("unchecked")
 	protected void retrieveAttributeValues() {
-		HashMap<AT,ATV> map = getStorage().getAttsFromCache(this.getClass(), getId());
+		HashMap<AT,ATV> map = (HashMap<AT, ATV>) getStorage().getAttsFromCache(this.getClass(), getId());
+		HashMap<String,AT> mapNames = (HashMap<String, AT>) getStorage().getAttNamesFromCache(this.getClass(), getId());
 		
-		HashMap<String,AT> mapNames = getStorage().getAttNamesFromCache(this.getClass(), getId());
-//		if (map == null) {
-//			map = queryAttributeValues();
-//			getStorage().putAttsInCache(this, map);
-//		}
+		if (map == null) {
+			map = this.queryAttributeValues();
+			mapNames = new HashMap<>();
+			for (AT at : map.keySet()) {
+				mapNames.put(at.getName(), at);
+			}
+		}
+		
 		this.setAttributeValues(map,mapNames);
 	}
 

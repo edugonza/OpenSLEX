@@ -3,8 +3,6 @@
  */
 package org.processmining.openslex.metamodel;
 
-import org.processmining.openslex.utils.MMUtils;
-
 // TODO: Auto-generated Javadoc
 /**
  * The Class SLEXMMLogAttributeValue.

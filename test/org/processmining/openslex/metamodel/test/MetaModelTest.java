@@ -28,7 +28,7 @@ public class MetaModelTest {
 		
 	}
 	
-	private void check(AbstractRSetElement rset) {
+	private void check(AbstractRSetElement<?> rset) {
 		if (rset == null) {
 			fail("Output was null");
 		}

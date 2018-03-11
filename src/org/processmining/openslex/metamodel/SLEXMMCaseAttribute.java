@@ -14,6 +14,10 @@ import org.processmining.openslex.utils.MMUtils;
  */
 public class SLEXMMCaseAttribute extends AbstractAttDBElement {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2261653976293276421L;
 	/** The name. */
 	private String name = null;
 	

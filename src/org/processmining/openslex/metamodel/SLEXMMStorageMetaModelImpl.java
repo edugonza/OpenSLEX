@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
@@ -25,7 +24,6 @@ import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.HTreeMap;
 import org.mapdb.Serializer;
-import org.mapdb.serializer.SerializerString;
 import org.processmining.openslex.metamodel.querygen.SLEXMMEdge;
 import org.processmining.openslex.metamodel.querygen.SLEXMMStorageQueryGenerator;
 import org.processmining.openslex.metamodel.querygen.SLEXMMTables;
@@ -47,7 +45,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	
 	private HTreeMap<String, AbstractDBElement> objectRepo;
 	
-	private HTreeMap<String, HashMap<AbstractAttDBElement, AbstractDBElement>> attsRepo;
+	private HTreeMap<String, HashMap<AbstractAttDBElement, AbstractDBElementWithValue>> attsRepo;
 	
 	private HTreeMap<String, HashMap<String, AbstractAttDBElement>> attNamesRepo;
 	
@@ -70,7 +68,9 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	private String filename;
 	
 	/** The path. */
-	private String path;	
+	private String path;
+	
+	private boolean diskCache;
 	
 	/** The connection. */
 	private Connection connection;
@@ -86,15 +86,20 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	 * @throws Exception the exception
 	 */
 	public SLEXMMStorageMetaModelImpl(String path, String filename) throws Exception {
-		startConnection(path, filename);
+		startConnection(path, filename, false);
 	}
 	
-	private void startConnection(String path, String filename) throws Exception {
+	public SLEXMMStorageMetaModelImpl(String path, String filename, boolean diskCache) throws Exception {
+		startConnection(path, filename, diskCache);
+	}
+	
+	private void startConnection(String path, String filename, boolean diskCache) throws Exception {
 		this.slxmmstrqgen = null;
 		this.metamodel_attached = false;
 		this.autoCommitOnCreation = true;
 		this.filename = null;
 		this.path = null;
+		this.diskCache = diskCache;
 		this.connection = null;
 		this.statements = new HashSet<>();
 		
@@ -104,27 +109,36 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 				new AttNamesMapSerializer(this);
 		DBElementSerializer absDBobjectSerializer =
 				new DBElementSerializer(this);
-		DB db = DBMaker
-				//.heapDB()
-				.tempFileDB()
-				//.memoryDirectDB()
-				.concurrencyDisable()
-				.allocateStartSize( 15 * 1024*1024*1024)  // 10GB
-			    .allocateIncrement(512 * 1024*1024)       // 512MB
-		        .fileMmapEnable()
-		        .fileMmapPreclearDisable()
-		        .make();
-		HTreeMap map = db
+		DB db = null;
+		
+		if (diskCache) {
+			db = DBMaker
+					.tempFileDB()
+					.concurrencyDisable()
+					.allocateStartSize( 15 * 1024*1024*1024)  // 10GB
+				    .allocateIncrement(512 * 1024*1024)       // 512MB
+			        .fileMmapEnable()
+			        .fileMmapPreclearDisable()
+			        .make();
+		} else {
+			db = DBMaker
+					.heapDB()
+					.concurrencyDisable()
+					.allocateStartSize( 15 * 1024*1024*1024)  // 10GB
+				    .allocateIncrement(512 * 1024*1024)       // 512MB
+			        .make();
+		}
+		HTreeMap<String, AbstractDBElement> map = db
 		        .hashMap("objectRepo")
 		        .keySerializer(Serializer.STRING)
 		        .valueSerializer(absDBobjectSerializer)
 		        .create();
-		HTreeMap mapAtts = db
+		HTreeMap<String, HashMap<AbstractAttDBElement, AbstractDBElementWithValue>> mapAtts = db
 				.hashMap("attsRepo")
 				.keySerializer(Serializer.STRING)
 				.valueSerializer(atMapSerializer)
 				.create();
-		HTreeMap mapAttNames = db
+		HTreeMap<String, HashMap<String, AbstractAttDBElement>> mapAttNames = db
 				.hashMap("attNamesRepo")
 				.keySerializer(Serializer.STRING)
 				.valueSerializer(atNamesMapSerializer)
@@ -143,7 +157,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	@Override
 	public void reconnect() throws Exception {
 		disconnect();
-		startConnection(this.path, this.filename);
+		startConnection(this.path, this.filename, this.diskCache);
 	}
 	
 	/* (non-Javadoc)
@@ -1173,7 +1187,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		try {
 			statement = createStatement();
 			statement.setQueryTimeout(30);
-			ResultSet rset = statement.executeQuery("SELECT DISTINCT AT.id, AT.name, ATV.value, ATV.type FROM "+
+			ResultSet rset = statement.executeQuery("SELECT AT.id, AT.name, ATV.value, ATV.type FROM "+
 														METAMODEL_ALIAS+".event_attribute_name AS AT, "+
 														METAMODEL_ALIAS+".event_attribute_value AS ATV, "+
 														METAMODEL_ALIAS+".event AS EV "+
@@ -1213,7 +1227,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		try {
 			statement = createStatement();
-			ResultSet rset = statement.executeQuery("SELECT DISTINCT * FROM "+METAMODEL_ALIAS+".datamodel");
+			ResultSet rset = statement.executeQuery("SELECT * FROM "+METAMODEL_ALIAS+".datamodel");
 			dmrset = new SLEXMMDataModelResultSet(this, rset);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1647,7 +1661,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		try {
 			statement = createStatement();
 			statement.setQueryTimeout(30);
-			ResultSet rset = statement.executeQuery("SELECT DISTINCT AT.id, AT.name, AT.class_id, ATV.id, ATV.value, ATV.type FROM "+
+			ResultSet rset = statement.executeQuery("SELECT AT.id, AT.name, AT.class_id, ATV.id, ATV.value, ATV.type FROM "+
 														METAMODEL_ALIAS+".attribute_name AS AT, "+
 														METAMODEL_ALIAS+".attribute_value AS ATV, "+
 														METAMODEL_ALIAS+".object_version AS OBJV "+
@@ -1692,7 +1706,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		try {
 			statement = createStatement();
-			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJV.* FROM "
+			ResultSet rset = statement.executeQuery("SELECT OBJV.* FROM "
 					+METAMODEL_ALIAS+".object_version AS OBJV "
 					+" ORDER BY OBJV.start_timestamp ");
 			erset = new SLEXMMObjectVersionResultSet(this, rset);
@@ -1721,7 +1735,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		try {
 			statement = createStatement();
-			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJV.object_id as originIdQuery, RL.* FROM "
+			ResultSet rset = statement.executeQuery("SELECT OBJV.object_id as originIdQuery, RL.* FROM "
 					+METAMODEL_ALIAS+".relation RL, "
 					+METAMODEL_ALIAS+".object_version OBJV "
 					+" WHERE RL.source_object_version_id = OBJV.id "
@@ -1752,7 +1766,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		try {
 			statement = createStatement();
-			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJV.object_id as originIdQuery, RL.* FROM "
+			ResultSet rset = statement.executeQuery("SELECT OBJV.object_id as originIdQuery, RL.* FROM "
 					+METAMODEL_ALIAS+".relation RL, "
 					+METAMODEL_ALIAS+".object_version OBJV "
 					+" WHERE RL.target_object_version_id = OBJV.id "
@@ -1783,7 +1797,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		try {
 			statement = createStatement();
-			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJV.object_id as originIdQuery, REL.* FROM "
+			ResultSet rset = statement.executeQuery("SELECT OBJV.object_id as originIdQuery, REL.* FROM "
 					+METAMODEL_ALIAS+".relation as REL, "
 					+METAMODEL_ALIAS+".object_version OBJV "
 					+" WHERE REL.source_object_version_id = OBJV.id "
@@ -1815,7 +1829,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		try {
 			statement = createStatement();
-			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJV.object_id as originIdQuery, REL.* FROM "
+			ResultSet rset = statement.executeQuery("SELECT OBJV.object_id as originIdQuery, REL.* FROM "
 					+METAMODEL_ALIAS+".relation as REL, "
 					+METAMODEL_ALIAS+".object_version OBJV "
 					+" WHERE REL.target_object_version_id = OBJV.id "
@@ -1839,7 +1853,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		try {
 			statement = createStatement();
-			ResultSet rset = statement.executeQuery("SELECT DISTINCT OBJ.id, OBJ.class_id FROM "
+			ResultSet rset = statement.executeQuery("SELECT OBJ.id, OBJ.class_id FROM "
 					+METAMODEL_ALIAS+".object AS OBJ "
 					+" ORDER BY OBJ.id");
 			erset = new SLEXMMObjectResultSet(this, rset);
@@ -1862,7 +1876,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		try {
 			statement = createStatement();
-			ResultSet rset = statement.executeQuery("SELECT DISTINCT * FROM "
+			ResultSet rset = statement.executeQuery("SELECT * FROM "
 					+METAMODEL_ALIAS+".event ");
 			erset = new SLEXMMEventResultSet(this, rset);
 		} catch (Exception e) {
@@ -1882,7 +1896,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		try {
 			statement = createStatement();
-			ResultSet rset = statement.executeQuery("SELECT DISTINCT * FROM "
+			ResultSet rset = statement.executeQuery("SELECT * FROM "
 					+METAMODEL_ALIAS+".event ORDER BY ordering ASC ");
 			erset = new SLEXMMEventResultSet(this, rset);
 		} catch (Exception e) {
@@ -1902,7 +1916,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		try {
 			statement = createStatement();
-			ResultSet rset = statement.executeQuery("SELECT DISTINCT * FROM "
+			ResultSet rset = statement.executeQuery("SELECT * FROM "
 					+METAMODEL_ALIAS+".'case' ");
 			erset = new SLEXMMCaseResultSet(this, rset);
 		} catch (Exception e) {
@@ -2062,7 +2076,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		try {
 			statement = createStatement();
-			String query = "SELECT DISTINCT EV.* FROM "
+			String query = "SELECT EV.* FROM "
 					+METAMODEL_ALIAS+".event as EV "
 					+" WHERE EV.id = '"+evId+"' ";
 			ResultSet rset = statement.executeQuery(query);
@@ -2087,7 +2101,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		
 		try {
 			statement = createStatement();
-			ResultSet rset = statement.executeQuery("SELECT DISTINCT * FROM "+METAMODEL_ALIAS+".activity");
+			ResultSet rset = statement.executeQuery("SELECT * FROM "+METAMODEL_ALIAS+".activity");
 			actrset = new SLEXMMActivityResultSet(this, rset);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -2103,7 +2117,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		
 		try {
 			statement = createStatement();
-			ResultSet rset = statement.executeQuery("SELECT DISTINCT * FROM "+METAMODEL_ALIAS+".class");
+			ResultSet rset = statement.executeQuery("SELECT * FROM "+METAMODEL_ALIAS+".class");
 			actrset = new SLEXMMClassResultSet(this, rset);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -2124,7 +2138,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String query = "";
 		try {
 			statement = createStatement();
-			query = "SELECT DISTINCT "+ob.getId()+" as originIdQuery, OBJV.* FROM "
+			query = "SELECT "+ob.getId()+" as originIdQuery, OBJV.* FROM "
 					+METAMODEL_ALIAS+".object_version AS OBJV, "
 					+METAMODEL_ALIAS+".relation AS RL "
 					+" WHERE ( RL.source_object_version_id = "+ob.getId()+" AND OBJV.id = RL.target_object_version_id ) "
@@ -2150,7 +2164,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String query = "";
 		try {
 			statement = createStatement();
-			query = "SELECT DISTINCT OBJV1.id as originIdQuery, OBJV2.* FROM "
+			query = "SELECT OBJV1.id as originIdQuery, OBJV2.* FROM "
 					+METAMODEL_ALIAS+".object_version AS OBJV1, "
 					+METAMODEL_ALIAS+".object_version AS OBJV2, "
 					+METAMODEL_ALIAS+".relation AS RL "
@@ -2216,7 +2230,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		try {
 			statement = createStatement();
-			String query = "SELECT DISTINCT OBJ.id as originIdQuery, OBJ.* FROM "
+			String query = "SELECT OBJ.id as originIdQuery, OBJ.* FROM "
 					+METAMODEL_ALIAS+".object as OBJ "
 					+" WHERE OBJ.id = '"+objectId+"' ";
 			ResultSet rset = statement.executeQuery(query);
@@ -2292,7 +2306,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		try {
 			statement = createStatement();
-			ResultSet rset = statement.executeQuery("SELECT DISTINCT RL.* FROM "
+			ResultSet rset = statement.executeQuery("SELECT RL.* FROM "
 					+METAMODEL_ALIAS+".relation RL ");
 			erset = new SLEXMMRelationResultSet(this, rset);
 		} catch (Exception e) {
@@ -2313,7 +2327,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		
 		try {
 			statement = createStatement();
-			ResultSet rset = statement.executeQuery("SELECT DISTINCT * FROM "+METAMODEL_ALIAS+".relationship ");
+			ResultSet rset = statement.executeQuery("SELECT * FROM "+METAMODEL_ALIAS+".relationship ");
 			while (rset.next()) {
 				int id = rset.getInt("id");
 				String name = rset.getString("name");
@@ -2343,7 +2357,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		try {
 			statement = createStatement();
-			ResultSet rset = statement.executeQuery("SELECT DISTINCT * FROM "+METAMODEL_ALIAS+".relationship ");
+			ResultSet rset = statement.executeQuery("SELECT * FROM "+METAMODEL_ALIAS+".relationship ");
 			rsrset = new SLEXMMRelationshipResultSet(this, rset);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -2362,7 +2376,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		try {
 			statement = createStatement();
-			ResultSet rset = statement.executeQuery("SELECT DISTINCT AI.* FROM "
+			ResultSet rset = statement.executeQuery("SELECT AI.* FROM "
 					+METAMODEL_ALIAS+".activity_instance AI ");
 			airset = new SLEXMMActivityInstanceResultSet(this, rset);
 		} catch (Exception e) {
@@ -2382,7 +2396,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		try {
 			statement = createStatement();
-			ResultSet rset = statement.executeQuery("SELECT DISTINCT A.* FROM "
+			ResultSet rset = statement.executeQuery("SELECT A.* FROM "
 					+METAMODEL_ALIAS+".attribute_name A ");
 			arset = new SLEXMMAttributeResultSet(this, rset);
 		} catch (Exception e) {
@@ -2421,7 +2435,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		try {
 			statement = createStatement();
-			ResultSet rset = statement.executeQuery("SELECT DISTINCT EA.* FROM "
+			ResultSet rset = statement.executeQuery("SELECT EA.* FROM "
 					+METAMODEL_ALIAS+".event_attribute_name EA ");
 			arset = new SLEXMMEventAttributeResultSet(this, rset);
 		} catch (Exception e) {
@@ -4294,7 +4308,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		try {
 			statement = createStatement();
 			statement.setQueryTimeout(30);
-			ResultSet rset = statement.executeQuery("SELECT DISTINCT CAT.id, CAT.name, CATV.value, CATV.type FROM "+
+			ResultSet rset = statement.executeQuery("SELECT CAT.id, CAT.name, CATV.value, CATV.type FROM "+
 														METAMODEL_ALIAS+".case_attribute_name AS CAT, "+
 														METAMODEL_ALIAS+".case_attribute_value AS CATV "+
 														"WHERE CATV.case_id = "+caseId+" AND "
@@ -4423,7 +4437,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		try {
 			statement = createStatement();
 			statement.setQueryTimeout(30);
-			ResultSet rset = statement.executeQuery("SELECT DISTINCT LAT.id, LAT.name, LATV.value, LATV.type FROM "+
+			ResultSet rset = statement.executeQuery("SELECT LAT.id, LAT.name, LATV.value, LATV.type FROM "+
 														METAMODEL_ALIAS+".log_attribute_name AS LAT, "+
 														METAMODEL_ALIAS+".log_attribute_value AS LATV "+
 														"WHERE LATV.log_id = "+logId+" AND "
@@ -4465,7 +4479,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		try {
 			statement = createStatement();
 			statement.setQueryTimeout(30);
-			ResultSet rset = statement.executeQuery("SELECT DISTINCT CLAT.id, CLAT.classifier_id, CLAT.event_attribute_name FROM "+
+			ResultSet rset = statement.executeQuery("SELECT CLAT.id, CLAT.classifier_id, CLAT.event_attribute_name FROM "+
 														METAMODEL_ALIAS+".classifier_attributes AS CLAT "+
 														"WHERE CLAT.classifier_id = "+classifierId);
 			attributes = new ArrayList<>();
@@ -4595,7 +4609,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		try {
 			statement = createStatement();
-			ResultSet rset = statement.executeQuery("SELECT DISTINCT * FROM "
+			ResultSet rset = statement.executeQuery("SELECT * FROM "
 					+METAMODEL_ALIAS+".log ");
 			lrset = new SLEXMMLogResultSet(this, rset);
 		} catch (Exception e) {
@@ -4612,7 +4626,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		try {
 			statement = createStatement();
-			ResultSet rset = statement.executeQuery("SELECT DISTINCT * FROM "
+			ResultSet rset = statement.executeQuery("SELECT * FROM "
 					+METAMODEL_ALIAS+".process ");
 			prset = new SLEXMMProcessResultSet(this, rset);
 		} catch (Exception e) {
@@ -5245,19 +5259,19 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		return l;
 	}
 	
-	public AbstractRSetElement getResultSetFor(Class<?> rsetClass, SLEXMMTables tableA, SLEXMMTables tableB, int[] idsB) {
+	public AbstractRSetElement<?> getResultSetFor(Class<?> rsetClass, SLEXMMTables tableA, SLEXMMTables tableB, int[] idsB) {
 		
 		List<List<SLEXMMEdge>> paths = slxmmstrqgen.getPaths(tableA, tableB);
 				
 		String query = slxmmstrqgen.getSelectQuery(paths, idsB);
 		
-		AbstractRSetElement arset = null;
+		AbstractRSetElement<?> arset = null;
 		Statement statement = null;
 		
 		try {
 			statement = createStatement();
 			ResultSet rset = statement.executeQuery(query);
-			arset = (AbstractRSetElement) rsetClass.
+			arset = (AbstractRSetElement<?>) rsetClass.
 					getConstructor(SLEXMMStorageMetaModel.class,ResultSet.class).
 					newInstance(this, rset);
 		} catch (Exception e) {
@@ -5269,7 +5283,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		
 	}
 	
-	public AbstractRSetElement getResultSetForPeriod(Class<?> rsetClass, SLEXMMTables tableA, SLEXMMPeriod p) {
+	public AbstractRSetElement<?> getResultSetForPeriod(Class<? extends AbstractRSetElement<?>> rsetClass, SLEXMMTables tableA, SLEXMMPeriod p) {
 		
 		SLEXMMTables tableB = null;
 		
@@ -5294,13 +5308,13 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		
 		String query = slxmmstrqgen.getSelectQueryForPeriod(paths, p);
 		
-		AbstractRSetElement arset = null;
+		AbstractRSetElement<?> arset = null;
 		Statement statement = null;
 		
 		try {
 			statement = createStatement();
 			ResultSet rset = statement.executeQuery(query);
-			arset = (AbstractRSetElement) rsetClass.
+			arset = rsetClass.
 					getConstructor(SLEXMMStorageMetaModel.class,ResultSet.class).
 					newInstance(this, rset);
 		} catch (Exception e) {
@@ -5369,7 +5383,7 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		Statement statement = null;
 		try {
 			statement = createStatement();
-			String query = "SELECT DISTINCT EV.*, EVAT.id as atId, "
+			String query = "SELECT EV.*, EVAT.id as atId, "
 					+ " EVAT.name as atName,"
 					+ " EVATV.value as atValue, "
 					+ " EVATV.type as atType, "
@@ -5394,6 +5408,35 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		return erset;
 	}
 	
+	public SLEXMMEventResultSet getAllEventsAndAttributeValues() {
+		SLEXMMEventResultSet erset = null;
+		Statement statement = null;
+		try {
+			statement = createStatement();
+			String query = "SELECT EV.*, EVAT.id as atId, "
+					+ " EVAT.name as atName,"
+					+ " EVATV.value as atValue, "
+					+ " EVATV.type as atType, "
+					+ " EVATV.id as atvId "
+					+ " FROM "
+					+METAMODEL_ALIAS+".event as EV "
+					+ " LEFT OUTER JOIN "
+					+METAMODEL_ALIAS+".event_attribute_value as EVATV "
+					+ " ON EV.id = EVATV.event_id "
+					+ " LEFT OUTER JOIN "
+					+METAMODEL_ALIAS+".event_attribute_name as EVAT "
+					+ " ON EVATV.event_attribute_name_id = EVAT.id "
+					+" ORDER BY EV.id ";
+			ResultSet rset = statement.executeQuery(query);
+			erset = new SLEXMMEventResultSet(this, rset);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return erset;
+	}
+	
 	public SLEXMMObjectVersionResultSet getVersionsAndAttributeValues(Set<SLEXMMObjectVersion> set) {
 		
 		int[] ids = new int[set.size()];
@@ -5407,12 +5450,41 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		return getVersionsAndAttributeValues(ids);
 	}
 	
+	public SLEXMMObjectVersionResultSet getAllVersionsAndAttributeValues() {
+		SLEXMMObjectVersionResultSet ovrset = null;
+		Statement statement = null;
+		try {
+			statement = createStatement();
+			String query = "SELECT OV.*, OVAT.id as atId, "
+					+ " OVAT.name as atName,"
+					+ " OVATV.value as atValue, "
+					+ " OVATV.type as atType, "
+					+ " OVATV.id as atvId "
+					+ " FROM "
+					+METAMODEL_ALIAS+".object_version as OV "
+					+ " LEFT OUTER JOIN "
+					+METAMODEL_ALIAS+".attribute_value as OVATV "
+					+ " ON OV.id = OVATV.object_version_id "
+					+ " LEFT OUTER JOIN "
+					+METAMODEL_ALIAS+".attribute_name as OVAT "
+					+ " ON OVATV.attribute_name_id = OVAT.id "
+					+" ORDER BY OV.id ";
+			ResultSet rset = statement.executeQuery(query);
+			ovrset = new SLEXMMObjectVersionResultSet(this, rset);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return ovrset;
+	}
+	
 	public SLEXMMObjectVersionResultSet getVersionsAndAttributeValues(int[] ids) {
 		SLEXMMObjectVersionResultSet ovrset = null;
 		Statement statement = null;
 		try {
 			statement = createStatement();
-			String query = "SELECT DISTINCT OV.*, OVAT.id as atId, "
+			String query = "SELECT OV.*, OVAT.id as atId, "
 					+ " OVAT.name as atName,"
 					+ " OVATV.value as atValue, "
 					+ " OVATV.type as atType, "
@@ -5437,6 +5509,8 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		return ovrset;
 	}
 	
+	
+	
 	public SLEXMMCaseResultSet getCasesAndAttributeValues(Set<SLEXMMCase> set) {
 		
 		int[] ids = new int[set.size()];
@@ -5450,12 +5524,41 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		return getCasesAndAttributeValues(ids);
 	}
 	
+	public SLEXMMCaseResultSet getAllCasesAndAttributeValues() {
+		SLEXMMCaseResultSet crset = null;
+		Statement statement = null;
+		try {
+			statement = createStatement();
+			String query = "SELECT C.*, CAT.id as atId, "
+					+ " CAT.name as atName,"
+					+ " CATV.value as atValue, "
+					+ " CATV.type as atType, "
+					+ " CATV.id as atvId "
+					+ " FROM "
+					+METAMODEL_ALIAS+".'case' as C "
+					+ " LEFT OUTER JOIN "
+					+METAMODEL_ALIAS+".case_attribute_value as CATV "
+					+ " ON C.id = CATV.case_id "
+					+ " LEFT OUTER JOIN "
+					+METAMODEL_ALIAS+".case_attribute_name as CAT "
+					+ " ON CATV.case_attribute_name_id = CAT.id "
+					+" ORDER BY C.id ";
+			ResultSet rset = statement.executeQuery(query);
+			crset = new SLEXMMCaseResultSet(this, rset);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return crset;
+	}
+	
 	public SLEXMMCaseResultSet getCasesAndAttributeValues(int[] ids) {
 		SLEXMMCaseResultSet crset = null;
 		Statement statement = null;
 		try {
 			statement = createStatement();
-			String query = "SELECT DISTINCT C.*, CAT.id as atId, "
+			String query = "SELECT C.*, CAT.id as atId, "
 					+ " CAT.name as atName,"
 					+ " CATV.value as atValue, "
 					+ " CATV.type as atType, "
@@ -5493,12 +5596,41 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		return getLogsAndAttributeValues(ids);
 	}
 	
+	public SLEXMMLogResultSet getAllLogsAndAttributeValues() {
+		SLEXMMLogResultSet lrset = null;
+		Statement statement = null;
+		try {
+			statement = createStatement();
+			String query = "SELECT L.*, LAT.id as atId, "
+					+ " LAT.name as atName,"
+					+ " LATV.value as atValue, "
+					+ " LATV.type as atType, "
+					+ " LATV.id as atvId "
+					+ " FROM "
+					+METAMODEL_ALIAS+".log as L "
+					+ " LEFT OUTER JOIN "
+					+METAMODEL_ALIAS+".log_attribute_value as LATV "
+					+ " ON L.id = LATV.log_id "
+					+ " LEFT OUTER JOIN "
+					+METAMODEL_ALIAS+".log_attribute_name as LAT "
+					+ " ON LATV.log_attribute_name_id = LAT.id "
+					+" ORDER BY L.id ";
+			ResultSet rset = statement.executeQuery(query);
+			lrset = new SLEXMMLogResultSet(this, rset);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			closeStatement(statement);
+		}
+		
+		return lrset;
+	}
+	
 	public SLEXMMLogResultSet getLogsAndAttributeValues(int[] ids) {
 		SLEXMMLogResultSet lrset = null;
 		Statement statement = null;
 		try {
 			statement = createStatement();
-			String query = "SELECT DISTINCT L.*, LAT.id as atId, "
+			String query = "SELECT L.*, LAT.id as atId, "
 					+ " LAT.name as atName,"
 					+ " LATV.value as atValue, "
 					+ " LATV.type as atType, "
@@ -5536,14 +5668,14 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 	
 	@Override
-	@SuppressWarnings("unchecked")
 	public void putInCache(AbstractDBElement o) {
 		objectRepo.put(o.getUniqueId(), o);
 	}
 	
 	@Override
-	@SuppressWarnings("unchecked")
-	public HashMap getAttsFromCache(Class<?> c, int id) {
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public HashMap<AbstractAttDBElement, AbstractDBElementWithValue> getAttsFromCache(
+			Class<? extends AbstractDBElementWithAtts> c, int id) {
 		String uniqueId = AbstractDBElement.computeUniqueId(c, id);
 		if (attsRepo.containsKey(uniqueId)) {
 			HashMap o = attsRepo.get(uniqueId);
@@ -5554,14 +5686,14 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 	
 	@Override
-	@SuppressWarnings("unchecked")
-	public void putAttsInCache(AbstractDBElement o, HashMap map) {
+	public void putAttsInCache(AbstractDBElement o, HashMap<AbstractAttDBElement, AbstractDBElementWithValue> map) {
 		attsRepo.put(o.getUniqueId(), map);
 	}
 	
 	@Override
-	@SuppressWarnings("unchecked")
-	public HashMap getAttNamesFromCache(Class<?> c, int id) {
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public HashMap<String, AbstractAttDBElement> getAttNamesFromCache(Class<? extends AbstractDBElementWithAtts> c,
+			int id) {
 		String uniqueId = AbstractDBElement.computeUniqueId(c, id);
 		if (attNamesRepo.containsKey(uniqueId)) {
 			HashMap o = attNamesRepo.get(uniqueId);
@@ -5572,24 +5704,8 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	}
 	
 	@Override
-	@SuppressWarnings("unchecked")
-	public void putAttNamesInCache(AbstractDBElement o, HashMap map) {
+	public void putAttNamesInCache(AbstractDBElement o, HashMap<String, AbstractAttDBElement> map) {
 		attNamesRepo.put(o.getUniqueId(), map);
 	}
 	
-//	@Override
-//	@SuppressWarnings("unchecked")
-//	public <T extends SLEXMMAbstractDatabaseObject> T getFromCache(
-//			T defaultObj) {
-//		SLEXMMAbstractDatabaseObject o = objectRepo.get(defaultObj);
-//		//return defaultObj;
-//		if (o == null) {
-//			// Does not exist
-//			objectRepo.put(defaultObj, defaultObj);
-//			return defaultObj;
-//		} else {
-//			((SLEXMMAbstractDatabaseObject) o).setStorage(this);
-//			return (T) o;
-//		}
-//	}
 }

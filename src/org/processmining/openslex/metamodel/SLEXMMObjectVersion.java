@@ -142,7 +142,7 @@ public class SLEXMMObjectVersion extends AbstractDBElementWithAtts<SLEXMMAttribu
 	}
 
 	@Override
-	protected HashMap queryAttributeValues() {
+	protected HashMap<SLEXMMAttribute, SLEXMMAttributeValue> queryAttributeValues() {
 		return getStorage().getAttributeValuesForObjectVersion(this);
 	}
 	

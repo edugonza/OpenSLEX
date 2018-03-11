@@ -17,7 +17,7 @@ import java.util.HashMap;
 public abstract class AbstractRSetWithAtts
 		<T extends AbstractDBElementWithAtts<AT,ATV>,
 		 AT extends AbstractAttDBElement,
-		 ATV extends AbstractDBElement>
+		 ATV extends AbstractDBElementWithValue>
 extends AbstractRSetElement<T> {
 		
 	/**
@@ -74,6 +74,7 @@ extends AbstractRSetElement<T> {
 	
 	private boolean doNext = true;
 	
+	@SuppressWarnings("unchecked")
 	public T getNextWithAttributes() {
 		T ev = null;
 		try {
@@ -94,8 +95,8 @@ extends AbstractRSetElement<T> {
 					ev.setInserted(true);
 					storage.putInCache(ev);
 				} else {
-					HashMap map = storage.getAttsFromCache(this.getTypeClass(), id);
-					HashMap mapNames = storage.getAttNamesFromCache(this.getTypeClass(), id);
+					HashMap<AT, ATV> map = (HashMap<AT, ATV>) storage.getAttsFromCache(this.getTypeClass(), id);
+					HashMap<String, AT> mapNames = (HashMap<String, AT>) storage.getAttNamesFromCache(this.getTypeClass(), id);
 					if (map == null || mapNames == null) {
 						attsInCache = false;
 					} else {
@@ -146,8 +147,8 @@ extends AbstractRSetElement<T> {
 					ev.setAttributeValues(attributeValues, attributeNames);
 					ev.setDirty(false);
 					ev.setInserted(true);
-					storage.putAttsInCache(ev, attributeValues);
-					storage.putAttNamesInCache(ev, attributeNames);
+					storage.putAttsInCache(ev, (HashMap<AbstractAttDBElement, AbstractDBElementWithValue>) attributeValues);
+					storage.putAttNamesInCache(ev, (HashMap<String, AbstractAttDBElement>) attributeNames);
 				}
 			}
 		} catch (Exception e) {

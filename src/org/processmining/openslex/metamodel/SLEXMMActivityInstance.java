@@ -12,6 +12,10 @@ package org.processmining.openslex.metamodel;
  */
 public class SLEXMMActivityInstance extends AbstractDBElement {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4969450509747800476L;
 	/** The activity id. */
 	private int activityId = -1;
 	

@@ -12,6 +12,10 @@ package org.processmining.openslex.metamodel;
  */
 public class SLEXMMObject extends AbstractDBElement {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -9063368192007827629L;
 	/** The class id. */
 	private int classId = -1;
 	

@@ -8,7 +8,7 @@ import org.mapdb.DataInput2;
 import org.mapdb.DataOutput2;
 import org.mapdb.Serializer;
 
-public class AttsMapSerializer implements Serializer<HashMap<AbstractAttDBElement,AbstractDBElement>>, Serializable {
+public class AttsMapSerializer implements Serializer<HashMap<AbstractAttDBElement,AbstractDBElementWithValue>>, Serializable {
 
 	/**
 	 * 
@@ -27,10 +27,10 @@ public class AttsMapSerializer implements Serializer<HashMap<AbstractAttDBElemen
 	}
 	
     @Override
-    public void serialize(DataOutput2 out, HashMap<AbstractAttDBElement,AbstractDBElement> value) throws IOException {
+    public void serialize(DataOutput2 out, HashMap<AbstractAttDBElement,AbstractDBElementWithValue> value) throws IOException {
         
     	out.writeInt(value.size());
-    	for (Entry<AbstractAttDBElement,AbstractDBElement> aten: value.entrySet()) {
+    	for (Entry<AbstractAttDBElement,AbstractDBElementWithValue> aten: value.entrySet()) {
     		AbstractAttDBElement at = aten.getKey();
     		AbstractDBElement atv = aten.getValue();
     		serializeElement(out, at);
@@ -39,8 +39,8 @@ public class AttsMapSerializer implements Serializer<HashMap<AbstractAttDBElemen
     }
 
     @Override
-    public HashMap<AbstractAttDBElement,AbstractDBElement> deserialize(DataInput2 in, int available) throws IOException {
-    	HashMap<AbstractAttDBElement,AbstractDBElement> map = new HashMap<>();
+    public HashMap<AbstractAttDBElement,AbstractDBElementWithValue> deserialize(DataInput2 in, int available) throws IOException {
+    	HashMap<AbstractAttDBElement,AbstractDBElementWithValue> map = new HashMap<>();
     	
     	int size = in.readInt();
     	for (int i = 0; i < size; i++) {
@@ -52,9 +52,9 @@ public class AttsMapSerializer implements Serializer<HashMap<AbstractAttDBElemen
     			at = at2;
     		}
     		
-    		AbstractDBElement atv = elementSerializer.deserialize(in, available);
+    		AbstractDBElementWithValue atv = (AbstractDBElementWithValue) elementSerializer.deserialize(in, available);
     		
-    		AbstractAttDBElement atv2 = storage.getFromCache(atv.getClazz(), atv.getId());
+    		AbstractDBElementWithValue atv2 = storage.getFromCache(atv.getClazz(), atv.getId());
     		
     		if (atv2 != null) {
     			atv = atv2;

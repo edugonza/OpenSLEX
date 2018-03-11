@@ -16,6 +16,11 @@ import org.processmining.openslex.utils.MMUtils;
  */
 public class SLEXMMClassifier extends AbstractDBElement {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 412592528234941686L;
+
 	/** The name. */
 	private String name = null;
 	

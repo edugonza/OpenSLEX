@@ -12,6 +12,11 @@ package org.processmining.openslex.metamodel;
  */
 public class SLEXMMRelation extends AbstractDBElement {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3921586241703792954L;
+
 	/** The source object version id. */
 	private int sourceObjectVersionId = -1;
 	

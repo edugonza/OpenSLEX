@@ -2539,17 +2539,25 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 
 	public abstract SLEXMMLog createLog(int processId, String name);
 	
+	public abstract SLEXMMEventResultSet getAllEventsAndAttributeValues();
+	
 	public abstract SLEXMMEventResultSet getEventsAndAttributeValues(Set<SLEXMMEvent> set);
 	
 	public abstract SLEXMMEventResultSet getEventsAndAttributeValues(int[] ids);
+	
+	public abstract SLEXMMObjectVersionResultSet getAllVersionsAndAttributeValues();
 	
 	public abstract SLEXMMObjectVersionResultSet getVersionsAndAttributeValues(Set<SLEXMMObjectVersion> set);
 	
 	public abstract SLEXMMObjectVersionResultSet getVersionsAndAttributeValues(int[] ids);
 	
+	public abstract SLEXMMCaseResultSet getAllCasesAndAttributeValues();
+	
 	public abstract SLEXMMCaseResultSet getCasesAndAttributeValues(Set<SLEXMMCase> set);
 	
 	public abstract SLEXMMCaseResultSet getCasesAndAttributeValues(int[] ids);
+	
+	public abstract SLEXMMLogResultSet getAllLogsAndAttributeValues();
 	
 	public abstract SLEXMMLogResultSet getLogsAndAttributeValues(Set<SLEXMMLog> set);
 	

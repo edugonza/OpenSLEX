@@ -103,12 +103,16 @@ public interface SLEXMMStorage {
 	
 	public abstract void putInCache(AbstractDBElement o);
 
-	public abstract HashMap getAttsFromCache(Class<?> c, int id);
-	
-	public abstract void putAttsInCache(AbstractDBElement o, HashMap map);
+	@SuppressWarnings("rawtypes")
+	public abstract HashMap<AbstractAttDBElement, AbstractDBElementWithValue> getAttsFromCache(
+			Class<? extends AbstractDBElementWithAtts> c, int id);
 
-	public abstract HashMap getAttNamesFromCache(Class<?> c, int id);
+	public abstract void putAttsInCache(AbstractDBElement o, HashMap<AbstractAttDBElement,AbstractDBElementWithValue> map);
+
+	@SuppressWarnings("rawtypes")
+	public abstract HashMap<String, AbstractAttDBElement> getAttNamesFromCache(
+			Class<? extends AbstractDBElementWithAtts> c, int id);
 	
-	public abstract void putAttNamesInCache(AbstractDBElement o, HashMap map);
+	public abstract void putAttNamesInCache(AbstractDBElement o, HashMap<String,AbstractAttDBElement> map);
 
 }
