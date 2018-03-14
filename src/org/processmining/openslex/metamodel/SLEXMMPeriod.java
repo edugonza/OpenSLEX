@@ -35,6 +35,7 @@ public class SLEXMMPeriod extends AbstractDBElement {
 		this.start = start;
 		this.end = end;
 		this.setId(counter++);
+		getStorage().putInCache(this);
 	}
 	
 	public SLEXMMPeriod(SLEXMMStorageMetaModel storage) {
@@ -57,14 +58,6 @@ public class SLEXMMPeriod extends AbstractDBElement {
 	 */
 	public long getEnd() {
 		return end;
-	}
-	
-	public void setStart(long start) {
-		this.start = start;
-	}
-	
-	public void setEnd(long end) {
-		this.end = end;
 	}
 	
 	@Override

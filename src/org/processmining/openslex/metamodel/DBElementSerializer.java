@@ -307,9 +307,9 @@ public class DBElementSerializer implements Serializer<AbstractDBElement>, Seria
 			o = rs;
 			break;
 		case AbstractDBElement.PER:
-			SLEXMMPeriod per = new SLEXMMPeriod(storage);
-			per.setStart(in.readLong());
-			per.setEnd(in.readLong());
+			long start = in.readLong();
+			long end = in.readLong();
+			SLEXMMPeriod per = new SLEXMMPeriod(storage, start, end);
 			o = per;
 			break;
 		default:
