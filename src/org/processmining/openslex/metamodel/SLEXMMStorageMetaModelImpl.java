@@ -5259,11 +5259,21 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		return l;
 	}
 	
+
 	public AbstractRSetElement<?> getResultSetFor(Class<?> rsetClass, SLEXMMTables tableA, SLEXMMTables tableB, int[] idsB) {
+		return getResultSetFor(rsetClass, tableA, tableB, idsB, null);	
+	}
+	
+	public AbstractRSetElement<?> getResultSetFor(Class<?> rsetClass, SLEXMMTables tableA, SLEXMMTables tableB, int[] idsB,
+			String orderby) {
 		
 		List<List<SLEXMMEdge>> paths = slxmmstrqgen.getPaths(tableA, tableB);
 				
 		String query = slxmmstrqgen.getSelectQuery(paths, idsB);
+		
+		if (orderby != null) {
+			query = query + " ORDER BY " + orderby;
+		}
 		
 		AbstractRSetElement<?> arset = null;
 		Statement statement = null;

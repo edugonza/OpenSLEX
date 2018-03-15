@@ -149,6 +149,20 @@ extends AbstractRSetElement<T> {
 					ev.setInserted(true);
 					storage.putAttsInCache(ev, (HashMap<AbstractAttDBElement, AbstractDBElementWithValue>) attributeValues);
 					storage.putAttNamesInCache(ev, (HashMap<String, AbstractAttDBElement>) attributeNames);
+				} else {
+					boolean stop = false;
+					while (!stop) {
+						int idaux = this.rset.getInt("id");
+						if (idaux == id) {
+							if (!this.rset.next()) {
+								stop = true;
+								doNext = true;
+							}
+						} else {
+							stop = true;
+							doNext = false;
+						}
+					}
 				}
 			}
 		} catch (Exception e) {
