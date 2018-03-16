@@ -28,8 +28,7 @@ public class DBElementSerializer implements Serializer<AbstractDBElement>, Seria
     	
     	switch (cId) {
 		case AbstractDBElement.ACT:
-			SLEXMMAttribute act = (SLEXMMAttribute) value;	
-			out.writeInt(act.getClassId());
+			SLEXMMActivity act = (SLEXMMActivity) value;	
 			out.writeUTF(MMUtils.str(act.getName()));
 			break;
 		case AbstractDBElement.AI:
@@ -160,9 +159,8 @@ public class DBElementSerializer implements Serializer<AbstractDBElement>, Seria
     	
     	switch (cId) {
 		case AbstractDBElement.ACT:
-			SLEXMMAttribute act = new SLEXMMAttribute(storage);
-			act.setClassId(in.readInt());
-			act.setName(in.readUTF());
+			String name = in.readUTF();
+			SLEXMMActivity act = new SLEXMMActivity(storage, name);
 			o = act;
 			break;
 		case AbstractDBElement.AI:
