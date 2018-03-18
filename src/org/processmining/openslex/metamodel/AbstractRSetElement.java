@@ -56,25 +56,25 @@ public abstract class AbstractRSetElement<T> {
 		}
 	}
 	
-	/**
-	 * Gets the origin id.
-	 *
-	 * @return the origin id
-	 */
-	public Integer getOriginId() {
-		
-		Integer originId = null;
-		
-		if (this.rset != null) {
-			try {
-				originId = this.rset.getInt("originIdQuery");
-			} catch (SQLException e) {
-				//e.printStackTrace();
-			}
-		}
-		
-		return originId;
-	}
+//	/**
+//	 * Gets the origin id.
+//	 *
+//	 * @return the origin id
+//	 */
+//	public Integer getOriginId() {
+//		
+//		Integer originId = null;
+//		
+//		if (this.rset != null) {
+//			try {
+//				originId = this.rset.getInt("originIdQuery");
+//			} catch (SQLException e) {
+//				//e.printStackTrace();
+//			}
+//		}
+//		
+//		return originId;
+//	}
 	
 	/* (non-Javadoc)
 	 * @see java.lang.Object#finalize()
