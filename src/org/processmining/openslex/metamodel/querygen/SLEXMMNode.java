@@ -16,4 +16,22 @@ public class SLEXMMNode {
 		return this.table.toString();
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		// TODO Auto-generated method stub
+		if (super.equals(obj)) {
+			return true;
+		} else {
+			if (obj instanceof SLEXMMNode) {
+				return ((SLEXMMNode) obj).getTable().equals(this.getTable());
+			}
+		}
+		
+		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		return table.hashCode();
+	}
 }

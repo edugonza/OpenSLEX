@@ -4,7 +4,6 @@
 package org.processmining.openslex.metamodel;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
 // TODO: Auto-generated Javadoc
 /**

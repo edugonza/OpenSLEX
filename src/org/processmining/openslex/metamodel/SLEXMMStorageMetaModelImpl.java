@@ -5356,8 +5356,10 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		default:
 			tableA = SLEXMMTables.T_EVENT;
 		}
-
-		String query = slxmmstrqgen.getPeriodsQuery(slxmmstrqgen.getPaths(tableA, tableB), idsB);
+		
+		List<List<SLEXMMEdge>> paths = slxmmstrqgen.getPaths(tableA, tableB);
+		
+		String query = slxmmstrqgen.getPeriodsQuery(paths, idsB);
 		
 		SLEXMMPeriodResultSet prset = null;
 		Statement statement = null;

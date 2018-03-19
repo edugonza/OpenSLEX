@@ -117,20 +117,21 @@ extends AbstractRSetElement<T> {
 							int idaux = this.rset.getInt("id");
 							if (idaux == id) {
 								int atId = rset.getInt("atId");
-								AT at = storage.getFromCache(this.getAttributeTypeClass(), atId);
-								if (at == null) {
-									at = createAttributeFromRset();
-									at.setDirty(false);
-									at.setInserted(true);
-									storage.putInCache(at);
+								if (!this.rset.wasNull()) {
+									AT at = storage.getFromCache(this.getAttributeTypeClass(), atId);
+									if (at == null) {
+										at = createAttributeFromRset();
+										at.setDirty(false);
+										at.setInserted(true);
+										storage.putInCache(at);
+									}
+
+									ATV atv = createValueFromRset(atId, id);
+									atv.setDirty(false);
+									atv.setInserted(true);
+									attributeValues.put(at, atv);
+									attributeNames.put(at.getName(), at);
 								}
-
-								ATV atv = createValueFromRset(atId, id);
-								atv.setDirty(false);
-								atv.setInserted(true);
-								attributeValues.put(at, atv);
-								attributeNames.put(at.getName(), at);
-
 								if (!this.rset.next()) {
 									stop = true;
 									doNext = true;

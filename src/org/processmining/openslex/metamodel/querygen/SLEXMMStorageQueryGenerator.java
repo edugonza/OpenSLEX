@@ -1,6 +1,8 @@
 package org.processmining.openslex.metamodel.querygen;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -115,7 +117,62 @@ public class SLEXMMStorageQueryGenerator {
 		edgesMap.put(new Pair<>(SLEXMMTables.T_CLASSIFIER_ATTRIBUTES, SLEXMMTables.T_EVENT_ATTRIBUTE_NAME),
 				new Pair<>("event_attribute_name_id", "id"));
 	}
+	
+	private static SLEXMMEdge getEdge(SLEXMMTables a, SLEXMMTables b) throws Exception {
+		Pair<SLEXMMTables> p = new Pair<>(a,b);
+		Pair<SLEXMMTables> pInv = new Pair<>(b,a);
+		Pair<String> fieldsEdge = null;
 		
+		if (edgesMap.containsKey(p)) {
+			fieldsEdge = edgesMap.get(p);
+		} else if (edgesMap.containsKey(pInv)) {
+			Pair<String> feaux = edgesMap.get(pInv);
+			fieldsEdge = new Pair<String>(feaux.b, feaux.a);
+		} else {
+			throw new Exception("pair of fields for edge ("+p.a+","+p.b+") not found");
+		}
+		
+		SLEXMMEdge edge = new SLEXMMEdge(new SLEXMMNode(a), new SLEXMMNode(b),
+				fieldsEdge.a,fieldsEdge.b);
+		return edge;
+	}
+	
+	private static List<SLEXMMEdge> createPresetPath(List<SLEXMMTables> tables) throws Exception {
+		ArrayList<SLEXMMEdge> edges = new ArrayList<>();
+		
+		for (int i = 1; i < tables.size(); i++) {
+			edges.add(getEdge(tables.get(i-1),tables.get(i)));
+		}
+		
+		return edges;
+	}
+	
+	private static List<SLEXMMEdge> createInvPresetPath(List<SLEXMMTables> tables) throws Exception {
+		ArrayList<SLEXMMTables> tablesInv = new ArrayList<>(tables);
+		Collections.reverse(tablesInv);
+		return createPresetPath(tablesInv);
+	}
+	
+	private final static HashMap<Pair<SLEXMMTables>,List<SLEXMMEdge>> presetPaths;
+	
+	static {
+		presetPaths = new HashMap<>();
+		try {
+			Pair<SLEXMMTables> ppair = new Pair<>(SLEXMMTables.T_LOG, SLEXMMTables.T_EVENT); 
+			List<SLEXMMTables> plist = Arrays.asList(
+					SLEXMMTables.T_LOG,
+					SLEXMMTables.T_CASE_TO_LOG,
+					SLEXMMTables.T_CASE,
+					SLEXMMTables.T_ACTIVITY_INSTANCE_TO_CASE,
+					SLEXMMTables.T_ACTIVITY_INSTANCE,
+					SLEXMMTables.T_EVENT);
+			presetPaths.put(ppair,createPresetPath(plist));
+			presetPaths.put(new Pair<>(ppair.b,ppair.a),createInvPresetPath(plist));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public SLEXMMStorageQueryGenerator() {
 		init();
 	}
@@ -158,6 +215,10 @@ public class SLEXMMStorageQueryGenerator {
 	public List<List<SLEXMMEdge>> getPaths(SLEXMMTables orig, SLEXMMTables dest) {
 		SLEXMMNode norig = nodesMap.get(orig);
 		SLEXMMNode ndest = nodesMap.get(dest);
+		
+		if (presetPaths.containsKey(new Pair<SLEXMMTables>(orig,dest))) {
+			return Arrays.asList(presetPaths.get(new Pair<SLEXMMTables>(orig,dest)));
+		}
 		
 		//List<SLEXMMEdge> path = DijkstraShortestPath.findPathBetween(wmgraph, norig, ndest);
 		KShortestPaths<SLEXMMNode, SLEXMMEdge> kspc = new KShortestPaths<SLEXMMNode, SLEXMMEdge>(wmgraph, norig,
