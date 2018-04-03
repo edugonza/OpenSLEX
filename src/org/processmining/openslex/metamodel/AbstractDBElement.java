@@ -60,6 +60,7 @@ public abstract class AbstractDBElement implements Serializable {
 	protected final static int CLF = 20;
 	protected final static int CLFAT = 21;
 	protected final static int PER = 22;
+	protected final static int DM = 23;
 	
 	public int clazzId = ABS;
 	
@@ -117,6 +118,8 @@ public abstract class AbstractDBElement implements Serializable {
 			clazzId = CLFAT;
 		} else if (c == SLEXMMPeriod.class) {
 			clazzId = PER;
+		} else if (c == SLEXMMDataModel.class) {
+			clazzId = DM;
 		}
 	}
 	

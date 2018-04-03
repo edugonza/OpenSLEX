@@ -514,6 +514,15 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		try {
+			if (attNamesRepo != null) {
+				attNamesRepo.close();
+				attNamesRepo = null;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	/* (non-Javadoc)
