@@ -1,5 +1,7 @@
 package org.processmining.openslex.utils;
 
+import java.util.Collection;
+
 public class MMUtils {
 
 	public static final int INFINITE_FUTURE = -1;
@@ -58,4 +60,7 @@ public class MMUtils {
 		}
 	}
 	
+	public static int[] colAsArrayInt(Collection<Integer> list) {
+		return list.stream().filter(i -> i != null).mapToInt(i -> i).toArray();
+	}
 }

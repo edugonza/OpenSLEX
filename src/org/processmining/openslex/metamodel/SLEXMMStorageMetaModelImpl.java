@@ -49,6 +49,8 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	
 	private HTreeMap<String, HashMap<String, AbstractAttDBElement>> attNamesRepo;
 	
+	private HTreeMap<String, int[]> elementOfRepo;
+	
 	/** The metamodel schema in. */
 	private InputStream METAMODEL_SCHEMA_IN = SLEXMMStorage.class.getResourceAsStream("/org/processmining/openslex/resources/metamodel.sql");
 	
@@ -143,9 +145,15 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 				.keySerializer(Serializer.STRING)
 				.valueSerializer(atNamesMapSerializer)
 				.create();
+		HTreeMap<String, int[]> mapElementsOf = db
+				.hashMap("elementsOfRepo")
+				.keySerializer(Serializer.STRING)
+				.valueSerializer(Serializer.INT_ARRAY)
+				.create();
 		this.objectRepo = map;
 		this.attsRepo = mapAtts;
 		this.attNamesRepo = mapAttNames;
+		this.elementOfRepo = mapElementsOf;
 		init();
 		this.filename = filename;
 		this.path = path;
@@ -5727,6 +5735,22 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 	@Override
 	public void putAttNamesInCache(AbstractDBElement o, HashMap<String, AbstractAttDBElement> map) {
 		attNamesRepo.put(o.getUniqueId(), map);
+	}
+	
+	private String createCodeElementsOf(int from, int to, int id) {
+		return from+"#"+to+"#"+id;
+	}
+	
+	@Override
+	public int[] getElementsOf(int from, int to, int id) {
+		String code = createCodeElementsOf(from, to, id);
+		return elementOfRepo.get(code);
+	}
+	
+	@Override
+	public void putElementsOf(int from, int to, int id, int[] ids) {
+		String code = createCodeElementsOf(from, to, id);
+		elementOfRepo.put(code, ids);
 	}
 	
 }

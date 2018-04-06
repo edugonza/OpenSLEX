@@ -2564,5 +2564,9 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	public abstract SLEXMMLogResultSet getLogsAndAttributeValues(int[] ids);
 
 	SLEXMMRelationshipResultSet getRelationshipsRS();
+
+	public abstract int[] getElementsOf(int from, int to, int id);
+
+	public abstract void putElementsOf(int from, int to, int id, int[] ids);
 	
 }

@@ -37,30 +37,30 @@ public abstract class AbstractDBElement implements Serializable {
 //		return this.storage.getFromCache(uniqueId);
 //	}
 	
-	protected final static int ABS = 0;
-	protected final static int CL = 1;
-	protected final static int AT = 2;
-	protected final static int RS = 3;
-	protected final static int OBJ = 4;
-	protected final static int OV = 5;
-	protected final static int REL = 6;
-	protected final static int EV = 7;
-	protected final static int ATV = 8;
-	protected final static int EAT = 9;
-	protected final static int EATV = 10;
-	protected final static int AI = 11;
-	protected final static int CS = 12;
-	protected final static int LG = 13;
-	protected final static int CSAT = 14;
-	protected final static int CSATV = 15;
-	protected final static int LGAT = 16;
-	protected final static int LGATV = 17;
-	protected final static int ACT = 18;
-	protected final static int PS = 19;
-	protected final static int CLF = 20;
-	protected final static int CLFAT = 21;
-	protected final static int PER = 22;
-	protected final static int DM = 23;
+	public final static int ABS = 0;
+	public final static int CL = 1;
+	public final static int AT = 2;
+	public final static int RS = 3;
+	public final static int OBJ = 4;
+	public final static int OV = 5;
+	public final static int REL = 6;
+	public final static int EV = 7;
+	public final static int ATV = 8;
+	public final static int EAT = 9;
+	public final static int EATV = 10;
+	public final static int AI = 11;
+	public final static int CS = 12;
+	public final static int LG = 13;
+	public final static int CSAT = 14;
+	public final static int CSATV = 15;
+	public final static int LGAT = 16;
+	public final static int LGATV = 17;
+	public final static int ACT = 18;
+	public final static int PS = 19;
+	public final static int CLF = 20;
+	public final static int CLFAT = 21;
+	public final static int PER = 22;
+	public final static int DM = 23;
 	
 	public int clazzId = ABS;
 	
@@ -72,8 +72,9 @@ public abstract class AbstractDBElement implements Serializable {
 		return this.getClass();
 	}
 	
-	private void setClazzId() {
-		Class<?> c = getClazz();
+	public static int getClazzIdForClass(Class<?> c) {
+		int clazzId = ABS;
+		
 		if (c == SLEXMMClass.class) {
 			clazzId = CL;
 		} else if (c == SLEXMMAttribute.class) {
@@ -121,6 +122,13 @@ public abstract class AbstractDBElement implements Serializable {
 		} else if (c == SLEXMMDataModel.class) {
 			clazzId = DM;
 		}
+		
+		return clazzId;
+	}
+	
+	private void setClazzId() {
+		Class<?> c = getClazz();
+		clazzId = getClazzIdForClass(c);
 	}
 	
 	@Override

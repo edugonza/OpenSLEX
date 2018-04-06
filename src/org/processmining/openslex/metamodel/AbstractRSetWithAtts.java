@@ -53,6 +53,7 @@ extends AbstractRSetElement<T> {
 		T ev = null;
 		try {
 			if (this.rset != null && this.rset.next()) {
+				setOriginId();
 				int id = this.rset.getInt("id");
 				ev = storage.getFromCache(this.getTypeClass(), id);
 				if (ev == null) {
@@ -73,6 +74,16 @@ extends AbstractRSetElement<T> {
 	}
 	
 	private boolean doNext = true;
+	private Integer originId = null;
+	
+	@Override
+	public Integer getOriginId() {
+		return this.originId;
+	}
+	
+	private void setOriginId() {
+		this.originId = super.getOriginId();
+	}
 	
 	@SuppressWarnings("unchecked")
 	public T getNextWithAttributes() {
@@ -85,6 +96,8 @@ extends AbstractRSetElement<T> {
 			}
 			
 			if (this.rset != null && resNext) {
+				
+				setOriginId();
 				
 				int id = this.rset.getInt("id");
 				boolean attsInCache = false;
