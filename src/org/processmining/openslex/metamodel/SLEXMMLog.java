@@ -115,9 +115,9 @@ public class SLEXMMLog extends AbstractDBElementWithAtts<SLEXMMLogAttribute, SLE
 	 *
 	 * @return the case result set
 	 */
-	public SLEXMMCaseResultSet getCaseResultSet() {
-		return getStorage().getCasesForLog(this.getId());
-	}
+//	public SLEXMMCaseResultSet getCaseResultSet() {
+//		return getStorage().getCasesForLog(this.getId());
+//	}
 
 	@Override
 	protected HashMap<SLEXMMLogAttribute, SLEXMMLogAttributeValue> queryAttributeValues() {

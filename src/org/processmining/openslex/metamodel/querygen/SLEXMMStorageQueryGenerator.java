@@ -11,6 +11,7 @@ import org.jgrapht.alg.KShortestPaths;
 import org.jgrapht.graph.DirectedWeightedMultigraph;
 import org.processmining.openslex.metamodel.SLEXMMPeriod;
 import org.processmining.openslex.metamodel.SLEXMMStorageMetaModelImpl;
+import org.processmining.openslex.utils.MMUtils;
 
 public class SLEXMMStorageQueryGenerator {
 
@@ -272,6 +273,75 @@ public class SLEXMMStorageQueryGenerator {
 		return listPaths;
 	}
 	
+	private String getBetweens(String t, int[] ids) {
+		
+		StringBuilder strbld = new StringBuilder();
+		
+		if (ids.length == 0) {
+			return " 1 ";
+		} else if (ids.length == 1) {
+			return t+" == "+ids[0];
+		} else {
+			ArrayList<Integer> arr = new ArrayList<>();
+			ArrayList<Integer> ranges = new ArrayList<>();
+			strbld.append(" ( ");
+			int start = -1;
+			int end = -1;
+			int prevId = -1;
+			for (int i = 0; i < ids.length; i++) {
+				if (start == -1) {
+					start = ids[i];
+				} else if (ids[i] == prevId+1) {
+					end = ids[i];
+				} else {
+					if (end != -1) {
+						ranges.add(start);
+						ranges.add(end);
+						end = -1;
+					} else {
+						arr.add(start);
+					}
+					start = ids[i];
+				}
+				prevId = ids[i];
+			}
+			
+			if (start != -1) {
+				if (start != end) {
+					if (end != -1) {
+						ranges.add(start);
+						ranges.add(end);
+					} else {
+						arr.add(start);
+					}
+				}
+			}
+			
+			boolean first = true;
+			if (!arr.isEmpty()) {
+				String idsStr = SLEXMMStorageMetaModelImpl.buildStringFromArray(MMUtils.colAsArrayInt(arr));
+				strbld.append(t+" IN ("+idsStr+")");
+				first = false;
+			}
+			if (!ranges.isEmpty()) {
+				for (int j = 0; j < ranges.size()-1; j+=2) {
+					if (!first) {
+						strbld.append(" OR ");
+					}
+					first = false;
+					strbld.append(t);
+					strbld.append(" BETWEEN ");
+					strbld.append(ranges.get(j));
+					strbld.append(" AND ");
+					strbld.append(ranges.get(j+1));
+					strbld.append(" ");
+				}
+			}
+			strbld.append(" ) ");
+			return strbld.toString();
+		}
+	}
+	
 	private String getFromAndWhereOfQuery(List<SLEXMMEdge> path, int[] ids) {
 		StringBuilder strbldr = new StringBuilder();
 		
@@ -301,8 +371,11 @@ public class SLEXMMStorageQueryGenerator {
 		String idsStr = null; 
 		
 		if (ids != null) {
-			idsStr = SLEXMMStorageMetaModelImpl.buildStringFromArray(ids);
-			strbldr.append(" t"+i+".id IN ("+idsStr+")");
+			idsStr = getBetweens("t"+i+".id",ids);
+			strbldr.append(" ");
+			strbldr.append(idsStr);
+			//idsStr = SLEXMMStorageMetaModelImpl.buildStringFromArray(ids);
+			//strbldr.append(" t"+i+".id IN ("+idsStr+")");
 		} else {
 			strbldr.append(" 1 ");
 		}
@@ -332,7 +405,8 @@ public class SLEXMMStorageQueryGenerator {
 
 			//SLEXMMEdge lastEdge = path.get(path.size() - 1);
 
-			strbldr.append("SELECT DISTINCT t" + (path.size() + 1) + ".id"
+			//strbldr.append("SELECT DISTINCT t" + (path.size() + 1) + ".id"
+			strbldr.append("SELECT t" + (path.size() + 1) + ".id"
 					+ " as originIdQuery, t1.* ");
 
 			strbldr.append(getFromAndWhereOfQuery(path, ids));
@@ -379,7 +453,8 @@ public class SLEXMMStorageQueryGenerator {
 				return null;
 			}
 
-			strbldr.append("SELECT DISTINCT t1.* ");
+			//strbldr.append("SELECT DISTINCT t1.* ");
+			strbldr.append("SELECT t1.* ");
 
 			strbldr.append(getFromAndWhereOfQuery(path, null));
 
@@ -433,7 +508,8 @@ public class SLEXMMStorageQueryGenerator {
 				return null;
 			}
 
-			strbldr.append("SELECT DISTINCT t" + (path.size() + 1) + ".id"
+			//strbldr.append("SELECT DISTINCT t" + (path.size() + 1) + ".id"
+			strbldr.append("SELECT t" + (path.size() + 1) + ".id"
 					+ " as originIdQuery, min(t1." + startTField + ") as start, " + " max(t1." + endTField
 					+ ") as end, " + " min(t1." + endTField + ") as end2 ");
 
