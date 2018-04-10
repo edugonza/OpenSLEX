@@ -1,4 +1,4 @@
 language: java
-
+script: ./gradlew clean test -i
 after_success:
 - ./gradlew jacocoTestReport coveralls

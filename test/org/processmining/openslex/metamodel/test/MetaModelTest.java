@@ -86,6 +86,7 @@ public class MetaModelTest {
 	@Test
 	public void getThingsOfThings() throws Exception {
 		for (String t: listTypesFrom) {
+			System.out.println(t);
 			getThingsOf(t);
 		}
 	}
@@ -110,6 +111,7 @@ public class MetaModelTest {
 		for (String t: listTypesFor) {
 			if (!t.equals(elname)) {
 				Method m = SLEXMMStorageMetaModel.class.getMethod("get"+t+"For"+elname, int[].class);
+				System.out.println("get"+t+"For"+elname);
 				Object res = m.invoke(mm, ids);
 				if (res instanceof AbstractRSetElement) {
 					check((AbstractRSetElement<?>) res);

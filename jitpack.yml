@@ -1,3 +1,2 @@
 install:
-   - ./gradlew test
-   - ./gradlew publishToLocalMaven
+   - ./gradlew test publishToLocalMaven -i
