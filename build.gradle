@@ -42,10 +42,20 @@ jar {
 	from javadoc.destinationDir
 }
 
+task javadocJar(type: Jar, dependsOn: javadoc) {
+	classifier "javadoc"
+	from javadoc.destinationDir
+}
+
+artifacts {
+	archives javadocJar
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
             from components.java
+	    artifact javadocJar
         }
     }
     repositories {
