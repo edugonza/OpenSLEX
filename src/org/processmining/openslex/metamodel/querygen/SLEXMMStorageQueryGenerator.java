@@ -169,6 +169,39 @@ public class SLEXMMStorageQueryGenerator {
 					SLEXMMTables.T_EVENT);
 			presetPaths.put(ppair,createPresetPath(plist));
 			presetPaths.put(new Pair<>(ppair.b,ppair.a),createInvPresetPath(plist));
+			
+			ppair = new Pair<>(SLEXMMTables.T_ACTIVITY, SLEXMMTables.T_CASE); 
+			plist = Arrays.asList(
+					SLEXMMTables.T_ACTIVITY,
+					SLEXMMTables.T_ACTIVITY_INSTANCE,
+					SLEXMMTables.T_ACTIVITY_INSTANCE_TO_CASE,
+					SLEXMMTables.T_CASE);
+			presetPaths.put(ppair,createPresetPath(plist));
+			presetPaths.put(new Pair<>(ppair.b,ppair.a),createInvPresetPath(plist));
+			
+			ppair = new Pair<>(SLEXMMTables.T_ACTIVITY, SLEXMMTables.T_LOG); 
+			plist = Arrays.asList(
+					SLEXMMTables.T_ACTIVITY,
+					SLEXMMTables.T_ACTIVITY_INSTANCE,
+					SLEXMMTables.T_ACTIVITY_INSTANCE_TO_CASE,
+					SLEXMMTables.T_CASE,
+					SLEXMMTables.T_CASE_TO_LOG,
+					SLEXMMTables.T_LOG);
+			presetPaths.put(ppair,createPresetPath(plist));
+			presetPaths.put(new Pair<>(ppair.b,ppair.a),createInvPresetPath(plist));
+			
+			ppair = new Pair<>(SLEXMMTables.T_RELATIONSHIP, SLEXMMTables.T_CASE); 
+			plist = Arrays.asList(
+					SLEXMMTables.T_RELATIONSHIP,
+					SLEXMMTables.T_RELATION,
+					SLEXMMTables.T_OBJECT_VERSION,
+					SLEXMMTables.T_EVENT_TO_OBJECT_VERSION,
+					SLEXMMTables.T_EVENT,
+					SLEXMMTables.T_ACTIVITY_INSTANCE,
+					SLEXMMTables.T_ACTIVITY_INSTANCE_TO_CASE,
+					SLEXMMTables.T_CASE);
+			presetPaths.put(ppair,createPresetPath(plist));
+			presetPaths.put(new Pair<>(ppair.b,ppair.a),createInvPresetPath(plist));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
