@@ -156,42 +156,42 @@ public class SLEXMMStorageQueryGenerator {
 	
 	private final static HashMap<Pair<SLEXMMTables>,List<SLEXMMEdge>> presetPaths;
 	
+	private static void addPresetPath(SLEXMMTables from, SLEXMMTables to, SLEXMMTables... steps) throws Exception {
+		Pair<SLEXMMTables> ppair = new Pair<SLEXMMTables>(from, to);
+		Pair<SLEXMMTables> invppair = new Pair<SLEXMMTables>(to, from);
+		
+		List<SLEXMMTables> plist = Arrays.asList(steps);
+		
+		presetPaths.put(ppair,createPresetPath(plist));
+		presetPaths.put(invppair, createInvPresetPath(plist));
+	}
+	
 	static {
 		presetPaths = new HashMap<>();
 		try {
-			Pair<SLEXMMTables> ppair = new Pair<>(SLEXMMTables.T_LOG, SLEXMMTables.T_EVENT); 
-			List<SLEXMMTables> plist = Arrays.asList(
+			addPresetPath(SLEXMMTables.T_LOG,SLEXMMTables.T_EVENT,
 					SLEXMMTables.T_LOG,
 					SLEXMMTables.T_CASE_TO_LOG,
 					SLEXMMTables.T_CASE,
 					SLEXMMTables.T_ACTIVITY_INSTANCE_TO_CASE,
 					SLEXMMTables.T_ACTIVITY_INSTANCE,
 					SLEXMMTables.T_EVENT);
-			presetPaths.put(ppair,createPresetPath(plist));
-			presetPaths.put(new Pair<>(ppair.b,ppair.a),createInvPresetPath(plist));
 			
-			ppair = new Pair<>(SLEXMMTables.T_ACTIVITY, SLEXMMTables.T_CASE); 
-			plist = Arrays.asList(
+			addPresetPath(SLEXMMTables.T_ACTIVITY, SLEXMMTables.T_CASE,
 					SLEXMMTables.T_ACTIVITY,
 					SLEXMMTables.T_ACTIVITY_INSTANCE,
 					SLEXMMTables.T_ACTIVITY_INSTANCE_TO_CASE,
 					SLEXMMTables.T_CASE);
-			presetPaths.put(ppair,createPresetPath(plist));
-			presetPaths.put(new Pair<>(ppair.b,ppair.a),createInvPresetPath(plist));
 			
-			ppair = new Pair<>(SLEXMMTables.T_ACTIVITY, SLEXMMTables.T_LOG); 
-			plist = Arrays.asList(
+			addPresetPath(SLEXMMTables.T_ACTIVITY, SLEXMMTables.T_LOG,
 					SLEXMMTables.T_ACTIVITY,
 					SLEXMMTables.T_ACTIVITY_INSTANCE,
 					SLEXMMTables.T_ACTIVITY_INSTANCE_TO_CASE,
 					SLEXMMTables.T_CASE,
 					SLEXMMTables.T_CASE_TO_LOG,
 					SLEXMMTables.T_LOG);
-			presetPaths.put(ppair,createPresetPath(plist));
-			presetPaths.put(new Pair<>(ppair.b,ppair.a),createInvPresetPath(plist));
 			
-			ppair = new Pair<>(SLEXMMTables.T_RELATIONSHIP, SLEXMMTables.T_CASE); 
-			plist = Arrays.asList(
+			addPresetPath(SLEXMMTables.T_RELATIONSHIP, SLEXMMTables.T_CASE,
 					SLEXMMTables.T_RELATIONSHIP,
 					SLEXMMTables.T_RELATION,
 					SLEXMMTables.T_OBJECT_VERSION,
@@ -200,8 +200,31 @@ public class SLEXMMStorageQueryGenerator {
 					SLEXMMTables.T_ACTIVITY_INSTANCE,
 					SLEXMMTables.T_ACTIVITY_INSTANCE_TO_CASE,
 					SLEXMMTables.T_CASE);
-			presetPaths.put(ppair,createPresetPath(plist));
-			presetPaths.put(new Pair<>(ppair.b,ppair.a),createInvPresetPath(plist));
+			
+			addPresetPath(SLEXMMTables.T_ATTRIBUTE_NAME, SLEXMMTables.T_LOG,
+					SLEXMMTables.T_ATTRIBUTE_NAME,
+					SLEXMMTables.T_ATTRIBUTE_VALUE,
+					SLEXMMTables.T_OBJECT_VERSION,
+					SLEXMMTables.T_EVENT_TO_OBJECT_VERSION,
+					SLEXMMTables.T_EVENT,
+					SLEXMMTables.T_ACTIVITY_INSTANCE,
+					SLEXMMTables.T_ACTIVITY_INSTANCE_TO_CASE,
+					SLEXMMTables.T_CASE,
+					SLEXMMTables.T_CASE_TO_LOG,
+					SLEXMMTables.T_LOG);
+			
+			addPresetPath(SLEXMMTables.T_RELATIONSHIP, SLEXMMTables.T_LOG,
+					SLEXMMTables.T_RELATIONSHIP,
+					SLEXMMTables.T_RELATION,
+					SLEXMMTables.T_OBJECT_VERSION,
+					SLEXMMTables.T_EVENT_TO_OBJECT_VERSION,
+					SLEXMMTables.T_EVENT,
+					SLEXMMTables.T_ACTIVITY_INSTANCE,
+					SLEXMMTables.T_ACTIVITY_INSTANCE_TO_CASE,
+					SLEXMMTables.T_CASE,
+					SLEXMMTables.T_CASE_TO_LOG,
+					SLEXMMTables.T_LOG);
+					
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
