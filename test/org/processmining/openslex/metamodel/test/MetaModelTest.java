@@ -26,11 +26,11 @@ public class MetaModelTest {
 
 	static SLEXMMStorageMetaModel mm;
 	static String path = "data/";
-	static String filename = "metamodel-RL.slexmm";
+	static String filename = "metamodel-sample.slexmm";
 	
 	@BeforeClass
 	public static void initAll() throws Exception {
-		mm = new SLEXMMStorageMetaModelImpl(path, filename);
+		mm = new SLEXMMStorageMetaModelImpl(path, filename, true);
 	}
 	
 	@Before
