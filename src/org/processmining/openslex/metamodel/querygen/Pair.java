@@ -9,6 +9,7 @@ public class Pair<T> {
 		this.b = b;
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean equals(Object obj) {
 		if (super.equals(obj)) {

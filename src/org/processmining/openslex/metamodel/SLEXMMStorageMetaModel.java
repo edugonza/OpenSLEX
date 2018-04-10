@@ -239,9 +239,18 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	 *
 	 * @param name the name
 	 * @return the SLEXMM data model
+	 * @deprecated should call to createDatamodel(String name)
 	 */
 	public abstract SLEXMMDataModel createDataModel(String name);
 
+	/**
+	 * Creates the data model.
+	 *
+	 * @param name the name
+	 * @return the SLEXMM data model
+	 */
+	public abstract SLEXMMDataModel createDatamodel(String name);
+	
 	/**
 	 * Creates the class.
 	 *
@@ -275,8 +284,16 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	 * Gets the data models.
 	 *
 	 * @return the data models
+	 * @deprecated should call getDatamodels
 	 */
 	public abstract SLEXMMDataModelResultSet getDataModels();
+	
+	/**
+	 * Gets the data models.
+	 *
+	 * @return the data models
+	 */
+	public abstract SLEXMMDataModelResultSet getDatamodels();
 
 	/**
 	 * Gets the list attributes for class.
@@ -435,6 +452,7 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	 *
 	 * @param objv the objv
 	 * @return the attribute values for object version
+	 * @deprecated call getAttributeValuesForVersion instead
 	 */
 	public abstract HashMap<SLEXMMAttribute, SLEXMMAttributeValue> getAttributeValuesForObjectVersion(
 			SLEXMMObjectVersion objv);
@@ -442,10 +460,29 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	/**
 	 * Gets the attribute values for object version.
 	 *
+	 * @param objv the objv
+	 * @return the attribute values for object version
+	 */
+	public abstract HashMap<SLEXMMAttribute, SLEXMMAttributeValue> getAttributeValuesForVersion(
+			SLEXMMObjectVersion objv);
+	
+	/**
+	 * Gets the attribute values for object version.
+	 *
+	 * @param objvId the objv id
+	 * @return the attribute values for object version
+	 * @deprecated call getAttributeValuesForVersion instead
+	 */
+	public abstract HashMap<SLEXMMAttribute, SLEXMMAttributeValue> getAttributeValuesForObjectVersion(
+			int objvId);
+	
+	/**
+	 * Gets the attribute values for object version.
+	 *
 	 * @param objvId the objv id
 	 * @return the attribute values for object version
 	 */
-	public abstract HashMap<SLEXMMAttribute, SLEXMMAttributeValue> getAttributeValuesForObjectVersion(
+	public abstract HashMap<SLEXMMAttribute, SLEXMMAttributeValue> getAttributeValuesForVersion(
 			int objvId);
 
 	/**
@@ -651,8 +688,26 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	 * Gets the object versions.
 	 *
 	 * @return the object versions
+	 * @deprecated call getVersions instead
 	 */
 	public abstract SLEXMMObjectVersionResultSet getObjectVersions();
+
+	/**
+	 * Gets the object versions.
+	 *
+	 * @return the object versions
+	 */
+	public abstract SLEXMMObjectVersionResultSet getVersions();
+	
+	/**
+	 * Gets the versions related to object version.
+	 *
+	 * @param ob the ob
+	 * @return the versions related to object version
+	 * @deprecated call getVersionsRelatedToVersion instead
+	 */
+	public abstract SLEXMMObjectVersionResultSet getVersionsRelatedToObjectVersion(
+			SLEXMMObjectVersion ob);
 
 	/**
 	 * Gets the versions related to object version.
@@ -660,8 +715,18 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	 * @param ob the ob
 	 * @return the versions related to object version
 	 */
-	public abstract SLEXMMObjectVersionResultSet getVersionsRelatedToObjectVersion(
+	public abstract SLEXMMObjectVersionResultSet getVersionsRelatedToVersion(
 			SLEXMMObjectVersion ob);
+
+	
+	/**
+	 * Gets the versions related to object versions.
+	 *
+	 * @param verIds the version Ids
+	 * @return the versions related to object versions
+	 * @deprecated call getVersionsRelatedToVersions instead
+	 */
+	public abstract SLEXMMObjectVersionResultSet getVersionsRelatedToObjectVersions(int[] verIds);
 
 	/**
 	 * Gets the versions related to object versions.
@@ -669,8 +734,7 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	 * @param verIds the version Ids
 	 * @return the versions related to object versions
 	 */
-	public abstract SLEXMMObjectVersionResultSet getVersionsRelatedToObjectVersions(int[] verIds);
-
+	public abstract SLEXMMObjectVersionResultSet getVersionsRelatedToVersions(int[] verIds);	
 	
 	/**
 	 * Gets the object per id.
@@ -687,9 +751,33 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	 * @param ev the ev
 	 * @param label the label
 	 * @return true, if successful
+	 * @deprecated call addEventToVersion instead
 	 */
 	public abstract boolean addEventToObjectVersion(
 			SLEXMMObjectVersion ov, SLEXMMEvent ev, String label);
+	
+	/**
+	 * Adds the event to object version.
+	 *
+	 * @param ov the ov
+	 * @param ev the ev
+	 * @param label the label
+	 * @return true, if successful
+	 */
+	public abstract boolean addEventToVersion(
+			SLEXMMObjectVersion ov, SLEXMMEvent ev, String label);
+	
+	
+	/**
+	 * Adds the event to object version.
+	 *
+	 * @param ovId the ov id
+	 * @param evId the ev id
+	 * @param label the label
+	 * @return true, if successful
+	 * @deprecated call addEventToVersion instead
+	 */
+	public abstract boolean addEventToObjectVersion(int ovId, int evId, String label);
 	
 	/**
 	 * Adds the event to object version.
@@ -699,7 +787,7 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	 * @param label the label
 	 * @return true, if successful
 	 */
-	public abstract boolean addEventToObjectVersion(int ovId, int evId, String label);
+	public abstract boolean addEventToVersion(int ovId, int evId, String label);
 
 	/**
 	 * Gets the relations.
@@ -846,8 +934,27 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	 *
 	 * @param objectVersionId the object version id
 	 * @return the objects for object version
+	 * @deprecated call getObjectsForVersion instead
 	 */
 	public abstract SLEXMMObjectResultSet getObjectsForObjectVersion(int objectVersionId);
+	
+	/**
+	 * Gets the objects for object version.
+	 *
+	 * @param objectVersionId the object version id
+	 * @return the objects for object version
+	 */
+	public abstract SLEXMMObjectResultSet getObjectsForVersion(int objectVersionId);
+	
+	
+	/**
+	 * Gets the objects for object versions.
+	 *
+	 * @param objectVersionIds the object version ids
+	 * @return the objects for object versions
+	 * @deprecated call getObjectsForVersions instead
+	 */
+	public abstract SLEXMMObjectResultSet getObjectsForObjectVersions(int[] objectVersionIds);
 	
 	/**
 	 * Gets the objects for object versions.
@@ -855,7 +962,7 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	 * @param objectVersionIds the object version ids
 	 * @return the objects for object versions
 	 */
-	public abstract SLEXMMObjectResultSet getObjectsForObjectVersions(int[] objectVersionIds);
+	public abstract SLEXMMObjectResultSet getObjectsForVersions(int[] objectVersionIds);
 	
 	/**
 	 * Gets the objects for relationship.
@@ -1006,17 +1113,35 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	 *
 	 * @param objectVersionId the object version id
 	 * @return the cases for object version
+	 * @deprecated call getCasesForVersion instead
 	 */
 	public abstract SLEXMMCaseResultSet getCasesForObjectVersion(int objectVersionId);
+	
+	/**
+	 * Gets the cases for object version.
+	 *
+	 * @param objectVersionId the object version id
+	 * @return the cases for object version
+	 */
+	public abstract SLEXMMCaseResultSet getCasesForVersion(int objectVersionId);
 	
 	/**
 	 * Gets the cases for object versions.
 	 *
 	 * @param objectVersionIds the object version ids
 	 * @return the cases for object versions
+	 * @deprecated call getCasesForVersions instead
 	 */
 	public abstract SLEXMMCaseResultSet getCasesForObjectVersions(int[] objectVersionIds);
 
+	/**
+	 * Gets the cases for object versions.
+	 *
+	 * @param objectVersionIds the object version ids
+	 * @return the cases for object versions
+	 */
+	public abstract SLEXMMCaseResultSet getCasesForVersions(int[] objectVersionIds);
+	
 	/**
 	 * Gets the cases for relation.
 	 *
@@ -1150,8 +1275,26 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	 *
 	 * @param objectVersionId the object version id
 	 * @return the events for object version
+	 * @deprecated call getEventsForVersion instead
 	 */
 	public abstract SLEXMMEventResultSet getEventsForObjectVersion(int objectVersionId);
+	
+	/**
+	 * Gets the events for object version.
+	 *
+	 * @param objectVersionId the object version id
+	 * @return the events for object version
+	 */
+	public abstract SLEXMMEventResultSet getEventsForVersion(int objectVersionId);
+	
+	/**
+	 * Gets the events for object versions.
+	 *
+	 * @param objectVersionIds the object version ids
+	 * @return the events for object versions
+	 * @deprecated call getEventsForVersions instead
+	 */
+	public abstract SLEXMMEventResultSet getEventsForObjectVersions(int[] objectVersionIds);
 	
 	/**
 	 * Gets the events for object versions.
@@ -1159,7 +1302,7 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	 * @param objectVersionIds the object version ids
 	 * @return the events for object versions
 	 */
-	public abstract SLEXMMEventResultSet getEventsForObjectVersions(int[] objectVersionIds);
+	public abstract SLEXMMEventResultSet getEventsForVersions(int[] objectVersionIds);
 	
 	/**
 	 * Gets the events for relation.
@@ -1214,8 +1357,26 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	 *
 	 * @param objId the obj id
 	 * @return the object versions for object
+	 * @deprecated call getVersionsForObject instead
 	 */
 	public abstract SLEXMMObjectVersionResultSet getObjectVersionsForObject(int objId);
+	
+	/**
+	 * Gets the object versions for object.
+	 *
+	 * @param objId the obj id
+	 * @return the object versions for object
+	 */
+	public abstract SLEXMMObjectVersionResultSet getVersionsForObject(int objId);
+	
+	/**
+	 * Gets the object versions for objects.
+	 *
+	 * @param objIds the obj ids
+	 * @return the object versions for objects
+	 * @deprecated call getVersionsForObjects instead
+	 */
+	public abstract SLEXMMObjectVersionResultSet getObjectVersionsForObjects(int[] objIds);
 	
 	/**
 	 * Gets the object versions for objects.
@@ -1223,7 +1384,17 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	 * @param objIds the obj ids
 	 * @return the object versions for objects
 	 */
-	public abstract SLEXMMObjectVersionResultSet getObjectVersionsForObjects(int[] objIds);
+	public abstract SLEXMMObjectVersionResultSet getVersionsForObjects(int[] objIds);
+	
+	/**
+	 * Gets the object versions for event.
+	 *
+	 * @param eventId the event id
+	 * @return the object versions for event
+	 * @deprecated call getVersionsForEvent instead
+	 */
+	public abstract SLEXMMObjectVersionResultSet getObjectVersionsForEvent(
+			int eventId);
 	
 	/**
 	 * Gets the object versions for event.
@@ -1231,7 +1402,7 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	 * @param eventId the event id
 	 * @return the object versions for event
 	 */
-	public abstract SLEXMMObjectVersionResultSet getObjectVersionsForEvent(
+	public abstract SLEXMMObjectVersionResultSet getVersionsForEvent(
 			int eventId);
 	
 	/**
@@ -1239,8 +1410,18 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	 *
 	 * @param eventIds the event ids
 	 * @return the object versions for events
+	 * @deprecated call getVersionsForEvents instead
 	 */
 	public abstract SLEXMMObjectVersionResultSet getObjectVersionsForEvents(
+			int[] eventIds);
+	
+	/**
+	 * Gets the object versions for events.
+	 *
+	 * @param eventIds the event ids
+	 * @return the object versions for events
+	 */
+	public abstract SLEXMMObjectVersionResultSet getVersionsForEvents(
 			int[] eventIds);
 	
 	/**
@@ -1248,8 +1429,18 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	 *
 	 * @param activityId the activity id
 	 * @return the object versions for activity
+	 * @deprecated call getVersionsForActivity instead
 	 */
 	public abstract SLEXMMObjectVersionResultSet getObjectVersionsForActivity(
+			int activityId);
+	
+	/**
+	 * Gets the object versions for activity.
+	 *
+	 * @param activityId the activity id
+	 * @return the object versions for activity
+	 */
+	public abstract SLEXMMObjectVersionResultSet getVersionsForActivity(
 			int activityId);
 	
 	/**
@@ -1257,51 +1448,111 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	 *
 	 * @param activityIds the activity ids
 	 * @return the object versions for activities
+	 * @deprecated call getVersionsForActivities instead
 	 */
 	public abstract SLEXMMObjectVersionResultSet getObjectVersionsForActivities(
 			int[] activityIds);
 
+	/**
+	 * Gets the object versions for activities.
+	 *
+	 * @param activityIds the activity ids
+	 * @return the object versions for activities
+	 */
+	public abstract SLEXMMObjectVersionResultSet getVersionsForActivities(
+			int[] activityIds);
+	
+	/**
+	 * Gets the object versions for case.
+	 *
+	 * @param caseId the case id
+	 * @return the object versions for case
+	 * @deprecated call getVersionsForCase instead
+	 */
+	public abstract SLEXMMObjectVersionResultSet getObjectVersionsForCase(int caseId);
+	
 	/**
 	 * Gets the object versions for case.
 	 *
 	 * @param caseId the case id
 	 * @return the object versions for case
 	 */
-	public abstract SLEXMMObjectVersionResultSet getObjectVersionsForCase(int caseId);
+	public abstract SLEXMMObjectVersionResultSet getVersionsForCase(int caseId);
 	
 	/**
 	 * Gets the object versions for cases.
 	 *
 	 * @param caseIds the case ids
 	 * @return the object versions for cases
+	 * @deprecated call getVersionsForCases instead
 	 */
 	public abstract SLEXMMObjectVersionResultSet getObjectVersionsForCases(int[] caseIds);
 
+	/**
+	 * Gets the object versions for cases.
+	 *
+	 * @param caseIds the case ids
+	 * @return the object versions for cases
+	 */
+	public abstract SLEXMMObjectVersionResultSet getVersionsForCases(int[] caseIds);
+	
+	/**
+	 * Gets the object versions for class.
+	 *
+	 * @param classId the class id
+	 * @return the object versions for class
+	 * @deprecated call getVersionsForClass instead
+	 */
+	public abstract SLEXMMObjectVersionResultSet getObjectVersionsForClass(
+			int classId);
+	
 	/**
 	 * Gets the object versions for class.
 	 *
 	 * @param classId the class id
 	 * @return the object versions for class
 	 */
-	public abstract SLEXMMObjectVersionResultSet getObjectVersionsForClass(
+	public abstract SLEXMMObjectVersionResultSet getVersionsForClass(
 			int classId);
+	
 	
 	/**
 	 * Gets the object versions for classes.
 	 *
 	 * @param classIds the class ids
 	 * @return the object versions for classes
+	 * @deprecated call getVersionsForClasses instead
 	 */
 	public abstract SLEXMMObjectVersionResultSet getObjectVersionsForClasses(
 			int[] classIds);
 
+	/**
+	 * Gets the object versions for classes.
+	 *
+	 * @param classIds the class ids
+	 * @return the object versions for classes
+	 */
+	public abstract SLEXMMObjectVersionResultSet getVersionsForClasses(
+			int[] classIds);
+
+	
+	/**
+	 * Gets the object versions for relationship.
+	 *
+	 * @param relationshipId the relationship id
+	 * @return the object versions for relationship
+	 * @deprecated call getVersionsForRelationship instead
+	 */
+	public abstract SLEXMMObjectVersionResultSet getObjectVersionsForRelationship(
+			int relationshipId);
+	
 	/**
 	 * Gets the object versions for relationship.
 	 *
 	 * @param relationshipId the relationship id
 	 * @return the object versions for relationship
 	 */
-	public abstract SLEXMMObjectVersionResultSet getObjectVersionsForRelationship(
+	public abstract SLEXMMObjectVersionResultSet getVersionsForRelationship(
 			int relationshipId);
 	
 	/**
@@ -1309,8 +1560,18 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	 *
 	 * @param relationshipIds the relationship ids
 	 * @return the object versions for relationships
+	 * @deprecated call getVersionsForRelationships instead
 	 */
 	public abstract SLEXMMObjectVersionResultSet getObjectVersionsForRelationships(
+			int[] relationshipIds);
+	
+	/**
+	 * Gets the object versions for relationships.
+	 *
+	 * @param relationshipIds the relationship ids
+	 * @return the object versions for relationships
+	 */
+	public abstract SLEXMMObjectVersionResultSet getVersionsForRelationships(
 			int[] relationshipIds);
 
 	/**
@@ -1318,8 +1579,18 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	 *
 	 * @param relationId the relation id
 	 * @return the object versions for relation
+	 * @deprecated call getVersionsForRelation instead
 	 */
 	public abstract SLEXMMObjectVersionResultSet getObjectVersionsForRelation(
+			int relationId);
+	
+	/**
+	 * Gets the object versions for relation.
+	 *
+	 * @param relationId the relation id
+	 * @return the object versions for relation
+	 */
+	public abstract SLEXMMObjectVersionResultSet getVersionsForRelation(
 			int relationId);
 	
 	/**
@@ -1327,18 +1598,50 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	 *
 	 * @param relationIds the relation ids
 	 * @return the object versions for relations
+	 * @deprecated call getVersionsForRelations instead
 	 */
 	public abstract SLEXMMObjectVersionResultSet getObjectVersionsForRelations(
 			int[] relationIds);
 
+	/**
+	 * Gets the object versions for relations.
+	 *
+	 * @param relationIds the relation ids
+	 * @return the object versions for relations
+	 */
+	public abstract SLEXMMObjectVersionResultSet getVersionsForRelations(
+			int[] relationIds);
+
+	
+	/**
+	 * Gets the object versions for activity instance.
+	 *
+	 * @param activityInstanceId the activity instance id
+	 * @return the object versions for activity instance
+	 * @deprecated call getVersionsForActivityInstance instead
+	 */
+	public abstract SLEXMMObjectVersionResultSet getObjectVersionsForActivityInstance(
+			int activityInstanceId);
+	
 	/**
 	 * Gets the object versions for activity instance.
 	 *
 	 * @param activityInstanceId the activity instance id
 	 * @return the object versions for activity instance
 	 */
-	public abstract SLEXMMObjectVersionResultSet getObjectVersionsForActivityInstance(
+	public abstract SLEXMMObjectVersionResultSet getVersionsForActivityInstance(
 			int activityInstanceId);
+	
+	
+	/**
+	 * Gets the object versions for activity instances.
+	 *
+	 * @param activityInstanceIds the activity instance ids
+	 * @return the object versions for activity instances
+	 * @deprecated call getVersionsForActivityInstances instead
+	 */
+	public abstract SLEXMMObjectVersionResultSet getObjectVersionsForActivityInstances(
+			int[] activityInstanceIds);
 	
 	/**
 	 * Gets the object versions for activity instances.
@@ -1346,8 +1649,19 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	 * @param activityInstanceIds the activity instance ids
 	 * @return the object versions for activity instances
 	 */
-	public abstract SLEXMMObjectVersionResultSet getObjectVersionsForActivityInstances(
+	public abstract SLEXMMObjectVersionResultSet getVersionsForActivityInstances(
 			int[] activityInstanceIds);
+	
+	
+	/**
+	 * Gets the object versions for attribute.
+	 *
+	 * @param attributeId the attribute id
+	 * @return the object versions for attribute
+	 * @deprecated call getVersionsForAttribute instead
+	 */
+	public abstract SLEXMMObjectVersionResultSet getObjectVersionsForAttribute(
+			int attributeId);
 	
 	/**
 	 * Gets the object versions for attribute.
@@ -1355,18 +1669,30 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	 * @param attributeId the attribute id
 	 * @return the object versions for attribute
 	 */
-	public abstract SLEXMMObjectVersionResultSet getObjectVersionsForAttribute(
+	public abstract SLEXMMObjectVersionResultSet getVersionsForAttribute(
 			int attributeId);
+	
 	
 	/**
 	 * Gets the object versions for attributes.
 	 *
 	 * @param attributeIds the attribute ids
 	 * @return the object versions for attributes
+	 * @deprecated call getVersionsForAttributes instead
 	 */
 	public abstract SLEXMMObjectVersionResultSet getObjectVersionsForAttributes(
 			int[] attributeIds);
 
+	/**
+	 * Gets the object versions for attributes.
+	 *
+	 * @param attributeIds the attribute ids
+	 * @return the object versions for attributes
+	 */
+	public abstract SLEXMMObjectVersionResultSet getVersionsForAttributes(
+			int[] attributeIds);
+
+	
 	/**
 	 * Gets the activities for object.
 	 *
@@ -1452,17 +1778,37 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	 *
 	 * @param objectVersionId the object version id
 	 * @return the activities for object version
+	 * @deprecated call getActivitiesForVersion instead
 	 */
 	public abstract SLEXMMActivityResultSet getActivitiesForObjectVersion(int objectVersionId);
+	
+	/**
+	 * Gets the activities for object version.
+	 *
+	 * @param objectVersionId the object version id
+	 * @return the activities for object version
+	 */
+	public abstract SLEXMMActivityResultSet getActivitiesForVersion(int objectVersionId);
+	
 	
 	/**
 	 * Gets the activities for object versions.
 	 *
 	 * @param objectVersionIds the object version ids
 	 * @return the activities for object versions
+	 * @deprecated call getActivitiesForVersions instead
 	 */
 	public abstract SLEXMMActivityResultSet getActivitiesForObjectVersions(int[] objectVersionIds);
 
+	/**
+	 * Gets the activities for object versions.
+	 *
+	 * @param objectVersionIds the object version ids
+	 * @return the activities for object versions
+	 */
+	public abstract SLEXMMActivityResultSet getActivitiesForVersions(int[] objectVersionIds);
+
+	
 	/**
 	 * Gets the activities for relation.
 	 *
@@ -1598,17 +1944,35 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	 *
 	 * @param objectVersionId the object version id
 	 * @return the classes for object version
+	 * @deprecated call getClassesForVersion instead
 	 */
 	public abstract SLEXMMClassResultSet getClassesForObjectVersion(int objectVersionId);
+	
+	/**
+	 * Gets the classes for object version.
+	 *
+	 * @param objectVersionId the object version id
+	 * @return the classes for object version
+	 */
+	public abstract SLEXMMClassResultSet getClassesForVersion(int objectVersionId);
 	
 	/**
 	 * Gets the classes for object versions.
 	 *
 	 * @param objectVersionIds the object version ids
 	 * @return the classes for object versions
+	 * @deprecated call getClassesForVersions instead
 	 */
 	public abstract SLEXMMClassResultSet getClassesForObjectVersions(int[] objectVersionIds);
 
+	/**
+	 * Gets the classes for object versions.
+	 *
+	 * @param objectVersionIds the object version ids
+	 * @return the classes for object versions
+	 */
+	public abstract SLEXMMClassResultSet getClassesForVersions(int[] objectVersionIds);
+	
 	/**
 	 * Gets the classes for relation.
 	 *
@@ -1758,17 +2122,35 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	 *
 	 * @param objectVersionId the object version id
 	 * @return the relations for object version
+	 * @deprecated call getRelationsForVersion instead
 	 */
 	public abstract SLEXMMRelationResultSet getRelationsForObjectVersion(int objectVersionId);
+	
+	/**
+	 * Gets the relations for object version.
+	 *
+	 * @param objectVersionId the object version id
+	 * @return the relations for object version
+	 */
+	public abstract SLEXMMRelationResultSet getRelationsForVersion(int objectVersionId);
 	
 	/**
 	 * Gets the relations for object versions.
 	 *
 	 * @param objectVersionIds the object version ids
 	 * @return the relations for object versions
+	 * @deprecated call getRelationsForVersions instead
 	 */
 	public abstract SLEXMMRelationResultSet getRelationsForObjectVersions(int[] objectVersionIds);
 
+	/**
+	 * Gets the relations for object versions.
+	 *
+	 * @param objectVersionIds the object version ids
+	 * @return the relations for object versions
+	 */
+	public abstract SLEXMMRelationResultSet getRelationsForVersions(int[] objectVersionIds);
+	
 	/**
 	 * Gets the relations for activity instance.
 	 *
@@ -1890,8 +2272,18 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	 *
 	 * @param objectVersionId the object version id
 	 * @return the relationships for object version
+	 * @deprecated call getRelationshipsForVersion instead
 	 */
 	public abstract SLEXMMRelationshipResultSet getRelationshipsForObjectVersion(
+			int objectVersionId);
+	
+	/**
+	 * Gets the relationships for object version.
+	 *
+	 * @param objectVersionId the object version id
+	 * @return the relationships for object version
+	 */
+	public abstract SLEXMMRelationshipResultSet getRelationshipsForVersion(
 			int objectVersionId);
 	
 	/**
@@ -1899,10 +2291,21 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	 *
 	 * @param objectVersionIds the object version ids
 	 * @return the relationships for object versions
+	 * @deprecated call getRelationshipsForVersions instead
 	 */
 	public abstract SLEXMMRelationshipResultSet getRelationshipsForObjectVersions(
 			int[] objectVersionIds);
 
+	/**
+	 * Gets the relationships for object versions.
+	 *
+	 * @param objectVersionIds the object version ids
+	 * @return the relationships for object versions
+	 */
+	public abstract SLEXMMRelationshipResultSet getRelationshipsForVersions(
+			int[] objectVersionIds);
+
+	
 	/**
 	 * Gets the relationships for relation.
 	 *
@@ -2070,19 +2473,41 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	 *
 	 * @param objectVersionId the object version id
 	 * @return the activity instances for object version
+	 * @deprecated call getActivityInstancesForVersion instead
 	 */
 	public abstract SLEXMMActivityInstanceResultSet getActivityInstancesForObjectVersion(
 			int objectVersionId);
+
+	/**
+	 * Gets the activity instances for object version.
+	 *
+	 * @param objectVersionId the object version id
+	 * @return the activity instances for object version
+	 */
+	public abstract SLEXMMActivityInstanceResultSet getActivityInstancesForVersion(
+			int objectVersionId);
+	
 	
 	/**
 	 * Gets the activity instances for object versions.
 	 *
 	 * @param objectVersionIds the object version ids
 	 * @return the activity instances for object versions
+	 * @deprecated call getActivityInstancesForVersions instead
 	 */
 	public abstract SLEXMMActivityInstanceResultSet getActivityInstancesForObjectVersions(
 			int[] objectVersionIds);
 
+	/**
+	 * Gets the activity instances for object versions.
+	 *
+	 * @param objectVersionIds the object version ids
+	 * @return the activity instances for object versions
+	 */
+	public abstract SLEXMMActivityInstanceResultSet getActivityInstancesForVersions(
+			int[] objectVersionIds);
+
+	
 	/**
 	 * Gets the activity instances for relation.
 	 *
@@ -2222,19 +2647,41 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 	 *
 	 * @param objectVersionId the object version id
 	 * @return the attributes for object version
+	 * @deprecated call getAttributesForVersion instead
 	 */
 	public abstract SLEXMMAttributeResultSet getAttributesForObjectVersion(
 			int objectVersionId);
+
+	/**
+	 * Gets the attributes for object version.
+	 *
+	 * @param objectVersionId the object version id
+	 * @return the attributes for object version
+	 */
+	public abstract SLEXMMAttributeResultSet getAttributesForVersion(
+			int objectVersionId);
+	
 	
 	/**
 	 * Gets the attributes for object versions.
 	 *
 	 * @param objectVersionIds the object version ids
 	 * @return the attributes for object versions
+	 * @deprecated call getAttributesForVersions instead
 	 */
 	public abstract SLEXMMAttributeResultSet getAttributesForObjectVersions(
 			int[] objectVersionIds);
 
+	/**
+	 * Gets the attributes for object versions.
+	 *
+	 * @param objectVersionIds the object version ids
+	 * @return the attributes for object versions
+	 */
+	public abstract SLEXMMAttributeResultSet getAttributesForVersions(
+			int[] objectVersionIds);
+
+	
 	/**
 	 * Gets the attributes for relation.
 	 *
@@ -2427,7 +2874,10 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 
 	public abstract SLEXMMDataModelResultSet getDatamodelsForRelationships(int[] is);
 
+	@Deprecated
 	public abstract SLEXMMDataModelResultSet getDatamodelsForObjectVersions(int[] is);
+
+	public abstract SLEXMMDataModelResultSet getDatamodelsForVersions(int[] is);
 
 	public abstract SLEXMMDataModelResultSet getDatamodelsForRelations(int[] is);
 
@@ -2451,7 +2901,10 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 
 	public abstract SLEXMMProcessResultSet getProcessesForRelationships(int[] is);
 
+	@Deprecated
 	public abstract SLEXMMProcessResultSet getProcessesForObjectVersions(int[] is);
+	
+	public abstract SLEXMMProcessResultSet getProcessesForVersions(int[] is);
 
 	public abstract SLEXMMProcessResultSet getProcessesForRelations(int[] is);
 
@@ -2475,8 +2928,11 @@ public interface SLEXMMStorageMetaModel extends SLEXMMStorage {
 
 	public abstract SLEXMMLogResultSet getLogsForRelationships(int[] is);
 
+	@Deprecated
 	public abstract SLEXMMLogResultSet getLogsForObjectVersions(int[] is);
 
+	public abstract SLEXMMLogResultSet getLogsForVersions(int[] is);
+	
 	public abstract SLEXMMLogResultSet getLogsForRelations(int[] is);
 
 	public abstract SLEXMMLogResultSet getLogsForActivityInstances(int[] is);

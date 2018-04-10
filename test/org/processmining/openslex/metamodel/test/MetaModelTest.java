@@ -2,13 +2,15 @@ package org.processmining.openslex.metamodel.test;
 
 import static org.junit.Assert.*;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Vector;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.junit.AfterClass;
@@ -48,20 +50,74 @@ public class MetaModelTest {
 		}
 	}
 	
+	public static final List<String> listTypesFrom = new ArrayList<String>()
+	{{
+		add("Datamodels");
+		add("Attributes");
+		add("Relationships");
+		add("Relations");
+		add("Objects");
+		add("Versions");
+		add("Events");
+		add("Cases");
+		add("Logs");
+		add("Processes");
+		add("Activities");
+		add("ActivityInstances");
+	}};
+	
+	public static final List<String> listTypesFor = new ArrayList<String>()
+	{{
+		add("Datamodels");
+		add("Attributes");
+		add("Relationships");
+		add("Relations");
+		add("Objects");
+		add("Versions");
+		add("Events");
+		add("Cases");
+		add("Logs");
+		add("Periods");
+		add("Processes");
+		add("Activities");
+		add("ActivityInstances");
+	}};
+	
 	@Test
-	public void getThings() throws Exception {
-    	check(mm.getEvents());
-    	check(mm.getObjects());
-    	check(mm.getObjectVersions());
-    	check(mm.getActivities());
-    	check(mm.getProcesses());
-    	check(mm.getClasses());
-    	check(mm.getAttributes());
-    	check(mm.getRelationships());
-    	check(mm.getRelations());
-    	check(mm.getActivityInstances());
-    	check(mm.getCases());
-    	check(mm.getLogs());
+	public void getThingsOfThings() throws Exception {
+		for (String t: listTypesFrom) {
+			getThingsOf(t);
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void getThingsOf(String elname) throws Exception {
+		Method methodGet = SLEXMMStorageMetaModel.class.getMethod("get"+elname);
+		AbstractDBElement dbe = null;
+		
+		if (List.class.isAssignableFrom(methodGet.getReturnType())) {
+			Vector<AbstractDBElement> v = (Vector<AbstractDBElement>) methodGet.invoke(mm);
+			dbe = v.get(0);
+		} else if (AbstractRSetElement.class.isAssignableFrom(methodGet.getReturnType())) {
+			AbstractRSetElement<? extends AbstractDBElement> rset = 
+					(AbstractRSetElement<? extends AbstractDBElement>) methodGet.invoke(mm);
+			dbe = (AbstractDBElement) rset.getNext();
+		} else {
+			throw new Exception("Unknown return type: "+methodGet.getReturnType());
+		}
+		
+		int[] ids = new int[] {dbe.getId()};
+		for (String t: listTypesFor) {
+			if (!t.equals(elname)) {
+				Method m = SLEXMMStorageMetaModel.class.getMethod("get"+t+"For"+elname, int[].class);
+				Object res = m.invoke(mm, ids);
+				if (res instanceof AbstractRSetElement) {
+					check((AbstractRSetElement<?>) res);
+				} else if (res instanceof List){
+					check((List<?>) res);
+				}
+			}
+		}
 	}
 	
 	@Test

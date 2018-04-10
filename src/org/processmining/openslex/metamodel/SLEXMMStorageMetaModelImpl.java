@@ -5752,5 +5752,245 @@ public class SLEXMMStorageMetaModelImpl implements SLEXMMStorageMetaModel {
 		String code = createCodeElementsOf(from, to, id);
 		elementOfRepo.put(code, ids);
 	}
+
+	@Override
+	public SLEXMMDataModel createDatamodel(String name) {
+		return createDataModel(name);
+	}
+
+	@Override
+	public SLEXMMDataModelResultSet getDatamodels() {
+		return getDataModels();
+	}
+
+	@Override
+	public HashMap<SLEXMMAttribute, SLEXMMAttributeValue> getAttributeValuesForVersion(SLEXMMObjectVersion objv) {
+		return getAttributeValuesForObjectVersion(objv);
+	}
+
+	@Override
+	public HashMap<SLEXMMAttribute, SLEXMMAttributeValue> getAttributeValuesForVersion(int objvId) {
+		return getAttributeValuesForObjectVersion(objvId);
+	}
+
+	@Override
+	public SLEXMMObjectVersionResultSet getVersions() {
+		return getObjectVersions();
+	}
+
+	@Override
+	public SLEXMMObjectVersionResultSet getVersionsRelatedToVersion(SLEXMMObjectVersion ob) {
+		return getVersionsRelatedToObjectVersion(ob);
+	}
+
+	@Override
+	public SLEXMMObjectVersionResultSet getVersionsRelatedToVersions(int[] verIds) {
+		return getVersionsRelatedToObjectVersions(verIds);
+	}
+
+	@Override
+	public boolean addEventToVersion(SLEXMMObjectVersion ov, SLEXMMEvent ev, String label) {
+		return addEventToObjectVersion(ov,ev,label);
+	}
+
+	@Override
+	public boolean addEventToVersion(int ovId, int evId, String label) {
+		return addEventToObjectVersion(ovId,evId,label);
+	}
+
+	@Override
+	public SLEXMMObjectResultSet getObjectsForVersion(int objectVersionId) {
+		return getObjectsForObjectVersion(objectVersionId);
+	}
+
+	@Override
+	public SLEXMMObjectResultSet getObjectsForVersions(int[] objectVersionIds) {
+		return getObjectsForObjectVersions(objectVersionIds);
+	}
+
+	@Override
+	public SLEXMMCaseResultSet getCasesForVersion(int objectVersionId) {
+		return getCasesForObjectVersion(objectVersionId);
+	}
+
+	@Override
+	public SLEXMMCaseResultSet getCasesForVersions(int[] objectVersionIds) {
+		return getCasesForObjectVersions(objectVersionIds);
+	}
+
+	@Override
+	public SLEXMMEventResultSet getEventsForVersion(int objectVersionId) {
+		return getEventsForObjectVersion(objectVersionId);
+	}
+
+	@Override
+	public SLEXMMEventResultSet getEventsForVersions(int[] objectVersionIds) {
+		return getEventsForObjectVersions(objectVersionIds);
+	}
+
+	@Override
+	public SLEXMMObjectVersionResultSet getVersionsForObject(int objId) {
+		return getObjectVersionsForObject(objId);
+	}
+
+	@Override
+	public SLEXMMObjectVersionResultSet getVersionsForObjects(int[] objIds) {
+		return getObjectVersionsForObjects(objIds);
+	}
+
+	@Override
+	public SLEXMMObjectVersionResultSet getVersionsForEvent(int eventId) {
+		return getObjectVersionsForEvent(eventId);
+	}
+
+	@Override
+	public SLEXMMObjectVersionResultSet getVersionsForEvents(int[] eventIds) {
+		return getObjectVersionsForEvents(eventIds);
+	}
+
+	@Override
+	public SLEXMMObjectVersionResultSet getVersionsForActivity(int activityId) {
+		return getObjectVersionsForActivity(activityId);
+	}
+
+	@Override
+	public SLEXMMObjectVersionResultSet getVersionsForActivities(int[] activityIds) {
+		return getObjectVersionsForActivities(activityIds);
+	}
+
+	@Override
+	public SLEXMMObjectVersionResultSet getVersionsForCase(int caseId) {
+		return getObjectVersionsForCase(caseId);
+	}
+
+	@Override
+	public SLEXMMObjectVersionResultSet getVersionsForCases(int[] caseIds) {
+		return getObjectVersionsForCases(caseIds);
+	}
+
+	@Override
+	public SLEXMMObjectVersionResultSet getVersionsForClass(int classId) {
+		return getObjectVersionsForClass(classId);
+	}
+
+	@Override
+	public SLEXMMObjectVersionResultSet getVersionsForClasses(int[] classIds) {
+		return getObjectVersionsForClasses(classIds);
+	}
+
+	@Override
+	public SLEXMMObjectVersionResultSet getVersionsForRelationship(int relationshipId) {
+		return getObjectVersionsForRelationship(relationshipId);
+	}
+
+	@Override
+	public SLEXMMObjectVersionResultSet getVersionsForRelationships(int[] relationshipIds) {
+		return getObjectVersionsForRelationships(relationshipIds);
+	}
+
+	@Override
+	public SLEXMMObjectVersionResultSet getVersionsForRelation(int relationId) {
+		return getObjectVersionsForRelation(relationId);
+	}
+
+	@Override
+	public SLEXMMObjectVersionResultSet getVersionsForRelations(int[] relationIds) {
+		return getObjectVersionsForRelations(relationIds);
+	}
+
+	@Override
+	public SLEXMMObjectVersionResultSet getVersionsForActivityInstance(int activityInstanceId) {
+		return getObjectVersionsForActivityInstance(activityInstanceId);
+	}
+
+	@Override
+	public SLEXMMObjectVersionResultSet getVersionsForActivityInstances(int[] activityInstanceIds) {
+		return getObjectVersionsForActivityInstances(activityInstanceIds);
+	}
+
+	@Override
+	public SLEXMMObjectVersionResultSet getVersionsForAttribute(int attributeId) {
+		return getObjectVersionsForAttribute(attributeId);
+	}
+
+	@Override
+	public SLEXMMObjectVersionResultSet getVersionsForAttributes(int[] attributeIds) {
+		return getObjectVersionsForAttributes(attributeIds);
+	}
+
+	@Override
+	public SLEXMMActivityResultSet getActivitiesForVersion(int objectVersionId) {
+		return getActivitiesForObjectVersion(objectVersionId);
+	}
+
+	@Override
+	public SLEXMMActivityResultSet getActivitiesForVersions(int[] objectVersionIds) {
+		return getActivitiesForObjectVersions(objectVersionIds);
+	}
+
+	@Override
+	public SLEXMMClassResultSet getClassesForVersion(int objectVersionId) {
+		return getClassesForObjectVersion(objectVersionId);
+	}
+
+	@Override
+	public SLEXMMClassResultSet getClassesForVersions(int[] objectVersionIds) {
+		return getClassesForObjectVersions(objectVersionIds);
+	}
+
+	@Override
+	public SLEXMMRelationResultSet getRelationsForVersion(int objectVersionId) {
+		return getRelationsForObjectVersion(objectVersionId);
+	}
+
+	@Override
+	public SLEXMMRelationResultSet getRelationsForVersions(int[] objectVersionIds) {
+		return getRelationsForObjectVersions(objectVersionIds);
+	}
+
+	@Override
+	public SLEXMMRelationshipResultSet getRelationshipsForVersion(int objectVersionId) {
+		return getRelationshipsForObjectVersion(objectVersionId);
+	}
+
+	@Override
+	public SLEXMMRelationshipResultSet getRelationshipsForVersions(int[] objectVersionIds) {
+		return getRelationshipsForObjectVersions(objectVersionIds);
+	}
+
+	@Override
+	public SLEXMMActivityInstanceResultSet getActivityInstancesForVersion(int objectVersionId) {
+		return getActivityInstancesForObjectVersion(objectVersionId);
+	}
+
+	@Override
+	public SLEXMMActivityInstanceResultSet getActivityInstancesForVersions(int[] objectVersionIds) {
+		return getActivityInstancesForObjectVersions(objectVersionIds);
+	}
+
+	@Override
+	public SLEXMMAttributeResultSet getAttributesForVersion(int objectVersionId) {
+		return getAttributesForObjectVersion(objectVersionId);
+	}
+
+	@Override
+	public SLEXMMAttributeResultSet getAttributesForVersions(int[] objectVersionIds) {
+		return getAttributesForObjectVersions(objectVersionIds);
+	}
+
+	@Override
+	public SLEXMMProcessResultSet getProcessesForVersions(int[] is) {
+		return getProcessesForObjectVersions(is);
+	}
+
+	@Override
+	public SLEXMMLogResultSet getLogsForVersions(int[] is) {
+		return getLogsForObjectVersions(is);
+	}
+
+	@Override
+	public SLEXMMDataModelResultSet getDatamodelsForVersions(int[] is) {
+		return getDatamodelsForObjectVersions(is);
+	}
 	
 }
