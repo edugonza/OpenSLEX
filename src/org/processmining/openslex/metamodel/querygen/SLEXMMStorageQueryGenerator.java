@@ -213,6 +213,18 @@ public class SLEXMMStorageQueryGenerator {
 					SLEXMMTables.T_CASE_TO_LOG,
 					SLEXMMTables.T_LOG);
 			
+			addPresetPath(SLEXMMTables.T_CLASS, SLEXMMTables.T_LOG,
+					SLEXMMTables.T_CLASS,
+					SLEXMMTables.T_OBJECT,
+					SLEXMMTables.T_OBJECT_VERSION,
+					SLEXMMTables.T_EVENT_TO_OBJECT_VERSION,
+					SLEXMMTables.T_EVENT,
+					SLEXMMTables.T_ACTIVITY_INSTANCE,
+					SLEXMMTables.T_ACTIVITY_INSTANCE_TO_CASE,
+					SLEXMMTables.T_CASE,
+					SLEXMMTables.T_CASE_TO_LOG,
+					SLEXMMTables.T_LOG);
+			
 			addPresetPath(SLEXMMTables.T_RELATIONSHIP, SLEXMMTables.T_LOG,
 					SLEXMMTables.T_RELATIONSHIP,
 					SLEXMMTables.T_RELATION,
@@ -427,11 +439,11 @@ public class SLEXMMStorageQueryGenerator {
 		String idsStr = null; 
 		
 		if (ids != null) {
-			idsStr = getBetweens("t"+i+".id",ids);
-			strbldr.append(" ");
-			strbldr.append(idsStr);
-			//idsStr = SLEXMMStorageMetaModelImpl.buildStringFromArray(ids);
-			//strbldr.append(" t"+i+".id IN ("+idsStr+")");
+//			idsStr = getBetweens("t"+i+".id",ids);
+//			strbldr.append(" ");
+//			strbldr.append(idsStr);
+			idsStr = SLEXMMStorageMetaModelImpl.buildStringFromArray(ids);
+			strbldr.append(" t"+i+".id IN ("+idsStr+")");
 		} else {
 			strbldr.append(" 1 ");
 		}
